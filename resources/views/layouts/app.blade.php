@@ -112,4 +112,10 @@
 
     <footer class="footer mt-auto py-3 bg-white border-top">
         <div class="container text-center">
-            <span class="text-muted">&copy; {{ date('Y') }} Reservasi Ruangan. Dibuat dengan &hearts;.
+            <span class="text-muted">&copy; {{ date('Y') }} Reservasi Ruangan.</span>
+        </div>
+    </footer>
+
+    @yield('scripts')
+</body>
+</html>
