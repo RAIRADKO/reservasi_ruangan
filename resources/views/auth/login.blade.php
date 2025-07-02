@@ -14,7 +14,7 @@
                     @csrf
 
                     <div class="mb-3">
-                        <label for="identifier" class="form-label">{{ __('NIP / Username Admin') }}</label>
+                        <label for="identifier" class="form-label">{{ __('NIP') }}</label>
                         <input id="identifier" type="text" class="form-control @error('identifier') is-invalid @enderror" name="identifier" value="{{ old('identifier') }}" required autocomplete="identifier" autofocus>
                         
                         @error('identifier')
