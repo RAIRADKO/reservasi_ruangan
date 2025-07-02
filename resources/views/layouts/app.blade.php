@@ -117,8 +117,8 @@
         </div>
     </footer>
 
-    {{-- ✅ Tambahkan Bootstrap JS + Popper.js --}}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {{-- ✅ Bootstrap JS sekarang dimuat melalui Vite, jadi baris di bawah ini dihapus --}}
+    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> --}}
 
     @yield('scripts')
 </body>

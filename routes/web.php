@@ -60,7 +60,7 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-    Route::get('/reservations', [AdminController::class, 'reservations'])->name('reservations');
+    Route::get('/reservations', [AdminController::class, 'reservations'])->name('reservations.index');    
     
     Route::put('/reservations/{reservation}/update-status', [AdminController::class, 'updateStatus'])->name('reservations.update-status');
     Route::delete('/reservations/{reservation}', [AdminController::class, 'destroy'])->name('reservations.destroy');

@@ -75,7 +75,7 @@
                 </li>
                 <li class="sidebar-heading mt-2"><span>Manajemen</span></li>
                 <li>
-                    <a href="{{ route('admin.reservations') }}" class="nav-link {{ request()->routeIs('admin.reservations') ? 'active' : '' }}">
+                    <a href="{{ route('admin.reservations.index') }}" class="nav-link {{ request()->routeIs('admin.reservations.index') ? 'active' : '' }}">
                         <i class="bi bi-calendar-event"></i>
                         Reservasi
                     </a>
@@ -95,13 +95,13 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
                     <li>
-                        <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            <i class="bi bi-box-arrow-right me-2"></i>Logout
-                        </a>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                        <form action="{{ route('logout') }}" method="POST">
                             @csrf
+                            <button type="submit" class="dropdown-item">
+                                <i class="bi bi-box-arrow-right me-2"></i>Logout
+                            </button>
                         </form>
-                    </li>
+                    </li>               
                 </ul>
             </div>
         </div>
@@ -137,7 +137,8 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {{-- ✅ Bootstrap JS sekarang dimuat melalui Vite, jadi baris di bawah ini dihapus --}}
+    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> --}}
     @yield('scripts')
 </body>
 </html>
