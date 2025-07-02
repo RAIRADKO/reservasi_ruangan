@@ -10,53 +10,61 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Hapus baris Route::middleware('web')->group(function () {
+// ==========================
+// Halaman Utama (Publik)
+// ==========================
 
-    // Halaman Utama
-    Route::get('/', [RoomController::class, 'index'])->name('home');
-    Route::get('/reservations/date/{date}', [RoomController::class, 'showReservationsByDate'])
-        ->name('reservations.date');
+Route::get('/', [RoomController::class, 'index'])->name('home');
+Route::get('/reservations/date/{date}', [RoomController::class, 'showReservationsByDate'])->name('reservations.date');
 
-    // --- Autentikasi (Satu form untuk User & Admin) ---
-    Route::middleware('guest')->group(function () {
-        Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-        Route::post('/login', [LoginController::class, 'login']);
+// ==========================
+// Autentikasi (Login/Register)
+// ==========================
 
-        Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-        Route::post('/register', [RegisterController::class, 'register']);
-    });
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
 
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [RegisterController::class, 'register']);
+});
 
-    // Reset Password (Hanya untuk User)
-    Route::get('/password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-    Route::post('/password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-    Route::get('/password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-    Route::post('/password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+// ==========================
+// Reset Password (Untuk User)
+// ==========================
 
-    // --- Route untuk User yang Sudah Login ---
-    Route::middleware(['auth'])->group(function () {
-        Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
-        Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
-        Route::get('/reservations/success', [ReservationController::class, 'success'])->name('reservations.success');
-        
-        Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
-        Route::get('/my-reservations', [UserController::class, 'reservations'])->name('user.reservations');
-        Route::patch('/reservations/{id}/cancel', [UserController::class, 'cancelReservation'])->name('user.reservations.cancel');
-    });
+Route::get('/password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
 
+// ==========================
+// Route Untuk User Login
+// ==========================
 
-    // --- Admin Routes ---
-    Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
-        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-        Route::get('/reservations', [AdminController::class, 'reservations'])->name('reservations');
-        // Menggunakan PUT untuk update status
-        Route::put('/reservations/{reservation}/update-status', [AdminController::class, 'updateStatus'])->name('reservations.update-status');
-        Route::delete('/reservations/{reservation}', [AdminController::class, 'destroy'])->name('reservations.destroy');
-        Route::get('/room/edit', [AdminController::class, 'editRoom'])->name('room.edit');
-        // Menggunakan PUT untuk update ruangan
-        Route::put('/room/update', [AdminController::class, 'updateRoom'])->name('room.update');
-    });
+Route::middleware('auth')->group(function () {
+    Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
+    Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
+    Route::get('/reservations/success', [ReservationController::class, 'success'])->name('reservations.success');
 
-// Hapus baris }); penutup
+    Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
+    Route::get('/my-reservations', [UserController::class, 'reservations'])->name('user.reservations');
+    Route::patch('/reservations/{id}/cancel', [UserController::class, 'cancelReservation'])->name('user.reservations.cancel');
+});
+
+// ==========================
+// Route Untuk Admin
+// ==========================
+
+Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/reservations', [AdminController::class, 'reservations'])->name('reservations');
+    
+    Route::put('/reservations/{reservation}/update-status', [AdminController::class, 'updateStatus'])->name('reservations.update-status');
+    Route::delete('/reservations/{reservation}', [AdminController::class, 'destroy'])->name('reservations.destroy');
+
+    Route::get('/room/edit', [AdminController::class, 'editRoom'])->name('room.edit');
+    Route::put('/room/update', [AdminController::class, 'updateRoom'])->name('room.update');
+});

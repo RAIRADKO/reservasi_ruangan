@@ -1,62 +1,43 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
     public function showLoginForm()
     {
-        return view('auth.login');
+        return view('auth.login'); // Pastikan file view-nya bernama login.blade.php di resources/views/auth
     }
 
-    /**
-     * Menangani permintaan login untuk User dan Admin.
-     */
     public function login(Request $request)
     {
-        $request->validate([
-            'identifier' => 'required|string',
-            'password' => 'required|string',
+        // Validasi form input
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
         ]);
 
-        $remember = $request->boolean('remember');
-
-        // Atur agar sesi berakhir saat browser ditutup jika "remember me" tidak dicentang
-        config(['session.expire_on_close' => !$remember]);
-
-        // Coba login sebagai Admin terlebih dahulu
-        if (Auth::guard('admin')->attempt(['username' => $request->identifier, 'password' => $request->password], $remember)) {
-            $request->session()->regenerate();
-            return redirect()->intended(route('admin.dashboard'));
+        // Coba login dengan Auth::attempt()
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate(); // Wajib: mencegah session fixation
+            return redirect()->intended('/');  // Redirect ke halaman utama atau terakhir dikunjungi
         }
 
-        // Coba login sebagai User (dengan NIP)
-        if (Auth::guard('web')->attempt(['nip' => $request->identifier, 'password' => $request->password], $remember)) {
-            $request->session()->regenerate();
-            return redirect()->intended(route('home'));
-        }
-
-        // Jika keduanya gagal, kembalikan error
-        throw ValidationException::withMessages([
-            'identifier' => [trans('auth.failed')],
-        ]);
+        // Jika gagal login
+        return back()->withErrors([
+            'email' => 'Email atau password salah.',
+        ])->withInput();
     }
 
-    /**
-     * Menangani permintaan logout.
-     */
     public function logout(Request $request)
     {
-        Auth::guard('web')->logout();
-        Auth::guard('admin')->logout();
+        Auth::logout(); // Hapus login user
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $request->session()->invalidate();     // Kosongkan session
+        $request->session()->regenerateToken(); // Regenerasi CSRF token
 
         return redirect('/');
     }

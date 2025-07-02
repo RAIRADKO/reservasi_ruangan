@@ -77,7 +77,7 @@
                         <li class="nav-item">
                             <a href="{{ route('register') }}" class="btn btn-primary btn-sm ms-2">Register</a>
                         </li>
-                    @endauth {{-- <-- DIUBAH MENJADI @endauth --}}
+                    @endauth
                 </ul>
             </div>
         </div>
@@ -116,6 +116,9 @@
             <span class="text-muted">&copy; {{ date('Y') }} Reservasi Ruangan.</span>
         </div>
     </footer>
+
+    {{-- ✅ Tambahkan Bootstrap JS + Popper.js --}}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     @yield('scripts')
 </body>
