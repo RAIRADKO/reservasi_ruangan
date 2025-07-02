@@ -2,16 +2,19 @@
 
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-md-4">
+    <div class="col-md-5">
         <div class="card">
-            <div class="card-header">{{ __('Login') }}</div>
-
-            <div class="card-body">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <h4 class="card-title">{{ __('Login') }}</h4>
+                    <p class="text-muted">Masuk untuk melanjutkan ke aplikasi</p>
+                </div>
+                
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
 
                     <div class="mb-3">
-                        <label for="identifier" class="form-label">{{ __('NIP') }}</label>
+                        <label for="identifier" class="form-label">{{ __('NIP / Username Admin') }}</label>
                         <input id="identifier" type="text" class="form-control @error('identifier') is-invalid @enderror" name="identifier" value="{{ old('identifier') }}" required autocomplete="identifier" autofocus>
                         
                         @error('identifier')
@@ -32,12 +35,20 @@
                         @enderror
                     </div>
 
-                    <div class="mb-3 form-check">
-                        <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                        <label class="form-check-label" for="remember">
-                            {{ __('Remember Me') }}
-                        </label>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="remember">
+                                {{ __('Remember Me') }}
+                            </label>
+                        </div>
+                        @if (Route::has('password.request'))
+                            <a class="btn-link small" href="{{ route('password.request') }}">
+                                {{ __('Lupa Password?') }}
+                            </a>
+                        @endif
                     </div>
+
 
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary">
@@ -45,12 +56,8 @@
                         </button>
                     </div>
 
-                    <div class="mt-3 text-center">
-                        @if (Route::has('password.request'))
-                            <a class="btn btn-link" href="{{ route('password.request') }}">
-                                {{ __('Lupa Password Anda?') }}
-                            </a>
-                        @endif
+                    <div class="mt-4 text-center">
+                       <p class="text-muted">Belum punya akun? <a href="{{ route('register') }}">Daftar di sini</a></p>
                     </div>
                 </form>
             </div>

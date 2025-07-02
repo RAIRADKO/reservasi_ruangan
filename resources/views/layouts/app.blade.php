@@ -5,43 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Reservasi Ruangan')</title>
 
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
     @yield('styles')
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+        }
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .navbar {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+    </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
-    <header class="p-3 bg-dark text-white shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
         <div class="container">
-            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                <a href="{{ route('home') }}" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                    <i class="bi bi-calendar-week fs-4 me-2"></i>
-                    <span class="fs-4">Reservasi Ruangan</span>
-                </a>
-                <div class="ms-auto text-end">
-                    @auth
-                        <div class="dropdown">
-                            <a href="#" class="d-block link-light text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-person-circle"></i> {{ Auth::user()->name }}
+            <a class="navbar-brand fw-bold" href="{{ route('home') }}">
+                <i class="bi bi-calendar-week-fill me-2 text-primary"></i>
+                Reservasi Ruangan
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    @auth('web')
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('home') }}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('user.reservations') }}">Reservasi Saya</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle me-1"></i> {{ Auth::user()->name }}
                             </a>
-                            <ul class="dropdown-menu text-small dropdown-menu-end">
-                                <li><a class="dropdown-item" href="{{ route('user.profile') }}">Profil Saya</a></li>
-                                <li><a class="dropdown-item" href="{{ route('user.reservations') }}">Reservasi Saya</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{{ route('user.profile') }}">Profil</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <form method="POST" action="{{ route('logout') }}">
+                                    <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        Logout
+                                    </a>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                         @csrf
-                                        <button type="submit" class="dropdown-item">Logout</button>
                                     </form>
                                 </li>
                             </ul>
-                        </div>
-                    @else
-                        <a href="{{ route('login') }}" class="btn btn-outline-light me-2">Login</a>
-                        <a href="{{ route('register') }}" class="btn btn-primary">Daftar</a>
+                        </li>
                     @endauth
-                </div>
+                    @guest
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('register') }}" class="btn btn-primary btn-sm ms-2">Register</a>
+                        </li>
+                    @endguest
+                </ul>
             </div>
         </div>
-    </header>
+    </nav>
 
     <main class="py-4 flex-grow-1">
         <div class="container">
@@ -53,10 +92,11 @@
             @endif
             @if(session('error') || $errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Oops!</strong>
                     @if(session('error'))
                         {{ session('error') }}
                     @else
-                        <ul class="mb-0">
+                        <ul class="mb-0 mt-2">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
@@ -65,16 +105,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
+            
             @yield('content')
         </div>
     </main>
 
-    <footer class="footer mt-auto py-3 bg-light border-top">
+    <footer class="footer mt-auto py-3 bg-white border-top">
         <div class="container text-center">
-            <span class="text-muted">&copy; {{ date('Y') }} Reservasi Ruangan.</span>
-        </div>
-    </footer>
-
-    @yield('scripts')
-</body>
-</html>
+            <span class="text-muted">&copy; {{ date('Y') }} Reservasi Ruangan. Dibuat dengan &hearts;.
