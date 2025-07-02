@@ -22,9 +22,15 @@
                 <form action="{{ route('login') }}" method="POST">
                     @csrf
 
+                    {{-- Bagian ini diubah dari email menjadi NIP --}}
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" name="email" id="email" required value="{{ old('email') }}">
+                        <label for="nip" class="form-label">NIP</label>
+                        <input type="text" class="form-control @error('nip') is-invalid @enderror" name="nip" id="nip" required value="{{ old('nip') }}" autofocus>
+                        @error('nip')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
