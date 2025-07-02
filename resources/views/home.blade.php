@@ -12,7 +12,7 @@
             <div class="card-body">
                 <div class="row g-4">
                     <div class="col-md-5">
-                        <img src="{{ $room->foto_url }}" class="img-fluid rounded shadow-sm" alt="{{ $room->nama_ruangan }}">
+                        <img src="{{ asset('img/Lambang_Kabupaten_Purworejo.png') }}" class="img-fluid rounded" alt="{{ $room->nama_ruangan }}">
                     </div>
                     <div class="col-md-7">
                         <h4 class="card-title fw-bold">{{ $room->nama_ruangan }}</h4>
