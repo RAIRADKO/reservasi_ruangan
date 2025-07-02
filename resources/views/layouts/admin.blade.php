@@ -95,7 +95,7 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
                     <li>
-                        <form action="{{ route('logout') }}" method="POST">
+                        <form action="{{ route('admin.logout') }}" method="POST">
                             @csrf
                             <button type="submit" class="dropdown-item">
                                 <i class="bi bi-box-arrow-right me-2"></i>Logout
@@ -107,32 +107,29 @@
         </div>
 
         <div class="content">
-             @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show">
+            {{-- MENYAMAKAN BLOK NOTIFIKASI SEPERTI DI app.blade.php --}}
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
-            
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show">
-                    {{ session('error') }}
+            @if(session('error') || $errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Oops!</strong>
+                    @if(session('error'))
+                        {{ session('error') }}
+                    @else
+                        <ul class="mb-0 mt-2">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
             
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show">
-                    <strong>Oops! Terjadi kesalahan:</strong>
-                    <ul class="mb-0 mt-2">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
             @yield('content')
         </div>
     </div>

@@ -33,6 +33,10 @@
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
+    <div class="alert alert-info">
+        DEBUG: Auth::check() -> {{ Auth::check() ? 'true' : 'false' }} | User: {{ Auth::user()->name ?? 'Guest' }}
+    </div>
+
     <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
         <div class="container">
             <a class="navbar-brand fw-bold" href="{{ route('home') }}">
@@ -45,7 +49,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     @auth
-                        {{-- Tampilan Setelah Login --}}
+                        {{-- Tampilan Setelah Pengguna Login --}}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('home') }}">Home</a>
                         </li>
@@ -70,7 +74,7 @@
                             </ul>
                         </li>
                     @else
-                        {{-- Tampilan Sebelum Login --}}
+                        {{-- Tampilan Sebelum Login (Guest) --}}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('login') }}">Login</a>
                         </li>

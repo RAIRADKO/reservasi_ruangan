@@ -59,16 +59,17 @@
                             $endHour = 17;
                         @endphp
                         
-                        <div class="d-flex" style="position: relative; height: 40px; background-color: #f8f9fa;">
-                            @for($hour = $startHour; $hour <= $endHour; $hour++)
-                                <div class="border-start position-relative" style="flex: 1; text-align: center;">
-                                    <small class="position-absolute" style="top: -20px; left: 0; right: 0;">
-                                        {{ $hour }}:00
-                                    </small>
-                                </div>
-                            @endfor
-                        </div>
-                        
+                        <div class="position-absolute bg-primary text-white p-1 rounded" 
+                            style="left: {{ $startPosition / ($endHour - $startHour) * 100 }}%; 
+                                    width: {{ $duration / ($endHour - $startHour) * 100 }}%;
+                                    height: 100%;">
+                            <div class="d-flex justify-content-between align-items-center h-100 px-2">
+                                <span class="fw-bold">{{ $reservation->nama }}</span>
+                                <small>
+                                    {{ date('H:i', strtotime($reservation->jam_mulai)) }}-{{ date('H:i', strtotime($reservation->jam_selesai)) }}
+                                </small>
+                            </div>
+                        </div>                        
                         <!-- Tampilkan setiap reservasi sebagai baris visual -->
                         @foreach($reservations as $reservation)
                         @php

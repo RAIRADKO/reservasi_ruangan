@@ -29,24 +29,26 @@
                         {{ $reservation->status }}
                     </span>
                 </td>
-                <td>
-                    <form method="POST" action="{{ route('admin.reservations.update-status', $reservation->id) }}" class="d-inline">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" name="status" value="approved">
-                        <button type="submit" class="btn btn-sm btn-success" {{ $reservation->status == 'approved' ? 'disabled' : '' }}>Approve</button>
-                    </form>
-                    <form method="POST" action="{{ route('admin.reservations.update-status', $reservation->id) }}" class="d-inline">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" name="status" value="rejected">
-                        <button type="submit" class="btn btn-sm btn-danger" {{ $reservation->status == 'rejected' ? 'disabled' : '' }}>Reject</button>
-                    </form>
-                    <form method="POST" action="{{ route('admin.reservations.destroy', $reservation->id) }}" class="d-inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
-                    </form>
+                <td class="text-center">
+                    <div class="d-flex justify-content-center gap-2">
+                        <form method="POST" action="{{ route('admin.reservations.update-status', $reservation->id) }}" class="d-inline">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="status" value="approved">
+                            <button type="submit" class="btn btn-sm btn-success" {{ $reservation->status == 'approved' ? 'disabled' : '' }}>Approve</button>
+                        </form>
+                        <form method="POST" action="{{ route('admin.reservations.update-status', $reservation->id) }}" class="d-inline">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="status" value="rejected">
+                            <button type="submit" class="btn btn-sm btn-danger" {{ $reservation->status == 'rejected' ? 'disabled' : '' }}>Reject</button>
+                        </form>
+                        <form method="POST" action="{{ route('admin.reservations.destroy', $reservation->id) }}" class="d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             @endforeach
