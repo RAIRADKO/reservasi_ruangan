@@ -18,8 +18,8 @@ class AuthenticateAdmin
     {
         // Periksa apakah admin sudah login menggunakan guard 'admin'
         if (!Auth::guard('admin')->check()) {
-            // Arahkan ke halaman login utama jika tidak terautentikasi
-            return redirect()->route('login');
+            // Arahkan ke halaman login admin, bukan login user
+            return redirect()->route('admin.login');
         }
 
         return $next($request);

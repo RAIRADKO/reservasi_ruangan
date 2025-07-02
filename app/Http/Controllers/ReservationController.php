@@ -6,6 +6,7 @@ use App\Models\Reservation;
 use App\Models\RoomInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\StoreReservationRequest; // Import Form Request
 
 class ReservationController extends Controller
 {
@@ -15,28 +16,10 @@ class ReservationController extends Controller
         return view('reservations.create', compact('room'));
     }
 
-    public function store(Request $request)
+    public function store(StoreReservationRequest $request) // Gunakan Form Request di sini
     {
-        $request->validate([
-            'nama' => 'required|string|max:100',
-            'kontak' => 'required|string|max:100',
-            'tanggal' => 'required|date|after_or_equal:today',
-            'jam_mulai' => 'required|date_format:H:i',
-            'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
-            'keperluan' => 'required|string|max:255',
-        ]);
-
-        if (Reservation::hasConflict($request->tanggal, $request->jam_mulai, $request->jam_selesai)) {
-            return back()->withErrors([
-                'conflict' => 'Ruangan sudah dibooking pada jam tersebut. Silakan pilih jam lain.'
-            ])->withInput();
-        }
-
-        if ($request->jam_mulai < '08:00' || $request->jam_selesai > '17:00') {
-            return back()->withErrors([
-                'operational' => 'Jam operasional ruangan adalah 08:00 - 17:00'
-            ])->withInput();
-        }
+        // Validasi sudah ditangani secara otomatis oleh StoreReservationRequest
+        // Jika validasi gagal, Laravel akan otomatis redirect kembali dengan error.
 
         Reservation::create([
             'user_id' => Auth::id(),

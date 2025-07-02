@@ -16,7 +16,7 @@
 
             <div class="mb-3">
                 <label for="kontak" class="form-label">Nomor Kontak</label>
-                <input type="text" class="form-control" id="kontak" name="kontak" required>
+                <input type="text" class="form-control" id="kontak" name="kontak" value="{{ old('kontak') }}" required>
                 <div class="form-text">Contoh: 081234567890</div>
             </div>
 
@@ -24,28 +24,28 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label for="tanggal" class="form-label">Tanggal</label>
-                        <input type="date" class="form-control" id="tanggal" name="tanggal" min="{{ date('Y-m-d') }}" required>
+                        <input type="date" class="form-control" id="tanggal" name="tanggal" min="{{ date('Y-m-d') }}" value="{{ old('tanggal') }}" required>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="mb-3">
                         <label for="jam_mulai" class="form-label">Jam Mulai</label>
-                        <input type="time" class="form-control" id="jam_mulai" name="jam_mulai" min="08:00" max="17:00" required>
-                        <div class="form-text">Min: 08:00</div>
+                        <input type="time" class="form-control" id="jam_mulai" name="jam_mulai" min="{{ config('room.operating_hours.start') }}" max="{{ config('room.operating_hours.end') }}" value="{{ old('jam_mulai') }}" required>
+                        <div class="form-text">Min: {{ config('room.operating_hours.start') }}</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="mb-3">
                         <label for="jam_selesai" class="form-label">Jam Selesai</label>
-                        <input type="time" class="form-control" id="jam_selesai" name="jam_selesai" min="08:00" max="17:00" required>
-                        <div class="form-text">Max: 17:00</div>
+                        <input type="time" class="form-control" id="jam_selesai" name="jam_selesai" min="{{ config('room.operating_hours.start') }}" max="{{ config('room.operating_hours.end') }}" value="{{ old('jam_selesai') }}" required>
+                        <div class="form-text">Max: {{ config('room.operating_hours.end') }}</div>
                     </div>
                 </div>
             </div>
 
             <div class="mb-3">
                 <label for="keperluan" class="form-label">Keperluan</label>
-                <textarea class="form-control" id="keperluan" name="keperluan" rows="3" required></textarea>
+                <textarea class="form-control" id="keperluan" name="keperluan" rows="3" required>{{ old('keperluan') }}</textarea>
             </div>
 
             <button type="submit" class="btn btn-primary">Ajukan Reservasi</button>

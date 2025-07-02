@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -18,7 +19,7 @@ Route::get('/', [RoomController::class, 'index'])->name('home');
 Route::get('/reservations/date/{date}', [RoomController::class, 'showReservationsByDate'])->name('reservations.date');
 
 // ==========================
-// Autentikasi (Login/Register)
+// Autentikasi Pengguna
 // ==========================
 
 Route::middleware('guest')->group(function () {
@@ -55,13 +56,23 @@ Route::middleware('auth')->group(function () {
 });
 
 // ==========================
+// Autentikasi Admin
+// ==========================
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AdminLoginController::class, 'login'])->name('login.submit');
+    Route::post('/logout', [AdminLoginController::class, 'logout'])->name('logout');
+});
+
+
+// ==========================
 // Route Untuk Admin
 // ==========================
 
 Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-    Route::get('/reservations', [AdminController::class, 'reservations'])->name('reservations.index');    
-    
+    Route::get('/reservations', [AdminController::class, 'reservations'])->name('reservations.index');
+
     Route::put('/reservations/{reservation}/update-status', [AdminController::class, 'updateStatus'])->name('reservations.update-status');
     Route::delete('/reservations/{reservation}', [AdminController::class, 'destroy'])->name('reservations.destroy');
 
