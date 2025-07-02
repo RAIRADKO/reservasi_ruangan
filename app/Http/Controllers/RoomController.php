@@ -11,7 +11,8 @@ class RoomController extends Controller
 {
     public function index()
     {
-        $room = RoomInfo::first();
+        // Use firstOrFail() to get the room or fail with a 404 error
+        $room = RoomInfo::firstOrFail();
         
         $bookedDates = Reservation::where('status', Reservation::STATUS_APPROVED)
             ->select('tanggal')

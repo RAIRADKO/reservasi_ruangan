@@ -6,6 +6,7 @@
     
     <form method="POST" action="{{ route('admin.room.update') }}" enctype="multipart/form-data">
         @csrf
+        @method('PUT')
         <div class="mb-3">
             <label for="nama_ruangan" class="form-label">Nama Ruangan</label>
             <input type="text" class="form-control" id="nama_ruangan" name="nama_ruangan" value="{{ $room->nama_ruangan }}" required>

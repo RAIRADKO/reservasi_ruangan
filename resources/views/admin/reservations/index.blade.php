@@ -32,11 +32,13 @@
                 <td>
                     <form method="POST" action="{{ route('admin.reservations.update-status', $reservation->id) }}" class="d-inline">
                         @csrf
+                        @method('PUT')
                         <input type="hidden" name="status" value="approved">
                         <button type="submit" class="btn btn-sm btn-success" {{ $reservation->status == 'approved' ? 'disabled' : '' }}>Approve</button>
                     </form>
                     <form method="POST" action="{{ route('admin.reservations.update-status', $reservation->id) }}" class="d-inline">
                         @csrf
+                        @method('PUT')
                         <input type="hidden" name="status" value="rejected">
                         <button type="submit" class="btn btn-sm btn-danger" {{ $reservation->status == 'rejected' ? 'disabled' : '' }}>Reject</button>
                     </form>
