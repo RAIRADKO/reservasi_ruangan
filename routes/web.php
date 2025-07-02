@@ -10,8 +10,7 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Membungkus semua rute dengan middleware 'web' untuk memastikan sesi selalu aktif
-Route::middleware('web')->group(function () {
+// Hapus baris Route::middleware('web')->group(function () {
 
     // Halaman Utama
     Route::get('/', [RoomController::class, 'index'])->name('home');
@@ -60,4 +59,4 @@ Route::middleware('web')->group(function () {
         Route::put('/room/update', [AdminController::class, 'updateRoom'])->name('room.update');
     });
 
-});
+// Hapus baris }); penutup

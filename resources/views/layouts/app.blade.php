@@ -77,7 +77,7 @@
                         <li class="nav-item">
                             <a href="{{ route('register') }}" class="btn btn-primary btn-sm ms-2">Register</a>
                         </li>
-                    @endguest
+                    @endauth {{-- <-- DIUBAH MENJADI @endauth --}}
                 </ul>
             </div>
         </div>
