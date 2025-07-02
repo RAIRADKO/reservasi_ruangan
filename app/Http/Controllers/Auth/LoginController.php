@@ -35,7 +35,7 @@ class LoginController extends Controller
             return redirect()->intended(route('admin.dashboard'));
         }
 
-        // Jika gagal, coba login sebagai User (dengan NIP)
+        // Coba login sebagai User (dengan NIP)
         if (Auth::guard('web')->attempt(['nip' => $request->identifier, 'password' => $request->password], $remember)) {
             $request->session()->regenerate();
             return redirect()->intended(route('home'));
