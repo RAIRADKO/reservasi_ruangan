@@ -22,7 +22,7 @@ class AdminController extends Controller
         
         $reservations = Reservation::with('user')
             ->orderBy('created_at', 'desc')
-            ->take(5)
+            ->take(10)
             ->get();
             
         return view('admin.dashboard', compact('pendingCount', 'approvedCount', 'reservations'));
