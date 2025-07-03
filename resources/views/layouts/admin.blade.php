@@ -139,32 +139,33 @@
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" 
-                               href="{{ route('admin.dashboard') }}">
+                            href="{{ route('admin.dashboard') }}">
                                 <i class="bi bi-speedometer2 me-2"></i>
                                 Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.calendar.*') ? 'active' : '' }}" 
-                               href="{{ route('admin.calendar.management') }}">
+                            href="{{ route('admin.calendar.management') }}">
                                 <i class="bi bi-calendar3 me-2"></i>
                                 Manajemen Kalender
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.reservations.*') ? 'active' : '' }}" 
-                               href="{{ route('admin.reservations.index') }}">
+                            href="{{ route('admin.reservations.index') }}">
                                 <i class="bi bi-journal-text me-2"></i>
                                 Reservasi
                             </a>
                         </li>
-                        <li class="nav-item">
+                        {{-- This is the problematic link. You can comment it out like this. --}}
+                        {{-- <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" 
-                               href="{{ route('admin.settings.index') }}">
+                            href="{{ route('admin.settings.index') }}">
                                 <i class="bi bi-gear me-2"></i>
                                 Pengaturan
                             </a>
-                        </li>
+                        </li> --}}
                     </ul>
                     
                     <hr class="my-3" style="border-color: rgba(255,255,255,0.2);">
@@ -199,7 +200,7 @@
                             <div class="btn-group me-2">
                                 <button type="button" class="btn btn-sm btn-outline-secondary">
                                     <i class="bi bi-person-circle me-1"></i>
-                                    {{ Auth::user()->name }}
+                                    {{ Auth::guard('admin')->user()->username }}
                                 </button>
                             </div>
                         </div>
