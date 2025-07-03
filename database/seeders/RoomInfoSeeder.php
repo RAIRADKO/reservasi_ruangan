@@ -14,9 +14,11 @@ class RoomInfoSeeder extends Seeder
     public function run(): void
     {
         RoomInfo::create([
-            'room_name' => 'Ruang Rapat 3', // Diubah dari 'name'
-            'capacity' => 10,
-            'is_available' => true,
+            'nama_ruangan' => 'Ruang Rapat Oemar Seno Adji',
+            'deskripsi' => 'Ruang rapat utama yang terletak di lantai 2 dengan fasilitas modern untuk menunjang kebutuhan rapat Anda.',
+            'kapasitas' => 25,
+            'fasilitas' => 'Proyektor, Papan Tulis, Sound System, AC, Meja Rapat, Kursi',
+            'foto' => null, // Biarkan null atau isi dengan path jika ada gambar default
         ]);
     }
 }
