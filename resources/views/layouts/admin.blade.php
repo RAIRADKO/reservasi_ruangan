@@ -7,16 +7,12 @@
 
     <title>@yield('title', 'Admin Panel')</title>
 
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
-    <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Custom Admin Styles -->
     <style>
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -72,7 +68,7 @@
         }
         
         .sidebar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #212529; /* Latar belakang sidebar diubah menjadi hitam */
             box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
         }
         
@@ -126,9 +122,8 @@
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse vh-100 position-sticky top-0">
-                <div class="position-sticky pt-3">
+                <div class="position-sticky pt-3 h-100">
                     <div class="text-center mb-4">
                         <h4 class="text-white mb-0">
                             <i class="bi bi-shield-check me-2"></i>
@@ -158,40 +153,24 @@
                                 Reservasi
                             </a>
                         </li>
-                        {{-- This is the problematic link. You can comment it out like this. --}}
-                        {{-- <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" 
-                            href="{{ route('admin.settings.index') }}">
-                                <i class="bi bi-gear me-2"></i>
-                                Pengaturan
-                            </a>
-                        </li> --}}
                     </ul>
                     
-                    <hr class="my-3" style="border-color: rgba(255,255,255,0.2);">
-                    
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('home') }}" target="_blank">
-                                <i class="bi bi-house me-2"></i>
-                                Lihat Website
+                    <div class="sidebar-footer position-absolute bottom-0 start-0 w-100 p-3">
+                        <div class="d-flex justify-content-around align-items-center">
+                            <a class="btn btn-outline-light" href="{{ route('home') }}" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Website">
+                                <i class="bi bi-house-door"></i>
                             </a>
-                        </li>
-                        <li class="nav-item">
                             <form method="POST" action="{{ route('logout') }}" class="d-inline">
                                 @csrf
-                                <button type="submit" class="nav-link btn btn-link text-start w-100 p-0" 
-                                        style="color: rgba(255, 255, 255, 0.8);">
-                                    <i class="bi bi-box-arrow-right me-2"></i>
-                                    Logout
+                                <button type="submit" class="btn btn-outline-light" data-bs-toggle="tooltip" data-bs-placement="top" title="Logout">
+                                    <i class="bi bi-box-arrow-right"></i>
                                 </button>
                             </form>
-                        </li>
-                    </ul>
+                        </div>
+                    </div>
                 </div>
             </nav>
 
-            <!-- Main content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
                 <div class="pt-3 pb-2 mb-3 border-bottom">
                     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
@@ -230,10 +209,8 @@
         </div>
     </div>
 
-    <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Common Admin Scripts -->
     <script>
         // Auto-dismiss alerts after 5 seconds
         setTimeout(function() {
@@ -248,6 +225,12 @@
         
         // Add slide-up animation to cards
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips for new buttons
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+              return new bootstrap.Tooltip(tooltipTriggerEl)
+            })
+
             const cards = document.querySelectorAll('.card');
             cards.forEach(function(card, index) {
                 setTimeout(function() {

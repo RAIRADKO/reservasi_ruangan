@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="container-fluid px-4">
-    <!-- Header Section -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex align-items-center justify-content-between">
@@ -25,7 +24,6 @@
         </div>
     </div>
 
-    <!-- Status Cards -->
     <div class="row mb-4">
         <div class="col-md-4">
             <div class="card border-0 shadow-sm h-100">
@@ -80,7 +78,6 @@
         </div>
     </div>
 
-    <!-- Instructions Alert -->
     <div class="alert alert-light border border-primary shadow-sm mb-4">
         <div class="d-flex">
             <div class="flex-shrink-0">
@@ -97,7 +94,6 @@
         </div>
     </div>
 
-    <!-- Calendar Card -->
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white border-bottom">
             <div class="d-flex align-items-center justify-content-between">
@@ -123,7 +119,6 @@
     </div>
 </div>
 
-<!-- Help Modal -->
 <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -184,14 +179,30 @@
     </div>
 </div>
 
-<!-- Loading Overlay -->
-<div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none" style="background: rgba(0,0,0,0.5); z-index: 9999;">
+<div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none" style="background: rgba(0,0,0,0.5); z-index: 1060;">
     <div class="d-flex align-items-center justify-content-center h-100">
         <div class="bg-white rounded p-4 text-center">
             <div class="spinner-border text-primary mb-3" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
             <p class="mb-0">Memproses permintaan...</p>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="confirmationModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4 text-center" id="confirmationModalBody">
+                </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn" id="confirmActionButton">Ya, Lanjutkan</button>
+            </div>
         </div>
     </div>
 </div>
@@ -495,6 +506,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadingOverlay = document.getElementById('loadingOverlay');
     let manuallyBlockedDates = @json($blockedDates);
 
+    const confirmationModalEl = document.getElementById('confirmationModal');
+    const confirmationModal = new bootstrap.Modal(confirmationModalEl);
+    const confirmActionButton = document.getElementById('confirmActionButton');
+    const confirmationModalBody = document.getElementById('confirmationModalBody');
+    const confirmationModalLabel = document.getElementById('confirmationModalLabel');
+
     function showLoading() {
         loadingOverlay.classList.remove('d-none');
     }
@@ -604,62 +621,74 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = isBlocked ? '{{ route("admin.blocked-dates.destroy") }}' : '{{ route("admin.blocked-dates.store") }}';
             const method = isBlocked ? 'DELETE' : 'POST';
 
-            // Improved confirmation dialog
-            const confirmed = confirm(`🗓️ Konfirmasi Aksi\n\nApakah Anda yakin ingin ${action} tanggal ${dateStr}?\n\n${isBlocked ? '✅ Tanggal akan dibuka untuk reservasi' : '❌ Tanggal akan diblokir dari reservasi'}`);
-            
-            if (!confirmed) {
-                return;
+            // Set modal content
+            confirmationModalLabel.innerHTML = `<i class="bi bi-calendar-question me-2"></i> Konfirmasi Aksi`;
+            confirmationModalBody.innerHTML = `Apakah Anda yakin ingin <strong>${action}</strong> tanggal <strong>${dateStr}</strong>?<br><br><small class="text-muted">${isBlocked ? 'Tanggal ini akan kembali tersedia untuk reservasi.' : 'Tanggal ini tidak akan bisa direservasi oleh pengguna.'}</small>`;
+
+            // Change confirm button color based on action
+            if (isBlocked) {
+                confirmActionButton.className = 'btn btn-success';
+                confirmActionButton.innerHTML = `<i class="bi bi-unlock-fill me-1"></i> Ya, Buka Blokir`;
+            } else {
+                confirmActionButton.className = 'btn btn-danger';
+                confirmActionButton.innerHTML = `<i class="bi bi-lock-fill me-1"></i> Ya, Blokir`;
             }
 
-            // Add visual feedback
-            const dayEl = info.dayEl;
-            dayEl.classList.add('fc-day-status-change');
+            // Show the modal
+            confirmationModal.show();
             
-            showLoading();
+            // Define the action for the confirm button using a one-time event listener
+            confirmActionButton.onclick = () => {
+                confirmationModal.hide();
 
-            fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ date: dateStr })
-            })
-            .then(response => response.json())
-            .then(data => {
-                hideLoading();
-                
-                if (data.error) {
-                    showToast('Error: ' + data.error, 'danger');
-                } else {
-                    showToast(data.message, 'success');
+                const dayEl = info.dayEl;
+                dayEl.classList.add('fc-day-status-change');
+                showLoading();
+
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ date: dateStr })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    hideLoading();
                     
-                    // Update local data
-                    if (isBlocked) {
-                        manuallyBlockedDates = manuallyBlockedDates.filter(d => d !== dateStr);
+                    if (data.error) {
+                        showToast('Error: ' + data.error, 'danger');
                     } else {
-                        manuallyBlockedDates.push(dateStr);
+                        showToast(data.message, 'success');
+                        
+                        // Update local data
+                        if (isBlocked) {
+                            manuallyBlockedDates = manuallyBlockedDates.filter(d => d !== dateStr);
+                        } else {
+                            manuallyBlockedDates.push(dateStr);
+                        }
+                        
+                        // Update calendar
+                        calendar.removeAllEventSources();
+                        calendar.addEventSource(getEventSources()[0]);
+                        
+                        // Update day appearance
+                        setTimeout(updateDayAppearance, 100);
                     }
-                    
-                    // Update calendar
-                    calendar.removeAllEventSources();
-                    calendar.addEventSource(getEventSources()[0]);
-                    
-                    // Update day appearance
-                    setTimeout(updateDayAppearance, 100);
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('Error:', error);
-                showToast('Terjadi kesalahan. Silakan coba lagi.', 'danger');
-            })
-            .finally(() => {
-                // Remove animation class
-                setTimeout(() => {
-                    dayEl.classList.remove('fc-day-status-change');
-                }, 300);
-            });
+                })
+                .catch(error => {
+                    hideLoading();
+                    console.error('Error:', error);
+                    showToast('Terjadi kesalahan. Silakan coba lagi.', 'danger');
+                })
+                .finally(() => {
+                    // Remove animation class
+                    setTimeout(() => {
+                        dayEl.classList.remove('fc-day-status-change');
+                    }, 300);
+                });
+            };
         }
     });
 
