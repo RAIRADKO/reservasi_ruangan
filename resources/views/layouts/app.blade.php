@@ -40,6 +40,18 @@
         .dropdown-menu {
             border: none;
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border-radius: 0.5rem;
+        }
+        .dropdown-menu-end {
+            --bs-position: end;
+            right: -10px !important;
+            left: auto !important;
+        }
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+        }
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
         }
         .debug-info {
             background: #fff3cd;
@@ -48,6 +60,13 @@
             padding: 0.75rem;
             margin-bottom: 1rem;
             border-radius: 0.375rem;
+        }
+        /* Ensure dropdown works properly */
+        .navbar-nav .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        .dropdown-toggle::after {
+            margin-left: 0.5rem;
         }
     </style>
     
@@ -81,10 +100,16 @@
                             </a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" 
+                               href="#" 
+                               id="userDropdown" 
+                               role="button" 
+                               data-bs-toggle="dropdown" 
+                               data-bs-auto-close="true"
+                               aria-expanded="false">
                                 <i class="bi bi-person-circle me-1"></i>{{ Auth::user()->name }}
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li>
                                     <a class="dropdown-item" href="{{ route('user.profile') }}">
                                         <i class="bi bi-person me-2"></i>Profil
@@ -92,11 +117,11 @@
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
-                                    </a>
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                    <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
                                         @csrf
+                                        <button type="submit" class="dropdown-item text-danger" style="background: none; border: none; width: 100%; text-align: left;">
+                                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                        </button>
                                     </form>
                                 </li>
                             </ul>
@@ -157,22 +182,53 @@
         </div>
     </footer>
 
-    {{-- Bootstrap JavaScript --}}
+    {{-- Bootstrap JavaScript - PASTIKAN INI DIMUAT TERLEBIH DAHULU --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
-    {{-- Test Script - Hapus ini setelah testing --}}
+    {{-- Custom Script untuk memastikan dropdown bekerja --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Debug info
             console.log('DOM loaded');
             console.log('Bootstrap loaded:', typeof bootstrap !== 'undefined');
-            console.log('Auth status from debug:', '{{ Auth::check() ? "true" : "false" }}');
+            console.log('Auth status:', '{{ Auth::check() ? "authenticated" : "guest" }}');
             
-            // Test dropdown
-            const dropdownToggle = document.getElementById('navbarDropdown');
+            // Initialize dropdown manually jika diperlukan
+            const dropdownToggle = document.getElementById('userDropdown');
             if (dropdownToggle) {
-                console.log('Dropdown toggle found');
-            } else {
-                console.log('Dropdown toggle NOT found');
+                console.log('User dropdown found');
+                
+                // Pastikan dropdown bisa diklik
+                dropdownToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Dropdown clicked');
+                    
+                    // Toggle dropdown secara manual jika bootstrap tidak bekerja
+                    const dropdownMenu = this.nextElementSibling;
+                    if (dropdownMenu) {
+                        dropdownMenu.classList.toggle('show');
+                    }
+                });
+                
+                // Tutup dropdown ketika klik di luar
+                document.addEventListener('click', function(e) {
+                    if (!dropdownToggle.contains(e.target)) {
+                        const dropdownMenu = dropdownToggle.nextElementSibling;
+                        if (dropdownMenu && dropdownMenu.classList.contains('show')) {
+                            dropdownMenu.classList.remove('show');
+                        }
+                    }
+                });
+            }
+            
+            // Test Bootstrap components
+            if (typeof bootstrap !== 'undefined') {
+                console.log('Bootstrap components available:', Object.keys(bootstrap));
+                
+                // Initialize dropdown secara eksplisit
+                const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
+                const dropdownList = [...dropdownElementList].map(dropdownToggleEl => new bootstrap.Dropdown(dropdownToggleEl));
+                console.log('Dropdowns initialized:', dropdownList.length);
             }
         });
     </script>

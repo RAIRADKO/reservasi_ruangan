@@ -12,7 +12,7 @@ use Illuminate\Auth\Events\Registered;
 
 class RegisterController extends Controller
 {
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/';
 
     /**
      * Display the registration view.
