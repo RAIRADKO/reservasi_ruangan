@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class RoomInfo extends Model
 {
@@ -17,19 +18,22 @@ class RoomInfo extends Model
         'foto',
     ];
 
-    // Accessor untuk mengubah string fasilitas menjadi array
+    // Menambahkan relasi ke model Reservation
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
     public function getFasilitasArrayAttribute()
     {
         return array_map('trim', explode(',', $this->fasilitas));
     }
     
-    // Accessor untuk mendapatkan URL foto
     public function getFotoUrlAttribute()
     {
         if ($this->foto) {
             return asset('storage/' . $this->foto);
         }
-        // Ganti dengan path ke gambar default jika tidak ada foto
         return asset('img/default-room.jpg'); 
     }
 }

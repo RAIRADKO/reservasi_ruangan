@@ -8,22 +8,15 @@ use App\Models\BlockedDate;
 
 class StoreReservationRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return true; // Izinkan semua user yang terautentikasi untuk membuat request
+        return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
+            'room_info_id' => 'required|exists:room_infos,id', // Aturan validasi untuk room_info_id
             'nama' => 'required|string|max:100',
             'kontak' => 'required|string|max:100',
             'tanggal' => 'required|date|after_or_equal:today',
@@ -33,31 +26,24 @@ class StoreReservationRequest extends FormRequest
         ];
     }
     
-    /**
-     * Configure the validator instance.
-     *
-     * @param  \Illuminate\Validation\Validator  $validator
-     * @return void
-     */
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
             $tanggal = $this->input('tanggal');
             $jamMulai = $this->input('jam_mulai');
             $jamSelesai = $this->input('jam_selesai');
+            $roomInfoId = $this->input('room_info_id'); // Ambil room_info_id
 
-            // Cek apakah tanggal diblokir
             if (BlockedDate::where('date', $tanggal)->exists()) {
                 $validator->errors()->add('blocked', 'Tanggal yang dipilih tidak tersedia untuk reservasi. Silakan pilih tanggal lain.');
-                return; // Hentikan validasi jika tanggal sudah diblokir
+                return;
             }
 
-            // Cek konflik jadwal
-            if (Reservation::hasConflict($tanggal, $jamMulai, $jamSelesai)) {
+            // Periksa konflik jadwal untuk ruangan yang spesifik
+            if (Reservation::hasConflict($tanggal, $jamMulai, $jamSelesai, $roomInfoId)) {
                 $validator->errors()->add('conflict', 'Ruangan sudah dibooking pada jam tersebut. Silakan pilih jam lain.');
             }
 
-            // Cek jam operasional dari file config
             if ($jamMulai < config('room.operating_hours.start') || $jamSelesai > config('room.operating_hours.end')) {
                  $validator->errors()->add(
                      'operational', 

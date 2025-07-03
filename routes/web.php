@@ -76,15 +76,20 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::put('/reservations/{reservation}/update-status', [AdminController::class, 'updateStatus'])->name('reservations.update-status');
     Route::delete('/reservations/{reservation}', [AdminController::class, 'destroy'])->name('reservations.destroy');
 
-    Route::get('/room/edit', [AdminController::class, 'editRoom'])->name('room.edit');
-    Route::put('/room/update', [AdminController::class, 'updateRoom'])->name('room.update');
-
-    // == ROUTE BARU UNTUK MANAJEMEN KALENDER ==
+    // == ROUTE BARU UNTUK MANAJEMEN RUANGAN ==
+    Route::get('rooms', [AdminController::class, 'roomIndex'])->name('room.index');
+    Route::get('rooms/create', [AdminController::class, 'roomCreate'])->name('room.create');
+    Route::post('rooms', [AdminController::class, 'roomStore'])->name('room.store');
+    Route::get('rooms/{room}/edit', [AdminController::class, 'roomEdit'])->name('room.edit');
+    Route::put('rooms/{room}', [AdminController::class, 'roomUpdate'])->name('room.update');
+    Route::delete('rooms/{room}', [AdminController::class, 'roomDestroy'])->name('room.destroy');
+    
+    // == ROUTE UNTUK MANAJEMEN KALENDER ==
     Route::get('/calendar-management', [AdminController::class, 'showCalendarManagement'])->name('calendar.management');
     Route::post('/blocked-dates', [AdminController::class, 'storeBlockedDate'])->name('blocked-dates.store');
     Route::delete('/blocked-dates', [AdminController::class, 'destroyBlockedDate'])->name('blocked-dates.destroy');
     
-    // == ROUTE BARU UNTUK MANAJEMEN USER ==
+    // == ROUTE UNTUK MANAJEMEN USER ==
     Route::get('users', [AdminController::class, 'usersIndex'])->name('users.index');
     Route::get('users/create', [AdminController::class, 'usersCreate'])->name('users.create');
     Route::post('users', [AdminController::class, 'usersStore'])->name('users.store');

@@ -9,6 +9,7 @@ class Reservation extends Model
 {
     protected $fillable = [
         'user_id',
+        'room_info_id', // Ditambahkan
         'nama',
         'kontak',
         'tanggal',
@@ -41,10 +42,18 @@ class Reservation extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // Relasi ke model RoomInfo
+    public function roomInfo(): BelongsTo
+    {
+        return $this->belongsTo(RoomInfo::class);
+    }
     
-    public static function hasConflict($tanggal, $jam_mulai, $jam_selesai, $excludeId = null)
+    // Memperbarui method hasConflict untuk memeriksa berdasarkan ruangan
+    public static function hasConflict($tanggal, $jam_mulai, $jam_selesai, $room_info_id, $excludeId = null)
     {
         $query = self::where('tanggal', $tanggal)
+            ->where('room_info_id', $room_info_id) // Ditambahkan untuk memeriksa ruangan spesifik
             ->where('status', self::STATUS_APPROVED)
             ->where(function ($q) use ($jam_mulai, $jam_selesai) {
                 $q->where(function ($q) use ($jam_mulai, $jam_selesai) {

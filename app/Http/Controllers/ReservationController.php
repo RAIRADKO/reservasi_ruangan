@@ -6,25 +6,23 @@ use App\Models\Reservation;
 use App\Models\RoomInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\StoreReservationRequest; // Import Form Request
+use App\Http\Requests\StoreReservationRequest;
 use App\Models\BlockedDate;
 
 class ReservationController extends Controller
 {
     public function create()
     {
-        $room = RoomInfo::first();
+        $rooms = RoomInfo::all(); // Mengambil semua ruangan
         $blockedDates = BlockedDate::pluck('date')->map->format('Y-m-d')->toArray();
-        return view('reservations.create', compact('room', 'blockedDates'));
+        return view('reservations.create', compact('rooms', 'blockedDates'));
     }
 
-    public function store(StoreReservationRequest $request) // Gunakan Form Request di sini
+    public function store(StoreReservationRequest $request)
     {
-        // Validasi sudah ditangani secara otomatis oleh StoreReservationRequest
-        // Jika validasi gagal, Laravel akan otomatis redirect kembali dengan error.
-
         Reservation::create([
             'user_id' => Auth::id(),
+            'room_info_id' => $request->room_info_id, // Menyimpan room_info_id
             'nama' => $request->nama,
             'kontak' => $request->kontak,
             'tanggal' => $request->tanggal,

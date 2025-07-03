@@ -130,7 +130,6 @@
                             Admin Panel
                         </h4>
                     </div>
-                    
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" 
@@ -141,7 +140,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
-                               href="{{ route('admin.users.index') }}">
+                                href="{{ route('admin.users.index') }}">
                                 <i class="bi bi-people-fill me-2"></i>
                                 Manajemen User
                             </a>
@@ -160,8 +159,14 @@
                                 Reservasi
                             </a>
                         </li>
-                    </ul>
-                    
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.room.*') ? 'active' : '' }}"
+                                href="{{ route('admin.room.index') }}">
+                                <i class="bi bi-door-open-fill me-2"></i>
+                                Manajemen Ruangan
+                            </a>
+                        </li>
+                    </ul>                    
                     <div class="sidebar-footer position-absolute bottom-0 start-0 w-100 p-3">
                         <div class="d-flex justify-content-around align-items-center">
                             <a class="btn btn-outline-light" href="{{ route('home') }}" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Website">

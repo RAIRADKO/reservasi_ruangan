@@ -20,7 +20,7 @@ class AdminController extends Controller
         $pendingCount = Reservation::where('status', Reservation::STATUS_PENDING)->count();
         $approvedCount = Reservation::where('status', Reservation::STATUS_APPROVED)->count();
         
-        $reservations = Reservation::with('user')
+        $reservations = Reservation::with(['user', 'roomInfo']) // Eager load roomInfo
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
@@ -30,9 +30,9 @@ class AdminController extends Controller
 
     public function reservations()
     {
-        $reservations = Reservation::with('user')
+        $reservations = Reservation::with(['user', 'roomInfo']) // Eager load roomInfo
             ->orderBy('tanggal', 'desc')
-            ->paginate(10); // Menggunakan paginasi
+            ->paginate(10);
             
         return view('admin.reservations.index', compact('reservations'));
     }
@@ -52,6 +52,79 @@ class AdminController extends Controller
     {
         $reservation->delete();
         return back()->with('success', 'Reservasi berhasil dihapus.');
+    }
+
+    // == START: Room Management CRUD ==
+    public function roomIndex()
+    {
+        $rooms = RoomInfo::paginate(10);
+        return view('admin.room.index', compact('rooms'));
+    }
+
+    public function roomCreate()
+    {
+        return view('admin.room.create');
+    }
+
+    public function roomStore(Request $request)
+    {
+        $request->validate([
+            'nama_ruangan' => 'required|string|max:100|unique:room_infos,nama_ruangan',
+            'deskripsi' => 'required|string',
+            'kapasitas' => 'required|integer|min:1',
+            'fasilitas' => 'required|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+        
+        $data = $request->only(['nama_ruangan', 'deskripsi', 'kapasitas', 'fasilitas']);
+        
+        if ($request->hasFile('foto')) {
+            $path = $request->file('foto')->store('room_photos', 'public');
+            $data['foto'] = $path;
+        }
+        
+        RoomInfo::create($data);
+        
+        return redirect()->route('admin.room.index')->with('success', 'Ruangan baru berhasil ditambahkan.');
+    }
+    
+    public function roomEdit(RoomInfo $room)
+    {
+        return view('admin.room.edit', compact('room'));
+    }
+
+    public function roomUpdate(Request $request, RoomInfo $room)
+    {
+        $request->validate([
+            'nama_ruangan' => ['required', 'string', 'max:100', Rule::unique('room_infos')->ignore($room->id)],
+            'deskripsi' => 'required|string',
+            'kapasitas' => 'required|integer|min:1',
+            'fasilitas' => 'required|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+        
+        $data = $request->only(['nama_ruangan', 'deskripsi', 'kapasitas', 'fasilitas']);
+        
+        if ($request->hasFile('foto')) {
+            if ($room->foto) {
+                Storage::delete('public/' . $room->foto);
+            }
+            $path = $request->file('foto')->store('room_photos', 'public');
+            $data['foto'] = $path;
+        }
+        
+        $room->update($data);
+        
+        return redirect()->route('admin.room.index')->with('success', 'Informasi ruangan berhasil diperbarui.');
+    }
+
+    public function roomDestroy(RoomInfo $room)
+    {
+        if ($room->foto) {
+            Storage::delete('public/' . $room->foto);
+        }
+        $room->delete();
+        return redirect()->route('admin.room.index')->with('success', 'Ruangan berhasil dihapus.');
     }
 
     public function editRoom()
