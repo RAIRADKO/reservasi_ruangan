@@ -2,29 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class RoomInfo extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'nama_ruangan',
-        'deskripsi',
-        'kapasitas',
-        'fasilitas',
-        'foto'
+        'room_name', // Diubah dari 'name'
+        'capacity',
+        'is_available'
     ];
-    
-    public function getFasilitasArrayAttribute()
-    {
-        return explode(', ', $this->fasilitas);
-    }
-    
-    public function getFotoUrlAttribute()
-    {
-        if ($this->foto) {
-            return asset('storage/' . $this->foto);
-        }
-        return asset('images/default-room.jpg');
-    }
 }
