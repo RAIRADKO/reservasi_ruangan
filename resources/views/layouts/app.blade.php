@@ -78,7 +78,7 @@
         <div class="container">
             <a class="navbar-brand fw-bold" href="{{ route('home') }}">
                 <i class="bi bi-calendar-week-fill me-2 text-primary"></i>
-                Reservasi Ruangan
+                Sistem Elektronik Reservasi Ruangan
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
