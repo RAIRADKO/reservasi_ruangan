@@ -40,8 +40,7 @@ class LoginController extends Controller
             'password' => $request->password,
         ];
 
-        // Kredensial untuk admin (berdasarkan username)
-        // Admin akan memasukkan username mereka di kolom NIP
+        // Kredensial untuk admin (berdasarkan username dari kolom NIP)
         $credentialsAdmin = [
             'username' => $request->nip,
             'password' => $request->password,

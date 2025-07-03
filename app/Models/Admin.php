@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Hash;
 
 class Admin extends Authenticatable
 {
@@ -21,10 +20,14 @@ class Admin extends Authenticatable
     ];
 
     /**
-     * Hash password secara otomatis saat di-set.
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
      */
-    public function setPasswordAttribute($value)
+    protected function casts(): array
     {
-        $this->attributes['password'] = Hash::make($value);
+        return [
+            'password' => 'hashed',
+        ];
     }
 }
