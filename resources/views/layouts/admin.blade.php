@@ -140,6 +140,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
+                               href="{{ route('admin.users.index') }}">
+                                <i class="bi bi-people-fill me-2"></i>
+                                Manajemen User
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.calendar.*') ? 'active' : '' }}" 
                             href="{{ route('admin.calendar.management') }}">
                                 <i class="bi bi-calendar3 me-2"></i>

@@ -83,4 +83,12 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::get('/calendar-management', [AdminController::class, 'showCalendarManagement'])->name('calendar.management');
     Route::post('/blocked-dates', [AdminController::class, 'storeBlockedDate'])->name('blocked-dates.store');
     Route::delete('/blocked-dates', [AdminController::class, 'destroyBlockedDate'])->name('blocked-dates.destroy');
+    
+    // == ROUTE BARU UNTUK MANAJEMEN USER ==
+    Route::get('users', [AdminController::class, 'usersIndex'])->name('users.index');
+    Route::get('users/create', [AdminController::class, 'usersCreate'])->name('users.create');
+    Route::post('users', [AdminController::class, 'usersStore'])->name('users.store');
+    Route::get('users/{user}/edit', [AdminController::class, 'usersEdit'])->name('users.edit');
+    Route::put('users/{user}', [AdminController::class, 'usersUpdate'])->name('users.update');
+    Route::delete('users/{user}', [AdminController::class, 'usersDestroy'])->name('users.destroy');
 });
