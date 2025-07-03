@@ -81,6 +81,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('admin.calendar.management') }}" class="nav-link {{ request()->routeIs('admin.calendar.management') ? 'active' : '' }}">
+                        <i class="bi bi-calendar-x"></i>
+                        Blokir Kalender
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('admin.room.edit') }}" class="nav-link {{ request()->routeIs('admin.room.edit') ? 'active' : '' }}">
                         <i class="bi bi-door-open"></i>
                         Pengaturan Ruangan

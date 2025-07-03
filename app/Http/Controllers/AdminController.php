@@ -7,6 +7,8 @@ use App\Models\RoomInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use App\Models\BlockedDate;
+use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
@@ -83,4 +85,44 @@ class AdminController extends Controller
         
         return redirect()->route('admin.room.edit')->with('success', 'Informasi ruangan berhasil diperbarui.');
     }
+
+    public function showCalendarManagement()
+    {
+        $blockedDates = BlockedDate::pluck('date')->map(function ($date) {
+            return $date->format('Y-m-d');
+        });
+
+        return view('admin.calendar.management', compact('blockedDates'));
+    }
+
+    public function storeBlockedDate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'date' => 'required|date_format:Y-m-d|unique:blocked_dates,date',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()->first()], 422);
+        }
+
+        BlockedDate::create(['date' => $request->date]);
+
+        return response()->json(['message' => 'Tanggal berhasil diblokir.']);
+    }
+
+    public function destroyBlockedDate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'date' => 'required|date_format:Y-m-d|exists:blocked_dates,date',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()->first()], 422);
+        }
+
+        BlockedDate::where('date', $request->date)->delete();
+
+        return response()->json(['message' => 'Blokir tanggal berhasil dibuka.']);
+    }
+
 }

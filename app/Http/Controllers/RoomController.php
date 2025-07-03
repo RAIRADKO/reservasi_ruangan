@@ -6,22 +6,30 @@ use App\Models\Reservation;
 use App\Models\RoomInfo;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Models\BlockedDate;
+
 
 class RoomController extends Controller
 {
     public function index()
     {
-        // Use firstOrFail() to get the room or fail with a 404 error
         $room = RoomInfo::firstOrFail();
         
-        $bookedDates = Reservation::where('status', Reservation::STATUS_APPROVED)
-            ->select('tanggal')
+        // Mengambil tanggal yang penuh karena reservasi
+        $reservationDates = Reservation::where('status', Reservation::STATUS_APPROVED)
             ->distinct()
             ->pluck('tanggal')
             ->map(function ($date) {
                 return $date->format('Y-m-d');
-            })
-            ->toArray();
+            });
+            
+        // Mengambil tanggal yang diblokir manual oleh admin
+        $manualBlockedDates = BlockedDate::pluck('date')->map(function ($date) {
+            return $date->format('Y-m-d');
+        });
+        
+        // Menggabungkan keduanya dan memastikan tidak ada duplikat
+        $bookedDates = $reservationDates->merge($manualBlockedDates)->unique()->values()->all();
             
         return view('home', compact('room', 'bookedDates'));
     }

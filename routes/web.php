@@ -78,4 +78,9 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
 
     Route::get('/room/edit', [AdminController::class, 'editRoom'])->name('room.edit');
     Route::put('/room/update', [AdminController::class, 'updateRoom'])->name('room.update');
+
+    // == ROUTE BARU UNTUK MANAJEMEN KALENDER ==
+    Route::get('/calendar-management', [AdminController::class, 'showCalendarManagement'])->name('calendar.management');
+    Route::post('/blocked-dates', [AdminController::class, 'storeBlockedDate'])->name('blocked-dates.store');
+    Route::delete('/blocked-dates', [AdminController::class, 'destroyBlockedDate'])->name('blocked-dates.destroy');
 });
