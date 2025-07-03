@@ -7,13 +7,15 @@ use App\Models\RoomInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreReservationRequest; // Import Form Request
+use App\Models\BlockedDate;
 
 class ReservationController extends Controller
 {
     public function create()
     {
         $room = RoomInfo::first();
-        return view('reservations.create', compact('room'));
+        $blockedDates = BlockedDate::pluck('date')->map->format('Y-m-d')->toArray();
+        return view('reservations.create', compact('room', 'blockedDates'));
     }
 
     public function store(StoreReservationRequest $request) // Gunakan Form Request di sini

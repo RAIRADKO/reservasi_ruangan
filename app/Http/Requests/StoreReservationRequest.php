@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Reservation;
+use App\Models\BlockedDate;
 
 class StoreReservationRequest extends FormRequest
 {
@@ -44,6 +45,12 @@ class StoreReservationRequest extends FormRequest
             $tanggal = $this->input('tanggal');
             $jamMulai = $this->input('jam_mulai');
             $jamSelesai = $this->input('jam_selesai');
+
+            // Cek apakah tanggal diblokir
+            if (BlockedDate::where('date', $tanggal)->exists()) {
+                $validator->errors()->add('blocked', 'Tanggal yang dipilih tidak tersedia untuk reservasi. Silakan pilih tanggal lain.');
+                return; // Hentikan validasi jika tanggal sudah diblokir
+            }
 
             // Cek konflik jadwal
             if (Reservation::hasConflict($tanggal, $jamMulai, $jamSelesai)) {

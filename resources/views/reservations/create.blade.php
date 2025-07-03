@@ -25,6 +25,7 @@
                     <div class="mb-3">
                         <label for="tanggal" class="form-label">Tanggal</label>
                         <input type="date" class="form-control" id="tanggal" name="tanggal" min="{{ date('Y-m-d') }}" value="{{ old('tanggal') }}" required>
+                        <div id="date-warning" class="invalid-feedback d-block" style="display: none;"></div>
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -48,8 +49,39 @@
                 <textarea class="form-control" id="keperluan" name="keperluan" rows="3" required>{{ old('keperluan') }}</textarea>
             </div>
 
-            <button type="submit" class="btn btn-primary">Ajukan Reservasi</button>
+            <button type="submit" id="submitButton" class="btn btn-primary">Ajukan Reservasi</button>
         </form>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const blockedDates = @json($blockedDates ?? []);
+    const tanggalInput = document.getElementById('tanggal');
+    const submitButton = document.getElementById('submitButton');
+    const dateWarning = document.getElementById('date-warning');
+
+    function checkDate() {
+        const selectedDate = tanggalInput.value;
+        if (blockedDates.includes(selectedDate)) {
+            tanggalInput.classList.add('is-invalid');
+            dateWarning.textContent = 'Tanggal yang dipilih tidak tersedia untuk reservasi. Silakan pilih tanggal lain.';
+            dateWarning.style.display = 'block';
+            submitButton.disabled = true;
+        } else {
+            tanggalInput.classList.remove('is-invalid');
+            dateWarning.style.display = 'none';
+            submitButton.disabled = false;
+        }
+    }
+
+    if (tanggalInput.value) {
+        checkDate();
+    }
+
+    tanggalInput.addEventListener('change', checkDate);
+});
+</script>
 @endsection
