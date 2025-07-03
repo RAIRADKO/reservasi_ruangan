@@ -26,7 +26,7 @@
 
     <div class="card mt-4">
         <div class="card-header">
-            <a href="{{ route('admin.reservations') }}" class="btn btn-sm btn-outline-primary float-end">Lihat Semua</a>
+            <a href="{{ route('admin.reservations.index') }}" class="btn btn-sm btn-outline-primary float-end">Lihat Semua</a>
             Reservasi Terbaru
         </div>
         <div class="card-body">
