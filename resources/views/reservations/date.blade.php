@@ -59,17 +59,6 @@
                             $endHour = 17;
                         @endphp
                         
-                        <div class="position-absolute bg-primary text-white p-1 rounded" 
-                            style="left: {{ $startPosition / ($endHour - $startHour) * 100 }}%; 
-                                    width: {{ $duration / ($endHour - $startHour) * 100 }}%;
-                                    height: 100%;">
-                            <div class="d-flex justify-content-between align-items-center h-100 px-2">
-                                <span class="fw-bold">{{ $reservation->nama }}</span>
-                                <small>
-                                    {{ date('H:i', strtotime($reservation->jam_mulai)) }}-{{ date('H:i', strtotime($reservation->jam_selesai)) }}
-                                </small>
-                            </div>
-                        </div>                        
                         <!-- Tampilkan setiap reservasi sebagai baris visual -->
                         @foreach($reservations as $reservation)
                         @php
