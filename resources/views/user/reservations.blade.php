@@ -38,8 +38,12 @@
                     </thead>
                     <tbody>
                         @foreach($reservations as $reservation)
-                        <tr>
-                            <td>{{ $reservation->tanggal->isoFormat('dddd, D MMMM Y') }}</td>
+                        <tr class='clickable-row' data-href="{{ route('reservations.show', $reservation->id) }}">
+                            <td>
+                                <a href="{{ route('reservations.show', $reservation->id) }}" class="text-decoration-none fw-bold">
+                                    {{ $reservation->tanggal->isoFormat('dddd, D MMMM Y') }}
+                                </a>
+                            </td>
                             <td>{{ $reservation->jam_range }}</td>
                             <td>{{ \Illuminate\Support\Str::limit($reservation->keperluan, 60) }}</td>
                             <td class="text-center">
@@ -50,6 +54,13 @@
                                     @else bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle @endif">
                                     {{ ucfirst($reservation->status) }}
                                 </span>
+                                @if($reservation->status == 'rejected' && $reservation->rejection_reason)
+                                    <i class="bi bi-info-circle text-danger ms-1" 
+                                       data-bs-toggle="tooltip" 
+                                       data-bs-placement="top"
+                                       title="Alasan: {{ $reservation->rejection_reason }}">
+                                    </i>
+                                @endif
                             </td>
                             <td class="text-center">
                                 @if($reservation->status == 'pending')
@@ -78,12 +89,30 @@
 </div>
 @endsection
 
+@section('styles')
+<style>
+    .clickable-row {
+        cursor: pointer;
+    }
+</style>
+@endsection
+
 @section('scripts')
 <script>
-    // Inisialisasi tooltip Bootstrap
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inisialisasi tooltip Bootstrap
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+
+        // Membuat seluruh baris dapat diklik
+        const rows = document.querySelectorAll('.clickable-row');
+        rows.forEach(row => {
+            row.addEventListener('click', function() {
+                window.location.href = row.dataset.href;
+            });
+        });
+    });
 </script>
 @endsection

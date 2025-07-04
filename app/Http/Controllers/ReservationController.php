@@ -52,6 +52,25 @@ class ReservationController extends Controller
     }
 
     /**
+     * Menampilkan detail reservasi spesifik.
+     *
+     * @param  \App\Models\Reservation  $reservation
+     * @return \Illuminate\View\View
+     */
+    public function show(Reservation $reservation)
+    {
+        // Memastikan pengguna yang login hanya bisa melihat reservasinya sendiri
+        if (Auth::id() !== $reservation->user_id) {
+            abort(403, 'Anda tidak memiliki akses untuk melihat reservasi ini.');
+        }
+
+        // Eager load relasi untuk efisiensi
+        $reservation->load(['user', 'roomInfo', 'dinas']);
+
+        return view('reservations.show', compact('reservation'));
+    }
+
+    /**
      * Check room availability for specific date and time
      */
     public function checkAvailability(Request $request)

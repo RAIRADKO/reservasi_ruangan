@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ReservationApprovedUserNotification;
-
+use App\Mail\ReservationRejectedUserNotification; // Import Mailable baru
 
 class AdminController extends Controller
 {
@@ -44,18 +44,35 @@ class AdminController extends Controller
     {
         $request->validate([
             'status' => ['required', Rule::in(array_keys(Reservation::statusOptions()))],
+            // Alasan wajib diisi jika statusnya 'rejected'
+            'rejection_reason' => 'required_if:status,rejected|string|nullable',
         ]);
         
         $oldStatus = $reservation->status;
         $newStatus = $request->status;
         
-        $reservation->update(['status' => $newStatus]);
+        $updateData = ['status' => $newStatus];
+
+        // Simpan alasan penolakan jika statusnya 'rejected', jika tidak, hapus alasan.
+        if ($newStatus === Reservation::STATUS_REJECTED) {
+            $updateData['rejection_reason'] = $request->rejection_reason;
+        } else {
+            $updateData['rejection_reason'] = null;
+        }
+
+        $reservation->update($updateData);
+
+        // Memuat relasi user jika belum termuat
+        $reservation->load('user');
 
         // Kirim email jika status diubah menjadi 'approved'
         if ($newStatus === Reservation::STATUS_APPROVED && $oldStatus !== Reservation::STATUS_APPROVED) {
-            // Memuat relasi user jika belum termuat
-            $reservation->load('user');
             Mail::to($reservation->user->email)->send(new ReservationApprovedUserNotification($reservation));
+        }
+
+        // Kirim email jika status diubah menjadi 'rejected'
+        if ($newStatus === Reservation::STATUS_REJECTED && $oldStatus !== Reservation::STATUS_REJECTED) {
+            Mail::to($reservation->user->email)->send(new ReservationRejectedUserNotification($reservation));
         }
         
         return back()->with('success', 'Status reservasi berhasil diperbarui.');

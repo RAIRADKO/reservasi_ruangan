@@ -50,6 +50,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
     Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
     Route::get('/reservations/success', [ReservationController::class, 'success'])->name('reservations.success');
+    
+    // Route baru untuk detail reservasi
+    Route::get('/reservations/{reservation}', [ReservationController::class, 'show'])->name('reservations.show');
 
     Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
     Route::get('/my-reservations', [UserController::class, 'reservations'])->name('user.reservations');

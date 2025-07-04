@@ -18,6 +18,7 @@ class Reservation extends Model
         'jam_selesai',
         'keperluan',
         'status',
+        'rejection_reason', // Ditambahkan untuk alasan penolakan
     ];
 
     protected $casts = [
