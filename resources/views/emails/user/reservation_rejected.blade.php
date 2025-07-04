@@ -1,50 +1,38 @@
-<x-mail::message>
-{{-- Header Sederhana --}}
-<x-mail::layout>
-    <x-slot name="header">
-        <table style="width: 100%; text-align: center; background: #dc2626; padding: 20px; border-radius: 10px;">
-            <tr>
-                <td>
-                    <h1 style="color: white; margin: 0; font-size: 24px;">Sistem Reservasi Ruangan</h1>
-                    <p style="color: #fecaca; margin: 5px 0 0 0; font-size: 14px;">Sistem Manajemen Reservasi</p>
-                </td>
-            </tr>
-        </table>
-    </x-slot>
+@extends('emails.layouts.custom')
 
-# ❌ Reservasi Ruangan Anda Ditolak
+@section('title', 'Reservasi Anda Ditolak')
 
-Halo **{{ $reservation->nama }}**,
+@section('header', 'Reservasi Ditolak')
 
-Mohon maaf, reservasi ruangan yang Anda ajukan telah **ditolak** oleh admin.
+@section('content')
+    <h2 style="color: #dc3545;">❌ Reservasi Ruangan Anda Ditolak</h2>
 
-<x-mail::panel>
-**📋 Detail Reservasi:**
+    <p>Halo, <strong>{{ $reservation->nama }}</strong>.</p>
 
-**🏛️ Ruangan:** {{ $reservation->roomInfo->nama_ruangan }}  
-**📅 Tanggal:** {{ $reservation->tanggal->isoFormat('dddd, D MMMB YYYY') }}  
-**⏰ Waktu:** {{ date('H:i', strtotime($reservation->jam_mulai)) }} - {{ date('H:i', strtotime($reservation->jam_selesai)) }}  
-**📊 Status:** **DITOLAK** ❌
-</x-mail::panel>
+    <p>Mohon maaf, reservasi ruangan yang Anda ajukan telah ditolak oleh admin. Berikut adalah detail reservasi Anda:</p>
 
-**📝 Alasan Penolakan:**
-> {{ $reservation->rejection_reason }}
+    <div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 20px; margin: 20px 0;">
+        <h3 style="margin-top: 0;">📋 Detail Reservasi:</h3>
+        <p><strong>🏛️ Ruangan:</strong> {{ $reservation->roomInfo->nama_ruangan }}</p>
+        <p><strong>📅 Tanggal:</strong> {{ $reservation->tanggal->isoFormat('dddd, D MMMM YYYY') }}</p>
+        <p><strong>⏰ Waktu:</strong> {{ date('H:i', strtotime($reservation->jam_mulai)) }} - {{ date('H:i', strtotime($reservation->jam_selesai)) }}</p>
+        <p><strong>📊 Status:</strong> <span style="color: #dc3545; font-weight: bold;">DITOLAK</span></p>
+    </div>
 
-**💡 Langkah Selanjutnya:**
-- Anda dapat mengajukan reservasi ulang dengan waktu atau tanggal yang berbeda
-- Hubungi pihak administrasi untuk informasi lebih lanjut
-- Pastikan semua persyaratan reservasi telah dipenuhi
+    <h4>📝 Alasan Penolakan:</h4>
+    <blockquote style="border-left: 4px solid #ffc107; padding-left: 15px; margin-left: 0; font-style: italic;">
+        <p>{{ $reservation->rejection_reason }}</p>
+    </blockquote>
 
-**📞 Butuh Bantuan?**  
-Jika Anda memiliki pertanyaan lebih lanjut, silakan hubungi pihak administrasi.
+    <h4>💡 Langkah Selanjutnya:</h4>
+    <ul>
+        <li>Anda dapat mengajukan reservasi ulang dengan waktu atau tanggal yang berbeda.</li>
+        <li>Hubungi pihak administrasi untuk informasi lebih lanjut.</li>
+    </ul>
 
----
-
-Terima kasih atas pengertiannya.
-
-**Hormat kami,**  
-**{{ config('app.name') }}**  
-*Sistem Reservasi Ruangan*
-
-</x-mail::layout>
-</x-mail::message>
+    <p>Jika Anda memiliki pertanyaan, silakan hubungi pihak administrasi.</p>
+    <br>
+    <p>Terima kasih atas pengertiannya.</p>
+    <p>Hormat kami,<br>
+    <strong>{{ config('app.name') }}</strong></p>
+@endsection

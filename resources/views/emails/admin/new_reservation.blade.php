@@ -1,46 +1,46 @@
-<x-mail::message>
-{{-- Header Sederhana --}}
-<x-mail::layout>
-    <x-slot name="header">
-        <table style="width: 100%; text-align: center; background: #1e3a8a; padding: 20px; border-radius: 10px;">
-            <tr>
-                <td>
-                    <h1 style="color: white; margin: 0; font-size: 24px;">Sistem Reservasi Ruangan</h1>
-                    <p style="color: #e2e8f0; margin: 5px 0 0 0; font-size: 14px;">Sistem Manajemen Reservasi</p>
-                </td>
-            </tr>
-        </table>
-    </x-slot>
+{{-- Hapus semua kode <x-mail::...> yang lama --}}
 
-# 📋 Permintaan Reservasi Ruangan Baru
+@extends('emails.layouts.custom')
 
-Halo Admin,
+@section('title', 'Permintaan Reservasi Baru')
 
-Ada permintaan reservasi ruangan baru yang membutuhkan persetujuan Anda.
+@section('header', 'Permintaan Reservasi Baru')
 
-<x-mail::panel>
-**📄 Detail Reservasi:**
+@section('content')
+    <p>Halo Admin,</p>
 
-**👤 Nama Pemohon:** {{ $reservation->nama }}  
-**🏢 Instansi:** {{ $reservation->dinas->name ?? 'N/A' }}  
-**🏛️ Ruangan:** {{ $reservation->roomInfo->nama_ruangan }}  
-**📅 Tanggal:** {{ $reservation->tanggal->isoFormat('dddd, D MMMM YYYY') }}  
-**⏰ Waktu:** {{ date('H:i', strtotime($reservation->jam_mulai)) }} - {{ date('H:i', strtotime($reservation->jam_selesai)) }}  
-**📝 Keperluan:** {{ $reservation->keperluan }}
-</x-mail::panel>
+    <p>Ada permintaan reservasi ruangan baru yang membutuhkan persetujuan Anda. Berikut adalah detailnya:</p>
 
-⚠️ **Tindakan Diperlukan:** Silakan tinjau dan berikan persetujuan untuk permintaan reservasi ini.
+    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <tr style="background-color: #f9f9f9;">
+            <td style="padding: 8px; border: 1px solid #ddd; width: 30%;"><strong>Nama Pemohon</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ $reservation->nama }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Instansi</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ $reservation->dinas->name ?? 'N/A' }}</td>
+        </tr>
+        <tr style="background-color: #f9f9f9;">
+            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Ruangan</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ $reservation->roomInfo->nama_ruangan }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Tanggal</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ $reservation->tanggal->isoFormat('dddd, D MMMM YYYY') }}</td>
+        </tr>
+        <tr style="background-color: #f9f9f9;">
+            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Waktu</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ date('H:i', strtotime($reservation->jam_mulai)) }} - {{ date('H:i', strtotime($reservation->jam_selesai)) }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Keperluan</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ $reservation->keperluan }}</td>
+        </tr>
+    </table>
 
-<x-mail::button :url="$url">
-🔍 Lihat Permintaan Reservasi
-</x-mail::button>
+    <p>Silakan tinjau dan berikan persetujuan untuk permintaan reservasi ini.</p>
 
----
+    <a href="{{ $url }}" class="button">Lihat Permintaan Reservasi</a>
 
-Terima kasih atas perhatiannya.
-
-**{{ config('app.name') }}**  
-*Sistem Reservasi Ruangan*
-
-</x-mail::layout>
-</x-mail::message>
+    <p>Terima kasih atas perhatiannya.</p>
+@endsection

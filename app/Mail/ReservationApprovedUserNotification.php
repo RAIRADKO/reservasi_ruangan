@@ -40,7 +40,7 @@ class ReservationApprovedUserNotification extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.user.reservation_approved',
+            view: 'emails.user.reservation_approved',
             with: [
                 'url' => route('user.reservations'),
             ],

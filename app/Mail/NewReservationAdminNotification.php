@@ -40,7 +40,7 @@ class NewReservationAdminNotification extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.admin.new_reservation',
+            view: 'emails.admin.new_reservation',
             with: [
                 'url' => route('admin.reservations.index'),
             ],

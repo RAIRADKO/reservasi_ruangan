@@ -40,7 +40,7 @@ class ReservationRejectedUserNotification extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.user.reservation_rejected',
+            view: 'emails.user.reservation_rejected',
             with: [
                 'url' => route('user.reservations'),
             ],
