@@ -10,6 +10,7 @@
                 <tr>
                     <th>Tanggal</th>
                     <th>Nama</th>
+                    <th>Instansi</th>
                     <th>Kontak</th>
                     <th>Jam</th>
                     <th>Keperluan</th>
@@ -22,6 +23,7 @@
                 <tr>
                     <td>{{ $reservation->tanggal_formatted }}</td>
                     <td>{{ $reservation->nama }}</td>
+                    <td>{{ $reservation->dinas->name ?? 'N/A' }}</td>
                     <td>{{ $reservation->kontak }}</td>
                     <td>{{ $reservation->jam_range }}</td>
                     <td>{{ $reservation->keperluan }}</td>

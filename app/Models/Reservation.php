@@ -10,6 +10,7 @@ class Reservation extends Model
     protected $fillable = [
         'user_id',
         'room_info_id', // Ditambahkan
+        'dinas_id', // Ditambahkan
         'nama',
         'kontak',
         'tanggal',
@@ -47,6 +48,12 @@ class Reservation extends Model
     public function roomInfo(): BelongsTo
     {
         return $this->belongsTo(RoomInfo::class);
+    }
+    
+    // Relasi ke model Dinas
+    public function dinas(): BelongsTo
+    {
+        return $this->belongsTo(Dinas::class);
     }
     
     // Memperbarui method hasConflict untuk memeriksa berdasarkan ruangan

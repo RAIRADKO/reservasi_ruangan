@@ -20,6 +20,22 @@
                 <div class="form-text">Contoh: 081234567890</div>
             </div>
 
+            <!-- Asal Instansi/Dinas Field -->
+            <div class="mb-3">
+                <label for="dinas_id" class="form-label">Asal Instansi/Dinas</label>
+                <select class="form-select @error('dinas_id') is-invalid @enderror" id="dinas_id" name="dinas_id" required>
+                    <option value="" disabled {{ old('dinas_id') ? '' : 'selected' }}>-- Pilih Instansi/Dinas --</option>
+                    @foreach($dinas as $d)
+                        <option value="{{ $d->id }}" {{ old('dinas_id') == $d->id ? 'selected' : '' }}>
+                            {{ $d->name }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('dinas_id')
+                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                @enderror
+            </div>
+
             <!-- Pilihan Ruangan -->
             <div class="mb-3">
                 <label for="room_info_id" class="form-label">Pilih Ruangan</label>
@@ -107,6 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const rooms = @json($rooms ?? []);
     const tanggalInput = document.getElementById('tanggal');
     const roomSelect = document.getElementById('room_info_id');
+    const dinasSelect = document.getElementById('dinas_id');
     const submitButton = document.getElementById('submitButton');
     const dateWarning = document.getElementById('date-warning');
     const roomDetails = document.getElementById('room-details');
@@ -239,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Hide availability result when form inputs change
-    [roomSelect, tanggalInput, jamMulai, jamSelesai].forEach(element => {
+    [roomSelect, tanggalInput, jamMulai, jamSelesai, dinasSelect].forEach(element => {
         element.addEventListener('change', function() {
             availabilityResult.style.display = 'none';
         });

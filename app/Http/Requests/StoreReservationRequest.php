@@ -17,6 +17,7 @@ class StoreReservationRequest extends FormRequest
     {
         return [
             'room_info_id' => 'required|exists:room_infos,id', // Aturan validasi untuk room_info_id
+            'dinas_id' => 'required|exists:dinas,id', // Aturan validasi untuk dinas_id
             'nama' => 'required|string|max:100',
             'kontak' => 'required|string|max:100',
             'tanggal' => 'required|date|after_or_equal:today',

@@ -85,6 +85,14 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::put('rooms/{room}', [AdminController::class, 'roomUpdate'])->name('room.update');
     Route::delete('rooms/{room}', [AdminController::class, 'roomDestroy'])->name('room.destroy');
     
+    // == ROUTE BARU UNTUK MANAJEMEN DINAS ==
+    Route::get('dinas', [AdminController::class, 'dinasIndex'])->name('dinas.index');
+    Route::get('dinas/create', [AdminController::class, 'dinasCreate'])->name('dinas.create');
+    Route::post('dinas', [AdminController::class, 'dinasStore'])->name('dinas.store');
+    Route::get('dinas/{dina}/edit', [AdminController::class, 'dinasEdit'])->name('dinas.edit');
+    Route::put('dinas/{dina}', [AdminController::class, 'dinasUpdate'])->name('dinas.update');
+    Route::delete('dinas/{dina}', [AdminController::class, 'dinasDestroy'])->name('dinas.destroy');
+    
     // == ROUTE UNTUK MANAJEMEN KALENDER ==
     Route::get('/calendar-management', [AdminController::class, 'showCalendarManagement'])->name('calendar.management');
     Route::post('/blocked-dates', [AdminController::class, 'storeBlockedDate'])->name('blocked-dates.store');

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreReservationRequest;
 use App\Models\BlockedDate;
+use App\Models\Dinas;
 
 class ReservationController extends Controller
 {
@@ -15,7 +16,8 @@ class ReservationController extends Controller
     {
         $rooms = RoomInfo::all(); // Mengambil semua ruangan
         $blockedDates = BlockedDate::pluck('date')->map->format('Y-m-d')->toArray();
-        return view('reservations.create', compact('rooms', 'blockedDates'));
+        $dinas = Dinas::orderBy('name')->get(); // Mengambil semua data dinas
+        return view('reservations.create', compact('rooms', 'blockedDates', 'dinas'));
     }
 
     public function store(StoreReservationRequest $request)
@@ -23,6 +25,7 @@ class ReservationController extends Controller
         Reservation::create([
             'user_id' => Auth::id(),
             'room_info_id' => $request->room_info_id,
+            'dinas_id' => $request->dinas_id, // Menyimpan dinas_id
             'nama' => $request->nama,
             'kontak' => $request->kontak,
             'tanggal' => $request->tanggal,

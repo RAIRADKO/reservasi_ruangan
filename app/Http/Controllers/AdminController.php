@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use App\Models\BlockedDate;
 use App\Models\User;
+use App\Models\Dinas;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -200,6 +201,57 @@ class AdminController extends Controller
 
         return response()->json(['message' => 'Blokir tanggal berhasil dibuka.']);
     }
+
+    // == START: METODE BARU UNTUK MANAJEMEN DINAS ==
+    public function dinasIndex()
+    {
+        $dinas = Dinas::withCount('reservations')->orderBy('name')->paginate(10);
+        return view('admin.dinas.index', ['dinas' => $dinas]);
+    }
+
+    public function dinasCreate()
+    {
+        return view('admin.dinas.create');
+    }
+
+    public function dinasStore(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:dinas,name',
+        ]);
+
+        Dinas::create($request->only('name'));
+
+        return redirect()->route('admin.dinas.index')->with('success', 'Instansi/Dinas berhasil ditambahkan.');
+    }
+    
+    public function dinasEdit(Dinas $dina)
+    {
+        return view('admin.dinas.edit', compact('dina'));
+    }
+
+    public function dinasUpdate(Request $request, Dinas $dina)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255', Rule::unique('dinas')->ignore($dina->id)],
+        ]);
+
+        $dina->update($request->only('name'));
+
+        return redirect()->route('admin.dinas.index')->with('success', 'Informasi Instansi/Dinas berhasil diperbarui.');
+    }
+
+    public function dinasDestroy(Dinas $dina)
+    {
+        // Mencegah penghapusan jika ada reservasi terkait
+        if ($dina->reservations()->exists()) {
+            return redirect()->route('admin.dinas.index')->with('error', 'Instansi/Dinas tidak dapat dihapus karena sudah digunakan dalam data reservasi.');
+        }
+
+        $dina->delete();
+        return redirect()->route('admin.dinas.index')->with('success', 'Instansi/Dinas berhasil dihapus.');
+    }
+    // == END: METODE BARU UNTUK MANAJEMEN DINAS ==
 
     // == METODE BARU UNTUK MANAJEMEN USER ==
     public function usersIndex()
