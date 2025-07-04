@@ -60,6 +60,74 @@
     </div>
     @endif
 
+    <!-- Room Status Summary -->
+    @if(!isset($room) && $reservations->isNotEmpty())
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom-0 py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="bi bi-door-closed me-2 text-primary"></i>
+                        Status Ruangan
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @php
+                            $roomReservations = $reservations->groupBy('room_info_id');
+                            $allRooms = $rooms ?? collect();
+                        @endphp
+                        
+                        @foreach($allRooms as $roomItem)
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="room-status-card p-3 rounded-3 h-100 
+                                {{ $roomReservations->has($roomItem->id) ? 'bg-danger bg-opacity-10 border-danger' : 'bg-success bg-opacity-10 border-success' }}">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1 fw-bold">{{ $roomItem->nama_ruangan }}</h6>
+                                        @if($roomReservations->has($roomItem->id))
+                                            <small class="text-danger fw-bold">
+                                                <i class="bi bi-exclamation-circle me-1"></i>
+                                                {{ $roomReservations[$roomItem->id]->count() }} Reservasi
+                                            </small>
+                                        @else
+                                            <small class="text-success fw-bold">
+                                                <i class="bi bi-check-circle me-1"></i>
+                                                Tersedia
+                                            </small>
+                                        @endif
+                                    </div>
+                                    <div class="status-icon">
+                                        @if($roomReservations->has($roomItem->id))
+                                            <i class="bi bi-door-closed-fill text-danger fs-4"></i>
+                                        @else
+                                            <i class="bi bi-door-open-fill text-success fs-4"></i>
+                                        @endif
+                                    </div>
+                                </div>
+                                
+                                @if($roomReservations->has($roomItem->id))
+                                <div class="mt-2">
+                                    <small class="text-muted">Waktu terreservasi:</small>
+                                    <div class="reserved-times mt-1">
+                                        @foreach($roomReservations[$roomItem->id] as $res)
+                                        <span class="badge bg-danger bg-opacity-75 me-1 mb-1">
+                                            {{ date('H:i', strtotime($res->jam_mulai)) }}-{{ date('H:i', strtotime($res->jam_selesai)) }}
+                                        </span>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     @if ($reservations->isEmpty())
         <div class="row">
             <div class="col-12">
@@ -155,6 +223,9 @@
                                             <i class="bi bi-clock me-2"></i>Waktu
                                         </th>
                                         <th class="border-0 fw-bold py-3">
+                                            <i class="bi bi-door-open me-2"></i>Ruangan
+                                        </th>
+                                        <th class="border-0 fw-bold py-3">
                                             <i class="bi bi-person me-2"></i>Nama
                                         </th>
                                         <th class="border-0 fw-bold py-3">
@@ -175,6 +246,14 @@
                                                     {{ date('H:i', strtotime($reservation->jam_mulai)) }} - 
                                                     {{ date('H:i', strtotime($reservation->jam_selesai)) }}
                                                 </strong>
+                                            </div>
+                                        </td>
+                                        <td class="py-3">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-door-closed-fill text-primary me-2"></i>
+                                                <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1">
+                                                    {{ $reservation->roomInfo->nama_ruangan ?? 'Tidak diketahui' }}
+                                                </span>
                                             </div>
                                         </td>
                                         <td class="py-3">
@@ -284,6 +363,39 @@
 
     .table tbody tr:hover {
         background-color: #f8f9fa;
+    }
+
+    .room-status-card {
+        border: 2px solid;
+        transition: all 0.3s ease;
+    }
+
+    .room-status-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .reserved-times {
+        max-height: 60px;
+        overflow-y: auto;
+    }
+
+    .reserved-times::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .reserved-times::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .reserved-times::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .reserved-times::-webkit-scrollbar-thumb:hover {
+        background: #555;
     }
 
     @media (max-width: 768px) {

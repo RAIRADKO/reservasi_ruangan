@@ -49,7 +49,10 @@ class RoomController extends Controller
             ->orderBy('jam_mulai')
             ->get();
             
-        return view('reservations.date', compact('reservations', 'date'));
+        // Load all rooms for status summary
+        $rooms = RoomInfo::all();
+        
+        return view('reservations.date', compact('reservations', 'date', 'rooms'));
     }
 
     /**

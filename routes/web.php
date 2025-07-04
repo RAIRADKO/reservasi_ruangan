@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [RoomController::class, 'index'])->name('home');
 Route::get('/reservations/date/{date}', [RoomController::class, 'showReservationsByDate'])->name('reservations.date');
+Route::get('/reservations/date/{date}/room/{room}', [RoomController::class, 'showReservationsByDateAndRoom'])->name('reservations.date.room');
 
 // ==========================
 // Autentikasi Pengguna
@@ -64,7 +65,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/login', [AdminLoginController::class, 'login'])->name('login.submit');
     Route::post('/logout', [AdminLoginController::class, 'logout'])->name('logout');
 });
-
 
 // ==========================
 // Route Untuk Admin
