@@ -12,6 +12,6 @@ return [
     */
     'operating_hours' => [
         'start' => env('ROOM_OPERATING_START', '08:00'),
-        'end' => env('ROOM_OPERATING_END', '17:00'),
+        'end' => env('ROOM_OPERATING_END', '16:00'),
     ],
 ];
