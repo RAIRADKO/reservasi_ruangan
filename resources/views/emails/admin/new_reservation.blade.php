@@ -1,16 +1,12 @@
 <x-mail::message>
-{{-- Header dengan Logo --}}
+{{-- Header Sederhana --}}
 <x-mail::layout>
     <x-slot name="header">
         <table style="width: 100%; text-align: center; background: #1e3a8a; padding: 20px; border-radius: 10px;">
             <tr>
                 <td>
-                    @php
-                        $logoUrl = config('app.logo_url', url('img/Lambang_Kabupaten_Purworejo.png'));
-                    @endphp
-                    <img src="{{ $logoUrl }}" alt="Logo Kabupaten Purworejo" style="height: 80px; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto;" onerror="this.style.display='none'">
                     <h1 style="color: white; margin: 0; font-size: 24px;">Sistem Reservasi Ruangan</h1>
-                    <p style="color: #e2e8f0; margin: 5px 0 0 0; font-size: 14px;">Kabupaten Purworejo</p>
+                    <p style="color: #e2e8f0; margin: 5px 0 0 0; font-size: 14px;">Sistem Manajemen Reservasi</p>
                 </td>
             </tr>
         </table>
@@ -44,7 +40,7 @@ Ada permintaan reservasi ruangan baru yang membutuhkan persetujuan Anda.
 Terima kasih atas perhatiannya.
 
 **{{ config('app.name') }}**  
-*Sistem Reservasi Ruangan Kabupaten Purworejo*
+*Sistem Reservasi Ruangan*
 
 </x-mail::layout>
 </x-mail::message>
