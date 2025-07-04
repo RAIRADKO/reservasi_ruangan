@@ -1,46 +1,81 @@
-{{-- Hapus semua kode <x-mail::...> yang lama --}}
-
 @extends('emails.layouts.custom')
 
 @section('title', 'Permintaan Reservasi Baru')
 
 @section('header', 'Permintaan Reservasi Baru')
 
+@section('header_icon', '📋')
+
 @section('content')
-    <p>Halo Admin,</p>
+    <h2 style="color: #667eea; margin-bottom: 20px;">
+        🔔 Permintaan Reservasi Baru Masuk
+    </h2>
 
-    <p>Ada permintaan reservasi ruangan baru yang membutuhkan persetujuan Anda. Berikut adalah detailnya:</p>
+    <p>Halo <strong>Admin</strong>,</p>
 
-    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-        <tr style="background-color: #f9f9f9;">
-            <td style="padding: 8px; border: 1px solid #ddd; width: 30%;"><strong>Nama Pemohon</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ $reservation->nama }}</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Instansi</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ $reservation->dinas->name ?? 'N/A' }}</td>
-        </tr>
-        <tr style="background-color: #f9f9f9;">
-            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Ruangan</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ $reservation->roomInfo->nama_ruangan }}</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Tanggal</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ $reservation->tanggal->isoFormat('dddd, D MMMM YYYY') }}</td>
-        </tr>
-        <tr style="background-color: #f9f9f9;">
-            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Waktu</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ date('H:i', strtotime($reservation->jam_mulai)) }} - {{ date('H:i', strtotime($reservation->jam_selesai)) }}</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Keperluan</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ $reservation->keperluan }}</td>
-        </tr>
-    </table>
+    <p>Ada permintaan reservasi ruangan baru yang membutuhkan persetujuan Anda. Silakan tinjau detail berikut:</p>
 
-    <p>Silakan tinjau dan berikan persetujuan untuk permintaan reservasi ini.</p>
+    <div class="info-card">
+        <h3>📋 Detail Permintaan Reservasi</h3>
+        <table class="info-table">
+            <thead>
+                <tr>
+                    <th>Informasi</th>
+                    <th>Detail</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>👤 Nama Pemohon</td>
+                    <td>{{ $reservation->nama }}</td>
+                </tr>
+                <tr>
+                    <td>🏛️ Instansi</td>
+                    <td>{{ $reservation->dinas->name ?? 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <td>🚪 Ruangan</td>
+                    <td>{{ $reservation->roomInfo->nama_ruangan }}</td>
+                </tr>
+                <tr>
+                    <td>📅 Tanggal</td>
+                    <td>{{ $reservation->tanggal->isoFormat('dddd, D MMMM YYYY') }}</td>
+                </tr>
+                <tr>
+                    <td>⏰ Waktu</td>
+                    <td>{{ date('H:i', strtotime($reservation->jam_mulai)) }} - {{ date('H:i', strtotime($reservation->jam_selesai)) }}</td>
+                </tr>
+                <tr>
+                    <td>📝 Keperluan</td>
+                    <td>{{ $reservation->keperluan }}</td>
+                </tr>
+                <tr>
+                    <td>📊 Status</td>
+                    <td><span class="status-badge status-pending">Menunggu Persetujuan</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <a href="{{ $url }}" class="button">Lihat Permintaan Reservasi</a>
+    <div class="info-list">
+        <h4>⚡ Tindakan yang Diperlukan:</h4>
+        <ul>
+            <li>Tinjau ketersediaan ruangan pada tanggal dan waktu yang diminta</li>
+            <li>Periksa kelengkapan informasi pemohon</li>
+            <li>Berikan persetujuan atau penolakan dengan alasan yang jelas</li>
+            <li>Pastikan tidak ada konflik jadwal dengan reservasi lain</li>
+        </ul>
+    </div>
 
-    <p>Terima kasih atas perhatiannya.</p>
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ $url }}" class="button">🔍 Tinjau & Proses Permintaan</a>
+    </div>
+
+    <div class="signature">
+        <p>Harap segera ditindaklanjuti untuk memberikan kepastian kepada pemohon.</p>
+        <p>Terima kasih atas perhatian dan kerjasamanya.</p>
+        <br>
+        <p><strong>Sistem Reservasi Ruangan</strong><br>
+        <em>{{ config('app.name') }}</em></p>
+    </div>
 @endsection

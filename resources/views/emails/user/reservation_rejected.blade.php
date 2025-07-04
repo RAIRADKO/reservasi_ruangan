@@ -1,38 +1,89 @@
 @extends('emails.layouts.custom')
 
-@section('title', 'Reservasi Anda Ditolak')
+@section('title', 'Reservasi Anda Tidak Dapat Disetujui')
 
-@section('header', 'Reservasi Ditolak')
+@section('header', 'Reservasi Tidak Disetujui')
+
+@section('header_icon', '📋')
 
 @section('content')
-    <h2 style="color: #dc3545;">❌ Reservasi Ruangan Anda Ditolak</h2>
+    <h2 style="color: #dc3545; margin-bottom: 25px;">
+        📢 Pemberitahuan Reservasi
+    </h2>
 
     <p>Halo, <strong>{{ $reservation->nama }}</strong>.</p>
 
-    <p>Mohon maaf, reservasi ruangan yang Anda ajukan telah ditolak oleh admin. Berikut adalah detail reservasi Anda:</p>
+    <p>Terima kasih atas pengajuan reservasi ruangan Anda. Setelah ditinjau oleh tim admin, mohon maaf reservasi Anda <strong>tidak dapat disetujui</strong> pada saat ini.</p>
 
-    <div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 20px; margin: 20px 0;">
-        <h3 style="margin-top: 0;">📋 Detail Reservasi:</h3>
-        <p><strong>🏛️ Ruangan:</strong> {{ $reservation->roomInfo->nama_ruangan }}</p>
-        <p><strong>📅 Tanggal:</strong> {{ $reservation->tanggal->isoFormat('dddd, D MMMM YYYY') }}</p>
-        <p><strong>⏰ Waktu:</strong> {{ date('H:i', strtotime($reservation->jam_mulai)) }} - {{ date('H:i', strtotime($reservation->jam_selesai)) }}</p>
-        <p><strong>📊 Status:</strong> <span style="color: #dc3545; font-weight: bold;">DITOLAK</span></p>
+    <div class="info-card">
+        <h3>📋 Detail Reservasi yang Diajukan</h3>
+        <table class="info-table">
+            <thead>
+                <tr>
+                    <th>Informasi</th>
+                    <th>Detail</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>🏛️ Ruangan</td>
+                    <td>{{ $reservation->roomInfo->nama_ruangan }}</td>
+                </tr>
+                <tr>
+                    <td>📅 Tanggal</td>
+                    <td>{{ $reservation->tanggal->isoFormat('dddd, D MMMM YYYY') }}</td>
+                </tr>
+                <tr>
+                    <td>⏰ Waktu</td>
+                    <td>{{ date('H:i', strtotime($reservation->jam_mulai)) }} - {{ date('H:i', strtotime($reservation->jam_selesai)) }}</td>
+                </tr>
+                <tr>
+                    <td>📝 Keperluan</td>
+                    <td>{{ $reservation->keperluan }}</td>
+                </tr>
+                <tr>
+                    <td>📊 Status</td>
+                    <td><span class="status-badge status-rejected">Tidak Disetujui</span></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <h4>📝 Alasan Penolakan:</h4>
-    <blockquote style="border-left: 4px solid #ffc107; padding-left: 15px; margin-left: 0; font-style: italic;">
-        <p>{{ $reservation->rejection_reason }}</p>
-    </blockquote>
+    <div class="info-card" style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border: 1px solid #ffc107;">
+        <h3 style="color: #856404;">📝 Alasan Tidak Disetujui:</h3>
+        <div class="rejection-box">
+            <p><strong>{{ $reservation->rejection_reason }}</strong></p>
+        </div>
+    </div>
 
-    <h4>💡 Langkah Selanjutnya:</h4>
-    <ul>
-        <li>Anda dapat mengajukan reservasi ulang dengan waktu atau tanggal yang berbeda.</li>
-        <li>Hubungi pihak administrasi untuk informasi lebih lanjut.</li>
-    </ul>
+    <div class="info-list">
+        <h4>🔄 Langkah Selanjutnya yang Dapat Anda Lakukan:</h4>
+        <ul>
+            <li><strong>Ajukan Ulang:</strong> Anda dapat mengajukan reservasi dengan waktu atau tanggal yang berbeda</li>
+            <li><strong>Pilih Ruangan Lain:</strong> Coba pilih ruangan alternatif yang mungkin tersedia</li>
+            <li><strong>Hubungi Admin:</strong> Konsultasikan dengan admin untuk mendapatkan rekomendasi waktu yang tepat</li>
+            <li><strong>Periksa Ketersediaan:</strong> Cek kalender ketersediaan ruangan sebelum mengajukan kembali</li>
+        </ul>
+    </div>
 
-    <p>Jika Anda memiliki pertanyaan, silakan hubungi pihak administrasi.</p>
-    <br>
-    <p>Terima kasih atas pengertiannya.</p>
-    <p>Hormat kami,<br>
-    <strong>{{ config('app.name') }}</strong></p>
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ $url ?? '#' }}" class="button">🔄 Ajukan Reservasi Baru</a>
+    </div>
+
+    <div class="info-card" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border: 1px solid #2196f3;">
+        <h3 style="color: #1976d2;">💡 Tips untuk Reservasi Selanjutnya:</h3>
+        <p style="margin: 0; color: #0d47a1;">
+            Untuk meningkatkan peluang persetujuan, pastikan Anda mengajukan reservasi dengan waktu yang cukup (minimal 3 hari sebelumnya), 
+            pilih waktu di luar jam sibuk, dan sertakan informasi keperluan yang jelas dan detail.
+        </p>
+    </div>
+
+    <div class="signature">
+        <p>Kami mohon maaf atas ketidaknyamanan ini. Jika Anda memiliki pertanyaan lebih lanjut, jangan ragu untuk menghubungi tim administrasi kami.</p>
+        <p>Terima kasih atas pengertian dan kerjasamanya.</p>
+        <br>
+        <p>Hormat kami,<br>
+        <strong>Tim {{ config('app.name') }}</strong><br>
+        <em>Sistem Reservasi Ruangan</em></p>
+    </div>
 @endsection
