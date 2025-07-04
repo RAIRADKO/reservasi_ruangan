@@ -13,9 +13,10 @@ class RoomController extends Controller
 {
     public function index()
     {
-        $room = RoomInfo::firstOrFail();
+        $rooms = RoomInfo::all();
+        $room = RoomInfo::firstOrFail(); // Keep for backward compatibility
         
-        // Mengambil tanggal yang penuh karena reservasi
+        // Mengambil tanggal yang penuh karena reservasi (untuk semua ruangan)
         $reservationDates = Reservation::where('status', Reservation::STATUS_APPROVED)
             ->distinct()
             ->pluck('tanggal')
@@ -31,10 +32,9 @@ class RoomController extends Controller
         // Menggabungkan keduanya dan memastikan tidak ada duplikat
         $bookedDates = $reservationDates->merge($manualBlockedDates)->unique()->values()->all();
             
-        return view('home', compact('room', 'bookedDates'));
+        return view('home', compact('room', 'rooms', 'bookedDates'));
     }
     
-    // PASTIKAN METHOD INI ADA
     public function showReservationsByDate($date)
     {
         try {
@@ -43,12 +43,40 @@ class RoomController extends Controller
             abort(404, 'Format tanggal tidak valid');
         }
         
-        $reservations = Reservation::with('user')
+        $reservations = Reservation::with(['user', 'roomInfo'])
             ->where('tanggal', $date)
             ->where('status', Reservation::STATUS_APPROVED)
             ->orderBy('jam_mulai')
             ->get();
             
         return view('reservations.date', compact('reservations', 'date'));
+    }
+
+    /**
+     * Show reservations by date and room
+     */
+    public function showReservationsByDateAndRoom($date, $roomId = null)
+    {
+        try {
+            $date = Carbon::parse($date)->format('Y-m-d');
+        } catch (\Exception $e) {
+            abort(404, 'Format tanggal tidak valid');
+        }
+        
+        $query = Reservation::with(['user', 'roomInfo'])
+            ->where('tanggal', $date)
+            ->where('status', Reservation::STATUS_APPROVED);
+            
+        if ($roomId) {
+            $query->where('room_info_id', $roomId);
+            $room = RoomInfo::findOrFail($roomId);
+        } else {
+            $room = null;
+        }
+        
+        $reservations = $query->orderBy('jam_mulai')->get();
+        $rooms = RoomInfo::all();
+            
+        return view('reservations.date', compact('reservations', 'date', 'room', 'rooms'));
     }
 }

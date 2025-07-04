@@ -14,6 +14,12 @@
                     <p class="mb-0 fs-5 opacity-90">
                         {{ \Carbon\Carbon::parse($date)->isoFormat('dddd, D MMMM Y') }}
                     </p>
+                    @if(isset($room))
+                        <small class="opacity-75">
+                            <i class="bi bi-door-open me-1"></i>
+                            Ruangan: {{ $room->nama_ruangan }}
+                        </small>
+                    @endif
                 </div>
                 <a href="{{ route('home') }}" class="btn btn-light btn-lg shadow-sm">
                     <i class="bi bi-arrow-left me-2"></i>
@@ -22,7 +28,38 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Room Filter -->
+    @if(isset($rooms) && $rooms->count() > 1)
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <label for="room-filter" class="form-label fw-bold">
+                                <i class="bi bi-funnel me-2"></i>Filter Ruangan:
+                            </label>
+                        </div>
+                        <div class="col-md-9">
+                            <select id="room-filter" class="form-select" onchange="filterByRoom()">
+                                <option value="{{ route('reservations.date', ['date' => $date]) }}">Semua Ruangan</option>
+                                @foreach($rooms as $roomOption)
+                                    <option 
+                                        value="{{ route('reservations.date.room', ['date' => $date, 'room' => $roomOption->id]) }}" 
+                                        {{ (isset($room) && $room->id == $roomOption->id) ? 'selected' : '' }}>
+                                        {{ $roomOption->nama_ruangan }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     @if ($reservations->isEmpty())
         <div class="row">
             <div class="col-12">
@@ -36,8 +73,6 @@
             </div>
         </div>
     @else
-
-
         <!-- Visual Schedule -->
         <div class="row mb-4">
             <div class="col-12">
@@ -55,7 +90,7 @@
                                 $endHour = 17;
                                 $colors = ['bg-primary', 'bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-secondary'];
                             @endphp
-                            
+
                             <!-- Time markers -->
                             <div class="time-markers mb-3">
                                 @for($hour = $startHour; $hour <= $endHour; $hour++)
@@ -65,14 +100,14 @@
                                     </div>
                                 @endfor
                             </div>
-                            
+
                             <!-- Reservations timeline -->
                             <div class="reservations-timeline">
                                 @foreach($reservations as $index => $reservation)
                                 @php
                                     $startTime = \Carbon\Carbon::parse($reservation->jam_mulai);
                                     $endTime = \Carbon\Carbon::parse($reservation->jam_selesai);
-                                    
+
                                     $startPosition = (($startTime->hour - $startHour) * 60 + $startTime->minute) / (($endHour - $startHour) * 60);
                                     $duration = $startTime->diffInMinutes($endTime) / (($endHour - $startHour) * 60);
                                     $colorClass = $colors[$index % count($colors)];
@@ -181,7 +216,7 @@
     .bg-gradient-primary {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
-    
+
     .schedule-timeline {
         min-height: 200px;
         background: linear-gradient(90deg, #f8f9fa 0%, #ffffff 100%);
@@ -189,14 +224,14 @@
         padding: 20px;
         position: relative;
     }
-    
+
     .time-markers {
         position: relative;
         height: 30px;
         border-bottom: 2px solid #dee2e6;
         margin-bottom: 20px;
     }
-    
+
     .time-marker {
         position: absolute;
         top: 0;
@@ -209,22 +244,22 @@
         border-radius: 4px;
         border: 1px solid #dee2e6;
     }
-    
+
     .reservations-timeline {
         position: relative;
     }
-    
+
     .reservation-block {
         position: absolute;
         transition: all 0.3s ease;
         cursor: pointer;
     }
-    
+
     .reservation-block:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
     }
-    
+
     .avatar-circle {
         width: 35px;
         height: 35px;
@@ -237,37 +272,49 @@
         font-weight: bold;
         font-size: 0.9rem;
     }
-    
+
     .card {
         transition: all 0.3s ease;
     }
-    
+
     .card:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(0,0,0,0.1);
     }
-    
+
     .table tbody tr:hover {
         background-color: #f8f9fa;
     }
-    
+
     @media (max-width: 768px) {
         .schedule-timeline {
             padding: 15px;
         }
-        
+
         .reservation-block {
             height: 50px !important;
         }
-        
+
         .reservation-block .fw-bold {
             font-size: 0.8rem;
         }
-        
+
         .time-marker {
             font-size: 0.7rem;
             padding: 1px 4px;
         }
     }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    function filterByRoom() {
+        const select = document.getElementById('room-filter');
+        const url = select.value;
+        if (url) {
+            window.location.href = url;
+        }
+    }
+</script>
 @endsection
