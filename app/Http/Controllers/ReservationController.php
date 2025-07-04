@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreReservationRequest;
 use App\Models\BlockedDate;
 use App\Models\Dinas;
+use App\Mail\NewReservationAdminNotification;
+use Illuminate\Support\Facades\Mail;
 
 class ReservationController extends Controller
 {
@@ -22,7 +24,7 @@ class ReservationController extends Controller
 
     public function store(StoreReservationRequest $request)
     {
-        Reservation::create([
+        $reservation = Reservation::create([
             'user_id' => Auth::id(),
             'room_info_id' => $request->room_info_id,
             'dinas_id' => $request->dinas_id, // Menyimpan dinas_id
@@ -34,6 +36,12 @@ class ReservationController extends Controller
             'keperluan' => $request->keperluan,
             'status' => Reservation::STATUS_PENDING,
         ]);
+
+        // Kirim email notifikasi ke admin
+        $adminEmail = config('mail.admin_address');
+        if ($adminEmail) {
+            Mail::to($adminEmail)->send(new NewReservationAdminNotification($reservation));
+        }
 
         return redirect()->route('reservations.success');
     }

@@ -12,6 +12,8 @@ use App\Models\User;
 use App\Models\Dinas;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ReservationApprovedUserNotification;
 
 
 class AdminController extends Controller
@@ -44,7 +46,17 @@ class AdminController extends Controller
             'status' => ['required', Rule::in(array_keys(Reservation::statusOptions()))],
         ]);
         
-        $reservation->update(['status' => $request->status]);
+        $oldStatus = $reservation->status;
+        $newStatus = $request->status;
+        
+        $reservation->update(['status' => $newStatus]);
+
+        // Kirim email jika status diubah menjadi 'approved'
+        if ($newStatus === Reservation::STATUS_APPROVED && $oldStatus !== Reservation::STATUS_APPROVED) {
+            // Memuat relasi user jika belum termuat
+            $reservation->load('user');
+            Mail::to($reservation->user->email)->send(new ReservationApprovedUserNotification($reservation));
+        }
         
         return back()->with('success', 'Status reservasi berhasil diperbarui.');
     }
