@@ -77,6 +77,9 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/reservations', [AdminController::class, 'reservations'])->name('reservations.index');
 
+    // Route untuk export data reservasi ke Excel
+    Route::get('/reservations/export', [AdminController::class, 'exportReservations'])->name('reservations.export');
+
     Route::put('/reservations/{reservation}/update-status', [AdminController::class, 'updateStatus'])->name('reservations.update-status');
     Route::delete('/reservations/{reservation}', [AdminController::class, 'destroy'])->name('reservations.destroy');
 

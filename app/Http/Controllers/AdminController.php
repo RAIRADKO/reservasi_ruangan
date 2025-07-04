@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ReservationApprovedUserNotification;
 use App\Mail\ReservationRejectedUserNotification; // Import Mailable baru
+use App\Exports\ReservationExport; // <-- Tambahkan use statement ini
+use Maatwebsite\Excel\Facades\Excel; // <-- Tambahkan use statement ini
 
 class AdminController extends Controller
 {
@@ -38,6 +40,15 @@ class AdminController extends Controller
             ->paginate(10);
             
         return view('admin.reservations.index', compact('reservations'));
+    }
+
+    /**
+     * Menangani permintaan untuk export data reservasi ke Excel.
+     */
+    public function exportReservations()
+    {
+        $fileName = 'laporan-riwayat-reservasi-' . date('Y-m-d') . '.xlsx';
+        return Excel::download(new ReservationExport(), $fileName);
     }
 
     public function updateStatus(Request $request, Reservation $reservation)
