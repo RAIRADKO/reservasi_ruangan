@@ -115,4 +115,16 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Email Address
+    |--------------------------------------------------------------------------
+    |
+    | Alamat email ini digunakan untuk mengirim notifikasi ke admin,
+    | contohnya ketika ada reservasi baru yang dibuat.
+    |
+    */
+
+    'admin_address' => env('ADMIN_EMAIL', 'serru4725@gmail.com'),
+
 ];
