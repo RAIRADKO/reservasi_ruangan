@@ -132,8 +132,7 @@
             </div>
             
             <div class="d-flex justify-content-center justify-content-md-end mt-4">
-                {{ $reservations->links('pagination::bootstrap-4') }}
-            </div>
+                {{ $reservations->links('pagination::bootstrap-5') }}            </div>
         @endif
     </div>
 </div>

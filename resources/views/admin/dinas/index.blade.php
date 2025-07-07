@@ -56,7 +56,7 @@
                 </table>
             </div>
             <div class="d-flex justify-content-center mt-3 p-3">
-                {{ $dinas->links() }}
+                {{ $dinas->links('pagination::bootstrap-5') }}
             </div>
         </div>
     </div>
