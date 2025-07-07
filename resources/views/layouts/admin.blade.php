@@ -67,33 +67,189 @@
             background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
         }
         
+        /* Mobile-First Design */
+        .mobile-header {
+            background: #212529;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 1030;
+        }
+        
+        .mobile-toggle {
+            color: white;
+            font-size: 1.5rem;
+            border: none;
+            background: none;
+            padding: 0.5rem;
+        }
+        
+        .mobile-toggle:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+            border-radius: 0.375rem;
+        }
+        
         .sidebar {
-            background: #212529; /* Latar belakang sidebar diubah menjadi hitam */
+            background: #212529;
             box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            z-index: 1025;
         }
         
         .sidebar .nav-link {
             color: rgba(255, 255, 255, 0.8);
             transition: all 0.2s ease-in-out;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
         }
         
         .sidebar .nav-link:hover {
             color: #ffffff;
             background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 0.375rem;
         }
         
         .sidebar .nav-link.active {
             color: #ffffff;
             background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 0.375rem;
         }
         
         .main-content {
             background-color: #ffffff;
             min-height: 100vh;
-            border-radius: 0.5rem 0 0 0.5rem;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+        
+        .sidebar-footer {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 1rem;
+            margin-top: auto;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 992px) {
+            .mobile-header {
+                display: none;
+            }
+            
+            .sidebar {
+                position: sticky;
+                top: 0;
+                height: 100vh;
+                overflow-y: auto;
+            }
+            
+            .main-content {
+                border-radius: 0.5rem 0 0 0.5rem;
+                box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            }
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 991.98px) {
+            .container-fluid {
+                padding: 0;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 280px;
+                height: 100vh;
+                transition: left 0.3s ease-in-out;
+                overflow-y: auto;
+                padding-top: 60px;
+            }
+            
+            .sidebar.show {
+                left: 0;
+            }
+            
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 1020;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease-in-out;
+            }
+            
+            .sidebar-overlay.show {
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            .main-content {
+                margin-top: 60px;
+                padding: 1rem;
+            }
+            
+            .btn-toolbar {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .btn-group {
+                width: 100%;
+            }
+            
+            .btn-group .btn {
+                width: 100%;
+            }
+            
+            /* Make tables responsive */
+            .table-responsive {
+                border-radius: 0.375rem;
+                box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            }
+            
+            /* Adjust cards for mobile */
+            .card {
+                margin-bottom: 1rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            /* Make buttons stack on mobile */
+            .btn-group-vertical .btn {
+                margin-bottom: 0.5rem;
+            }
+        }
+        
+        /* Tablet Styles */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .main-content {
+                padding: 1.5rem;
+            }
+        }
+        
+        /* Small Mobile Styles */
+        @media (max-width: 575.98px) {
+            .sidebar {
+                width: 100%;
+                left: -100%;
+            }
+            
+            .main-content {
+                padding: 0.75rem;
+            }
+            
+            .card-body {
+                padding: 0.75rem;
+            }
+            
+            .btn-sm {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+            }
+            
+            .h2 {
+                font-size: 1.5rem;
+            }
         }
         
         /* Animation classes */
@@ -114,23 +270,73 @@
             from { transform: translateY(20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
+        
+        /* Utility classes for mobile */
+        .text-truncate-mobile {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        @media (max-width: 575.98px) {
+            .text-truncate-mobile {
+                max-width: 150px;
+            }
+        }
     </style>
     
     @yield('styles')
 </head>
 
 <body>
+    <!-- Mobile Header -->
+    <div class="mobile-header d-lg-none position-fixed w-100 top-0">
+        <div class="d-flex justify-content-between align-items-center p-3">
+            <button class="mobile-toggle" type="button" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
+            <h5 class="text-white mb-0">
+                <i class="bi bi-shield-check me-2"></i>
+                Admin Panel
+            </h5>
+            <div class="dropdown">
+                <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{{ route('home') }}" target="_blank"><i class="bi bi-house-door me-2"></i>Lihat Website</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                            @csrf
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="bi bi-box-arrow-right me-2"></i>Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay d-lg-none" onclick="toggleSidebar()"></div>
+
     <div class="container-fluid">
         <div class="row">
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse vh-100 position-sticky top-0">
-                <div class="position-sticky pt-3 h-100">
-                    <div class="text-center mb-4">
+            <!-- Sidebar -->
+            <nav class="col-lg-2 sidebar" id="sidebar">
+                <div class="h-100 d-flex flex-column">
+                    <!-- Desktop Header -->
+                    <div class="text-center mb-4 pt-3 d-none d-lg-block">
                         <h4 class="text-white mb-0">
                             <i class="bi bi-shield-check me-2"></i>
                             Admin Panel
                         </h4>
                     </div>
-                    <ul class="nav flex-column">
+                    
+                    <!-- Navigation -->
+                    <ul class="nav flex-column flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" 
                             href="{{ route('admin.dashboard') }}">
@@ -155,7 +361,6 @@
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.calendar.*') ? 'active' : '' }}" 
                             href="{{ route('admin.calendar.management') }}">
-
                                 <i class="bi bi-calendar3 me-2"></i>
                                 Manajemen Kalender
                             </a>
@@ -174,8 +379,10 @@
                                 Manajemen Ruangan
                             </a>
                         </li>
-                    </ul>                    
-                    <div class="sidebar-footer position-absolute bottom-0 start-0 w-100 p-3">
+                    </ul>
+                    
+                    <!-- Sidebar Footer -->
+                    <div class="sidebar-footer d-none d-lg-block">
                         <div class="d-flex justify-content-around align-items-center">
                             <a class="btn btn-outline-light" href="{{ route('home') }}" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Website">
                                 <i class="bi bi-house-door"></i>
@@ -191,8 +398,10 @@
                 </div>
             </nav>
 
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
-                <div class="pt-3 pb-2 mb-3 border-bottom">
+            <!-- Main Content -->
+            <main class="col-lg-10 main-content">
+                <!-- Desktop Header -->
+                <div class="pt-3 pb-2 mb-3 border-bottom d-none d-lg-block">
                     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
                         <h1 class="h2 text-gray-800">@yield('title', 'Admin Panel')</h1>
                         <div class="btn-toolbar mb-2 mb-md-0">
@@ -204,6 +413,11 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Mobile Header Content -->
+                <div class="pt-3 pb-2 mb-3 border-bottom d-lg-none">
+                    <h1 class="h2 text-gray-800 text-center">@yield('title', 'Admin Panel')</h1>
                 </div>
 
                 <div class="fade-in">
@@ -232,6 +446,39 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
+        // Sidebar toggle function
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+        }
+
+        // Close sidebar when clicking on overlay
+        document.querySelector('.sidebar-overlay').addEventListener('click', function() {
+            toggleSidebar();
+        });
+
+        // Close sidebar when clicking on nav links (mobile)
+        document.querySelectorAll('.sidebar .nav-link').forEach(function(link) {
+            link.addEventListener('click', function() {
+                if (window.innerWidth < 992) {
+                    toggleSidebar();
+                }
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 992) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.querySelector('.sidebar-overlay');
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+            }
+        });
+        
         // Auto-dismiss alerts after 5 seconds
         setTimeout(function() {
             const alerts = document.querySelectorAll('.alert');
@@ -245,11 +492,13 @@
         
         // Add slide-up animation to cards
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize tooltips for new buttons
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-              return new bootstrap.Tooltip(tooltipTriggerEl)
-            })
+            // Initialize tooltips for desktop
+            if (window.innerWidth >= 992) {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                  return new bootstrap.Tooltip(tooltipTriggerEl)
+                })
+            }
 
             const cards = document.querySelectorAll('.card');
             cards.forEach(function(card, index) {
@@ -257,6 +506,24 @@
                     card.classList.add('slide-up');
                 }, index * 100);
             });
+        });
+
+        // Prevent body scroll when sidebar is open on mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class') {
+                        if (sidebar.classList.contains('show')) {
+                            document.body.style.overflow = 'hidden';
+                        } else {
+                            document.body.style.overflow = '';
+                        }
+                    }
+                });
+            });
+            
+            observer.observe(sidebar, { attributes: true });
         });
     </script>
     
