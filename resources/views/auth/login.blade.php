@@ -40,6 +40,8 @@
                     </div>
                      <div class="mt-3 text-center">
                         <small class="text-muted">
+                            <a href="{{ route('password.request') }}">Lupa Password?</a>
+                            <span class="mx-1"><br></span>
                             Belum punya akun? <a href="{{ route('register') }}">Daftar Akun Baru</a>.
                         </small>
                     </div>
