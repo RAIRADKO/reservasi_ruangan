@@ -71,19 +71,25 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    {{-- PERBAIKAN LOGIKA TOMBOL AKSI --}}
                                     @if($reservation->status == 'approved' && $isPast)
                                         <a href="{{ route('user.reservations.checkout', $reservation->id) }}" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Lakukan Check Out" onclick="event.stopPropagation()">
                                             <i class="bi bi-box-arrow-right"></i>
                                         </a>
                                     @elseif($reservation->status == 'pending' || ($reservation->status == 'approved' && !$isPast))
-                                        <form method="POST" action="{{ route('user.reservations.cancel', $reservation->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan reservasi ini?{{ $reservation->status == 'approved' ? ' Admin akan diberitahu.' : '' }}');" onclick="event.stopPropagation()">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Batalkan Reservasi">
-                                                <i class="bi bi-x-circle"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-sm btn-outline-danger cancel-btn" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#cancelModal"
+                                                data-reservation-id="{{ $reservation->id }}"
+                                                data-reservation-date="{{ $reservation->tanggal->isoFormat('dddd, D MMMM Y') }}"
+                                                data-reservation-time="{{ $reservation->jam_range }}"
+                                                data-reservation-purpose="{{ $reservation->keperluan }}"
+                                                data-reservation-status="{{ $reservation->status }}"
+                                                data-cancel-url="{{ route('user.reservations.cancel', $reservation->id) }}"
+                                                data-bs-toggle="tooltip" 
+                                                title="Batalkan Reservasi"
+                                                onclick="event.stopPropagation()">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
                                     @else
                                         -
                                     @endif
@@ -124,19 +130,22 @@
                             </div>
                         </a>
                         <div class="mt-3 d-flex justify-content-end">
-                            {{-- PERBAIKAN LOGIKA TOMBOL AKSI MOBILE --}}
                              @if($reservation->status == 'approved' && $isPast)
                                 <a href="{{ route('user.reservations.checkout', $reservation->id) }}" class="btn btn-sm btn-info">
                                     <i class="bi bi-box-arrow-right me-1"></i> Check Out
                                 </a>
                             @elseif($reservation->status == 'pending' || ($reservation->status == 'approved' && !$isPast))
-                                <form method="POST" action="{{ route('user.reservations.cancel', $reservation->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan reservasi ini?{{ $reservation->status == 'approved' ? ' Admin akan diberitahu.' : '' }}');">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Batalkan Reservasi">
-                                        <i class="bi bi-x-circle me-1"></i> Batalkan
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-sm btn-outline-danger cancel-btn" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#cancelModal"
+                                        data-reservation-id="{{ $reservation->id }}"
+                                        data-reservation-date="{{ $reservation->tanggal->isoFormat('dddd, D MMMM Y') }}"
+                                        data-reservation-time="{{ $reservation->jam_range }}"
+                                        data-reservation-purpose="{{ $reservation->keperluan }}"
+                                        data-reservation-status="{{ $reservation->status }}"
+                                        data-cancel-url="{{ route('user.reservations.cancel', $reservation->id) }}">
+                                    <i class="bi bi-x-circle me-1"></i> Batalkan
+                                </button>
                             @endif
                         </div>
                     </div>
@@ -150,6 +159,76 @@
         @endif
     </div>
 </div>
+
+<!-- Cancel Confirmation Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="cancelModalLabel">
+                    <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                    Konfirmasi Pembatalan
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning d-flex align-items-center mb-3">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    <div>
+                        <strong>Perhatian!</strong> Tindakan ini tidak dapat dibatalkan.
+                    </div>
+                </div>
+                
+                <p class="mb-3">Apakah Anda yakin ingin membatalkan reservasi berikut?</p>
+                
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-4 text-muted">Tanggal:</div>
+                            <div class="col-8 fw-bold" id="modal-date">-</div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-4 text-muted">Jam:</div>
+                            <div class="col-8" id="modal-time">-</div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-4 text-muted">Keperluan:</div>
+                            <div class="col-8" id="modal-purpose">-</div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-4 text-muted">Status:</div>
+                            <div class="col-8">
+                                <span class="badge" id="modal-status">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <p class="text-muted small mb-0" id="admin-notification" style="display: none;">
+                        <i class="bi bi-bell text-info me-1"></i>
+                        Admin akan diberitahu tentang pembatalan ini.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i> Batal
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmCancelBtn">
+                    <i class="bi bi-trash me-1"></i> Ya, Batalkan Reservasi
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form untuk submit cancel (hidden) -->
+<form id="cancelForm" method="POST" style="display: none;">
+    @csrf
+    @method('PATCH')
+</form>
+
 @endsection
 
 @section('styles')
@@ -169,6 +248,23 @@
         background-color: #f8f9fa;
     }
     
+    .modal-content {
+        border-radius: 1rem;
+        box-shadow: 0 1rem 3rem rgba(0,0,0,0.175);
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+        border-top-left-radius: 1rem;
+        border-top-right-radius: 1rem;
+    }
+    
+    .modal-footer {
+        background-color: #f8f9fa;
+        border-bottom-left-radius: 1rem;
+        border-bottom-right-radius: 1rem;
+    }
+    
     @media (max-width: 767.98px) {
         .card-header h5 {
             font-size: 1.1rem;
@@ -177,6 +273,10 @@
         .card-header .btn {
             padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
+        }
+        
+        .modal-dialog {
+            margin: 1rem;
         }
     }
     
@@ -188,6 +288,10 @@
         .card-header .btn {
             padding: 0.2rem 0.4rem;
             font-size: 0.8rem;
+        }
+        
+        .modal-dialog {
+            margin: 0.5rem;
         }
     }
 </style>
@@ -209,15 +313,66 @@
                 window.location.href = row.dataset.href;
             });
         });
-    });
 
-    const cancelForms = document.querySelectorAll('.clickable-row form');
-        cancelForms.forEach(form => {
-            form.addEventListener('click', function(event) {
-                // Mencegah event klik pada form menyebar ke elemen <tr>
-                event.stopPropagation();
+        // Handler untuk tombol cancel
+        const cancelButtons = document.querySelectorAll('.cancel-btn');
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const reservationId = this.dataset.reservationId;
+                const reservationDate = this.dataset.reservationDate;
+                const reservationTime = this.dataset.reservationTime;
+                const reservationPurpose = this.dataset.reservationPurpose;
+                const reservationStatus = this.dataset.reservationStatus;
+                const cancelUrl = this.dataset.cancelUrl;
+                
+                // Populate modal dengan data reservasi
+                document.getElementById('modal-date').textContent = reservationDate;
+                document.getElementById('modal-time').textContent = reservationTime;
+                document.getElementById('modal-purpose').textContent = reservationPurpose;
+                
+                // Set status badge
+                const statusBadge = document.getElementById('modal-status');
+                statusBadge.textContent = reservationStatus.charAt(0).toUpperCase() + reservationStatus.slice(1);
+                statusBadge.className = 'badge ';
+                
+                if (reservationStatus === 'approved') {
+                    statusBadge.className += 'bg-success-subtle text-success-emphasis border border-success-subtle';
+                } else if (reservationStatus === 'pending') {
+                    statusBadge.className += 'bg-warning-subtle text-warning-emphasis border border-warning-subtle';
+                } else {
+                    statusBadge.className += 'bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle';
+                }
+                
+                // Show/hide admin notification
+                const adminNotification = document.getElementById('admin-notification');
+                if (reservationStatus === 'approved') {
+                    adminNotification.style.display = 'block';
+                } else {
+                    adminNotification.style.display = 'none';
+                }
+                
+                // Set form action - menggunakan URL yang sudah digenerate Laravel
+                const cancelForm = document.getElementById('cancelForm');
+                cancelForm.action = cancelUrl;
+                
+                // Handler untuk tombol konfirmasi
+                document.getElementById('confirmCancelBtn').onclick = function() {
+                    // Tampilkan loading state
+                    this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Membatalkan...';
+                    this.disabled = true;
+                    
+                    // Submit form
+                    cancelForm.submit();
+                };
             });
         });
-
+        
+        // Reset modal saat ditutup
+        document.getElementById('cancelModal').addEventListener('hidden.bs.modal', function () {
+            const confirmBtn = document.getElementById('confirmCancelBtn');
+            confirmBtn.innerHTML = '<i class="bi bi-trash me-1"></i> Ya, Batalkan Reservasi';
+            confirmBtn.disabled = false;
+        });
+    });
 </script>
 @endsection
