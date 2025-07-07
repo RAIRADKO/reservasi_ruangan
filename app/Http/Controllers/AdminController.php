@@ -24,13 +24,14 @@ class AdminController extends Controller
     {
         $pendingCount = Reservation::where('status', Reservation::STATUS_PENDING)->count();
         $approvedCount = Reservation::where('status', Reservation::STATUS_APPROVED)->count();
-        
+        $userCount = User::count(); 
+
         $reservations = Reservation::with(['user', 'roomInfo']) // Eager load roomInfo
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
             
-        return view('admin.dashboard', compact('pendingCount', 'approvedCount', 'reservations'));
+        return view('admin.dashboard', compact('pendingCount', 'approvedCount', 'reservations', 'userCount'));
     }
 
     public function reservations()
