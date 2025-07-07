@@ -55,10 +55,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/reservations/{reservation}', [ReservationController::class, 'show'])->name('reservations.show');
 
     Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
+    
+    // Route baru untuk update password
+    Route::patch('/profile/password', [UserController::class, 'updatePassword'])->name('user.password.update');
+
     Route::get('/my-reservations', [UserController::class, 'reservations'])->name('user.reservations');
     Route::patch('/reservations/{id}/cancel', [UserController::class, 'cancelReservation'])->name('user.reservations.cancel');
     Route::post('/reservations/check-availability', [ReservationController::class, 'checkAvailability'])->name('reservations.check-availability');
 });
+
 
 // ==========================
 // Autentikasi Admin

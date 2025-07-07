@@ -16,7 +16,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             RoomInfoSeeder::class,
-            AdminSeeder::class, // <-- TAMBAHKAN BARIS INI
+            AdminSeeder::class,
+            DinasSeeder::class, // <-- TAMBAHKAN BARIS INI
         ]);
     }
 }

@@ -2,7 +2,8 @@
 
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-12 col-md-8">
+    {{-- Card Informasi Profil --}}
+    <div class="col-12 col-md-8 mb-4">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Profil Pengguna</h5>
@@ -42,6 +43,61 @@
                         Lihat Semua Reservasi Saya
                     </a>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Card Ganti Password --}}
+    <div class="col-12 col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-key-fill me-2 text-primary"></i>
+                    Ganti Password
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ route('user.password.update') }}">
+                    @csrf
+                    @method('PATCH')
+
+                    {{-- Menampilkan pesan sukses --}}
+                    @if (session('password_success'))
+                        <div class="alert alert-success">
+                            {{ session('password_success') }}
+                        </div>
+                    @endif
+
+                    {{-- Menampilkan pesan error --}}
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label">Password Saat Ini</label>
+                        <input type="password" name="current_password" id="current_password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">Password Baru</label>
+                        <input type="password" name="new_password" id="new_password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_password_confirmation" class="form-label">Konfirmasi Password Baru</label>
+                        <input type="password" name="new_password_confirmation" id="new_password_confirmation" class="form-control" required>
+                    </div>
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save-fill me-2"></i>
+                            Simpan Password Baru
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
