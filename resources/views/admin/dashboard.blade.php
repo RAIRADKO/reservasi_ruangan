@@ -4,10 +4,9 @@
 <div class="container">
     <h2 class="mb-4">Dashboard Admin</h2>
     
-    <!-- Statistik Cards -->
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4 mb-4">
         <div class="col">
-            <div class="card bg-primary text-white shadow-sm">
+            <div class="card bg-warning text-white shadow-sm">
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -37,6 +36,21 @@
             </div>
         </div>
         <div class="col">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title fw-bold fs-4 mb-1">{{-- $completedCount ?? 0 --}}</h5>
+                            <p class="card-text mb-0">Reservasi Selesai</p>
+                        </div>
+                        <div class="bg-white bg-opacity-25 rounded-circle p-3">
+                            <i class="bi bi-check-all fs-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
             <div class="card bg-info text-white shadow-sm">
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-center">
@@ -53,7 +67,6 @@
         </div>
     </div>
 
-    <!-- Reservasi Terbaru -->
     <div class="card shadow-sm border-0">
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
             <h5 class="mb-0">Reservasi Terbaru</h5>
@@ -62,7 +75,6 @@
             </a>
         </div>
         
-        <!-- Desktop View -->
         <div class="d-none d-md-block">
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
@@ -84,8 +96,9 @@
                                 <span class="badge rounded-pill
                                     @if($reservation->status == 'approved') bg-success-subtle text-success-emphasis
                                     @elseif($reservation->status == 'pending') bg-warning-subtle text-warning-emphasis
+                                    @elseif($reservation->status == 'completed') bg-primary-subtle text-primary-emphasis
                                     @else bg-danger-subtle text-danger-emphasis @endif">
-                                    {{ $reservation->status }}
+                                    {{ ucfirst($reservation->status) }}
                                 </span>
                             </td>
                         </tr>
@@ -95,7 +108,6 @@
             </div>
         </div>
         
-        <!-- Mobile View -->
         <div class="d-block d-md-none">
             <div class="list-group list-group-flush">
                 @foreach($reservations as $reservation)
@@ -105,8 +117,9 @@
                         <span class="badge rounded-pill
                             @if($reservation->status == 'approved') bg-success-subtle text-success-emphasis
                             @elseif($reservation->status == 'pending') bg-warning-subtle text-warning-emphasis
+                            @elseif($reservation->status == 'completed') bg-primary-subtle text-primary-emphasis
                             @else bg-danger-subtle text-danger-emphasis @endif">
-                            {{ $reservation->status }}
+                            {{ ucfirst($reservation->status) }}
                         </span>
                     </div>
                     <div class="d-flex justify-content-between">

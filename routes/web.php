@@ -62,6 +62,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/my-reservations', [UserController::class, 'reservations'])->name('user.reservations');
     Route::patch('/reservations/{id}/cancel', [UserController::class, 'cancelReservation'])->name('user.reservations.cancel');
     Route::post('/reservations/check-availability', [ReservationController::class, 'checkAvailability'])->name('reservations.check-availability');
+    Route::get('/reservations/{reservation}/checkout', [UserController::class, 'showCheckoutForm'])->name('user.reservations.checkout');
+    Route::post('/reservations/{reservation}/complete', [UserController::class, 'completeCheckout'])->name('user.reservations.complete');
 });
 
 

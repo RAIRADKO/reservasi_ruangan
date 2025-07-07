@@ -18,17 +18,20 @@ class Reservation extends Model
         'jam_selesai',
         'keperluan',
         'status',
-        'rejection_reason', // Ditambahkan untuk alasan penolakan
+        'rejection_reason',
+        'checked_out_at', // Add this
     ];
 
     protected $casts = [
         'tanggal' => 'date',
+        'checked_out_at' => 'datetime', 
     ];
 
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
     const STATUS_REJECTED = 'rejected';
     const STATUS_CANCELED = 'canceled';
+    const STATUS_COMPLETED = 'completed';
 
     public static function statusOptions()
     {
@@ -37,6 +40,7 @@ class Reservation extends Model
             self::STATUS_APPROVED => 'Approved',
             self::STATUS_REJECTED => 'Ditolak',
             self::STATUS_CANCELED => 'Dibatalkan',
+            self::STATUS_COMPLETED => 'Selesai',
         ];
     }
     
