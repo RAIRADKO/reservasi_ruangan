@@ -83,45 +83,6 @@
                 <h6 class="text-muted h6"><i class="bi bi-card-text me-2"></i>Keperluan</h6>
                 <p class="lead fs-6">{{ $reservation->keperluan }}</p>
 
-                {{-- Check Out Button Section di bagian bawah --}}
-                {{-- DEBUG INFO - Hapus setelah selesai debug --}}
-                <div class="alert alert-info mt-4">
-                    <h6>Debug Info:</h6>
-                    <p><strong>Auth Check:</strong> {{ Auth::check() ? 'Logged In' : 'Not Logged In' }}</p>
-                    @auth
-                        <p><strong>User ID:</strong> {{ Auth::id() }}</p>
-                        <p><strong>Reservation User ID:</strong> {{ $reservation->user_id }}</p>
-                        <p><strong>Is Owner:</strong> {{ Auth::id() == $reservation->user_id ? 'Yes' : 'No' }}</p>
-                        <p><strong>Status:</strong> {{ $reservation->status }}</p>
-                        <p><strong>Tanggal:</strong> {{ $reservation->tanggal->toDateString() }}</p>
-                        <p><strong>Jam Mulai:</strong> {{ $reservation->jam_mulai }}</p>
-                        <p><strong>Jam Selesai:</strong> {{ $reservation->jam_selesai }}</p>
-                        
-                        @php
-                            // Set timezone to Indonesia (WIB = UTC+7)
-                            $currentTime = \Carbon\Carbon::now('Asia/Jakarta');
-                            
-                            // Parse reservation times with timezone
-                            $startTime = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_mulai, 'Asia/Jakarta');
-                            $endTime = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai, 'Asia/Jakarta');
-                            
-                            $isPast = $currentTime->isAfter($endTime);
-                            $isOngoing = $currentTime->isBetween($startTime, $endTime);
-                            
-                            // For testing - allow checkout if within 1 hour of start time or after
-                            $canCheckout = $currentTime->isAfter($startTime->copy()->subHour()) || $isPast || $isOngoing;
-                        @endphp
-                        
-                        <p><strong>Current Time (Jakarta):</strong> {{ $currentTime->format('Y-m-d H:i:s') }}</p>
-                        <p><strong>Start Time (Jakarta):</strong> {{ $startTime->format('Y-m-d H:i:s') }}</p>
-                        <p><strong>End Time (Jakarta):</strong> {{ $endTime->format('Y-m-d H:i:s') }}</p>
-                        <p><strong>Is Past:</strong> {{ $isPast ? 'Yes' : 'No' }}</p>
-                        <p><strong>Is Ongoing:</strong> {{ $isOngoing ? 'Yes' : 'No' }}</p>
-                        <p><strong>Can Checkout:</strong> {{ $canCheckout ? 'Yes' : 'No' }}</p>
-                        <p><strong>Should Show Button:</strong> {{ $canCheckout && $reservation->status == 'approved' && Auth::id() == $reservation->user_id ? 'Yes' : 'No' }}</p>
-                    @endauth
-                </div>
-
                 @auth
                     @if(Auth::id() == $reservation->user_id)
                         @php
