@@ -24,18 +24,32 @@ class ReservationController extends Controller
 
     public function store(StoreReservationRequest $request)
     {
-        $reservation = Reservation::create([
+        // Ambil semua data yang tervalidasi dari request
+        $validatedData = $request->validated();
+
+        // Siapkan data untuk pembuatan reservasi
+        $reservationData = [
             'user_id' => Auth::id(),
-            'room_info_id' => $request->room_info_id,
-            'dinas_id' => $request->dinas_id, // Menyimpan dinas_id
-            'nama' => $request->nama,
-            'kontak' => $request->kontak,
-            'tanggal' => $request->tanggal,
-            'jam_mulai' => $request->jam_mulai,
-            'jam_selesai' => $request->jam_selesai,
-            'keperluan' => $request->keperluan,
+            'room_info_id' => $validatedData['room_info_id'],
+            'dinas_id' => $validatedData['dinas_id'],
+            'nama' => $validatedData['nama'],
+            'kontak' => $validatedData['kontak'],
+            'tanggal' => $validatedData['tanggal'],
+            'jam_mulai' => $validatedData['jam_mulai'],
+            'jam_selesai' => $validatedData['jam_selesai'],
+            'keperluan' => $validatedData['keperluan'],
             'status' => Reservation::STATUS_PENDING,
-        ]);
+        ];
+        
+        // Cek jika 'fasilitas' ada dan merupakan array, lalu gabungkan
+        if (isset($validatedData['fasilitas']) && is_array($validatedData['fasilitas'])) {
+            $reservationData['fasilitas_terpilih'] = implode(',', $validatedData['fasilitas']);
+        } else {
+            $reservationData['fasilitas_terpilih'] = null;
+        }
+
+        // Buat reservasi
+        $reservation = Reservation::create($reservationData);
 
         // Kirim email notifikasi ke admin
         $adminEmail = config('mail.admin_address');

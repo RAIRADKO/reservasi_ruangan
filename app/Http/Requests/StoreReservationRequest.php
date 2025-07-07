@@ -24,6 +24,8 @@ class StoreReservationRequest extends FormRequest
             'jam_mulai' => 'required|date_format:H:i',
             'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
             'keperluan' => 'required|string|max:255',
+            'fasilitas' => 'nullable|array',
+            'fasilitas.*' => 'string|max:100',
         ];
     }
     

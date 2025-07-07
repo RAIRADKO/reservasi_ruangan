@@ -34,11 +34,14 @@
                     <td class="d-none d-md-table-cell small">{{ $reservation->jam_range }}</td>
                     <td class="d-none d-lg-table-cell small">{{ $reservation->keperluan }}</td>
                     <td>
-                        <span class="badge bg-{{ $reservation->status == 'approved' ? 'success' : ($reservation->status == 'pending' ? 'warning' : ($reservation->status == 'completed' ? 'primary' : 'danger')) }} small">
-                            {{ ucfirst($reservation->status) }}
+                        <span class="badge bg-{{ $reservation->status == 'approved' ? 'success' : ($reservation->status == 'pending' ? 'warning' : ($reservation->status == 'completed' ? 'primary' : ($reservation->status == 'cancelled' ? 'secondary' : 'danger'))) }} small">
+                            {{ ucfirst($reservation->status == 'cancelled' ? 'Cancelled' : $reservation->status) }}
                         </span>
                         @if($reservation->status == 'rejected' && $reservation->rejection_reason)
                             <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip" title="Alasan: {{ $reservation->rejection_reason }}"></i>
+                        @endif
+                        @if($reservation->status == 'cancelled')
+                            <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip" title="Dibatalkan oleh user"></i>
                         @endif
                     </td>
                     <td>
@@ -48,7 +51,7 @@
                                 @csrf
                                 @method('PUT')
                                 <input type="hidden" name="status" value="approved">
-                                <button type="submit" class="btn btn-sm btn-success" {{ in_array($reservation->status, ['approved', 'completed', 'rejected']) ? 'disabled' : '' }}>
+                                <button type="submit" class="btn btn-sm btn-success" {{ in_array($reservation->status, ['approved', 'completed', 'rejected', 'cancelled']) ? 'disabled' : '' }}>
                                     <span class="d-none d-md-inline">Approve</span>
                                     <i class="bi bi-check-lg d-md-none"></i>
                                 </button>
@@ -60,7 +63,7 @@
                                     data-bs-target="#rejectModal"
                                     data-reservation-id="{{ $reservation->id }}"
                                     data-reservation-name="{{ $reservation->nama }}"
-                                    {{ in_array($reservation->status, ['rejected', 'completed', 'approved']) ? 'disabled' : '' }}>
+                                    {{ in_array($reservation->status, ['rejected', 'completed', 'approved', 'cancelled']) ? 'disabled' : '' }}>
                                 <span class="d-none d-md-inline">Reject</span>
                                 <i class="bi bi-x-lg d-md-none"></i>
                             </button>

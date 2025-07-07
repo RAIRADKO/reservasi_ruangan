@@ -11,15 +11,14 @@
                     <i class="bi bi-journal-richtext me-2 text-primary"></i>
                     Detail Reservasi
                 </h5>
-                <div class="d-flex gap-2"> {{-- Wrapper untuk tombol --}}
+                <div class="d-flex gap-2">
                     @auth
-                        {{-- Logika untuk menampilkan tombol Check Out --}}
                         @if(Auth::id() == $reservation->user_id)
                             @php
                                 $isPast = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai)->isPast();
                             @endphp
 
-                            @if($reservation->status == 'approved' && $isPast)
+                            @if($reservation->status == 'approved' && $isPast && is_null($reservation->checked_out_at))
                                 <a href="{{ route('user.reservations.checkout', $reservation->id) }}" class="btn btn-sm btn-success mt-2 mt-md-0">
                                     <i class="bi bi-check2-square"></i> Check Out
                                 </a>
@@ -35,25 +34,15 @@
             <div class="card-body p-3 p-md-4">
                 {{-- Status Alert --}}
                 <div class="alert 
-                    @if($reservation->status == 'approved') alert-success @elseif($reservation->status == 'pending') alert-warning @elseif($reservation->status == 'rejected') alert-danger @else alert-secondary @endif" 
+                    @if($reservation->status == 'approved') alert-success @elseif($reservation->status == 'pending') alert-warning @elseif($reservation->status == 'rejected') alert-danger @elseif($reservation->status == 'completed') alert-primary @else alert-secondary @endif" 
                     role="alert">
                     <h5 class="alert-heading fw-bold h6">
                         @if($reservation->status == 'approved') <i class="bi bi-check-circle-fill me-2"></i>Disetujui @endif
                         @if($reservation->status == 'pending') <i class="bi bi-hourglass-split me-2"></i>Menunggu Persetujuan @endif
                         @if($reservation->status == 'rejected') <i class="bi bi-x-circle-fill me-2"></i>Ditolak @endif
                         @if($reservation->status == 'canceled') <i class="bi bi-slash-circle-fill me-2"></i>Dibatalkan @endif
+                        @if($reservation->status == 'completed') <i class="bi bi-patch-check-fill me-2"></i>Selesai @endif
                     </h5>
-                    <p class="mb-0 fs-6">
-                        @if($reservation->status == 'rejected')
-                            Reservasi ini ditolak oleh admin pada: <strong class="text-dark">{{ $reservation->updated_at->isoFormat('dddd, D MMMM YYYY, HH:mm') }}</strong>.
-                        @elseif($reservation->status == 'approved')
-                            Reservasi ini telah disetujui dan dijadwalkan.
-                        @elseif($reservation->status == 'pending')
-                            Reservasi ini sedang menunggu persetujuan dari admin.
-                        @elseif($reservation->status == 'canceled')
-                            Reservasi ini telah Anda batalkan pada {{ $reservation->updated_at->isoFormat('D MMMM YYYY, HH:mm') }}.
-                        @endif
-                    </p>
                     @if($reservation->status == 'rejected' && $reservation->rejection_reason)
                         <hr>
                         <p class="mb-0"><strong>Alasan Penolakan:</strong><br>{{ $reservation->rejection_reason }}</p>
@@ -83,49 +72,18 @@
                 <h6 class="text-muted h6"><i class="bi bi-card-text me-2"></i>Keperluan</h6>
                 <p class="lead fs-6">{{ $reservation->keperluan }}</p>
 
-                @auth
-                    @if(Auth::id() == $reservation->user_id)
-                        @php
-                            $currentTime = \Carbon\Carbon::now();
-                            $startTime = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_mulai);
-                            $endTime = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai);
-                            $isPast = $endTime->isPast();
-                            $isOngoing = $currentTime->between($startTime, $endTime);
-                            $canCheckout = $isOngoing || $isPast;
-                        @endphp
-                        @if($reservation->status == 'approved')
-                            <div class="mt-4 p-3 bg-light rounded">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1 fw-bold text-primary">
-                                            <i class="bi bi-clock-history me-2"></i>Status Kehadiran
-                                        </h6>
-                                    <p class="mb-0 text-muted small">
-                                        @if($isPast)
-                                            Waktu reservasi telah berakhir. Silakan lakukan check out.
-                                        @elseif($isOngoing)
-                                            Reservasi sedang berlangsung. Anda dapat melakukan check out sekarang.
-                                        @else
-                                            Reservasi akan dimulai pada {{ \Carbon\Carbon::parse($reservation->jam_mulai)->format('H:i') }}.
-                                        @endif
-                                    </p>
-                                    </div>
-                                    <div>
-                                        @if($canCheckout)
-                                            <a href="{{ route('user.reservations.checkout', $reservation->id) }}" 
-                                               class="btn btn-success btn-sm" 
-                                               onclick="return confirm('Apakah Anda yakin ingin melakukan check out?')">
-                                                <i class="bi bi-check2-square me-1"></i> Check Out
-                                            </a>
-                                        @else
-                                            <span class="badge bg-info">Belum Waktunya</span>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                    @endif
-                @endauth
+                <hr>
+
+                <h6 class="text-muted h6"><i class="bi bi-check-square-fill me-2"></i>Fasilitas yang Digunakan</h6>
+                @if($reservation->fasilitas_terpilih)
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach($reservation->getFasilitasTerpilihArrayAttribute() as $fasilitas)
+                            <span class="badge bg-primary-subtle text-primary-emphasis border border-primary-subtle rounded-pill px-3 py-2">{{ $fasilitas }}</span>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-muted fst-italic">Tidak ada fasilitas tambahan yang dipilih.</p>
+                @endif
             </div>
         </div>
     </div>

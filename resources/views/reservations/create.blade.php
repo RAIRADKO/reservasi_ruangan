@@ -20,7 +20,6 @@
                 <div class="form-text">Contoh: 081234567890</div>
             </div>
 
-            <!-- Asal Instansi/Dinas Field -->
             <div class="mb-3">
                 <label for="dinas_id" class="form-label">Asal Instansi/Dinas</label>
                 <select class="form-select @error('dinas_id') is-invalid @enderror" id="dinas_id" name="dinas_id" required>
@@ -36,13 +35,12 @@
                 @enderror
             </div>
 
-            <!-- Pilihan Ruangan -->
             <div class="mb-3">
                 <label for="room_info_id" class="form-label">Pilih Ruangan</label>
                 <select class="form-select" id="room_info_id" name="room_info_id" required>
                     <option value="" disabled {{ old('room_info_id') ? '' : 'selected' }}>-- Pilih Ruangan --</option>
                     @foreach($rooms as $room)
-                        <option value="{{ $room->id }}" {{ old('room_info_id') == $room->id ? 'selected' : '' }}>
+                        <option value="{{ $room->id }}" data-fasilitas="{{ $room->fasilitas }}" {{ old('room_info_id') == $room->id ? 'selected' : '' }}>
                             {{ $room->nama_ruangan }} (Kapasitas: {{ $room->kapasitas }} orang)
                         </option>
                     @endforeach
@@ -52,34 +50,29 @@
                 @enderror
             </div>
 
-            <!-- Room Details Card (initially hidden) -->
-            <div id="room-details" class="mb-3" style="display: none;">
-                <div class="card bg-light">
-                    <div class="card-body">
-                        <h6 class="card-title">Detail Ruangan</h6>
-                        <div id="room-info-content">
-                            <!-- Room details will be populated here -->
-                        </div>
+            <div id="fasilitas-wrapper" class="mb-3" style="display: none;">
+                <label class="form-label">Pilih Fasilitas yang Akan Digunakan</label>
+                <div id="fasilitas-checklist" class="p-3 border rounded">
                     </div>
-                </div>
+                @error('fasilitas')
+                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                @enderror
             </div>
 
+
             <div class="row">
-                <!-- Tanggal -->
                 <div class="col-12 col-md-6 mb-3">
                     <label for="tanggal" class="form-label">Tanggal</label>
                     <input type="date" class="form-control" id="tanggal" name="tanggal" min="{{ date('Y-m-d') }}" value="{{ old('tanggal') }}" required>
                     <div id="date-warning" class="invalid-feedback d-block" style="display: none;"></div>
                 </div>
                 
-                <!-- Jam Mulai -->
                 <div class="col-6 col-md-3 mb-3">
                     <label for="jam_mulai" class="form-label">Jam Mulai</label>
                     <input type="time" class="form-control" id="jam_mulai" name="jam_mulai" min="{{ config('room.operating_hours.start') }}" max="{{ config('room.operating_hours.end') }}" value="{{ old('jam_mulai') }}" required>
                     <div class="form-text d-none d-md-block">Min: {{ config('room.operating_hours.start') }}</div>
                 </div>
                 
-                <!-- Jam Selesai -->
                 <div class="col-6 col-md-3 mb-3">
                     <label for="jam_selesai" class="form-label">Jam Selesai</label>
                     <input type="time" class="form-control" id="jam_selesai" name="jam_selesai" min="{{ config('room.operating_hours.start') }}" max="{{ config('room.operating_hours.end') }}" value="{{ old('jam_selesai') }}" required>
@@ -88,13 +81,12 @@
             </div>
 
             <div class="d-flex justify-content-between">
-                <div>
+                 <div>
                     <small class="d-block d-md-none text-muted">Min: {{ config('room.operating_hours.start') }}</small>
                     <small class="d-block d-md-none text-muted">Max: {{ config('room.operating_hours.end') }}</small>
                 </div>
             </div>
 
-            <!-- Availability Check Results -->
             <div id="availability-result" class="mb-3" style="display: none;">
                 <div class="alert" role="alert">
                     <div id="availability-message"></div>
@@ -125,57 +117,70 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const blockedDates = @json($blockedDates ?? []);
-    const rooms = @json($rooms ?? []);
-    const tanggalInput = document.getElementById('tanggal');
     const roomSelect = document.getElementById('room_info_id');
-    const dinasSelect = document.getElementById('dinas_id');
+    const fasilitasWrapper = document.getElementById('fasilitas-wrapper');
+    const fasilitasChecklist = document.getElementById('fasilitas-checklist');
+
+    roomSelect.addEventListener('change', function() {
+        // Clear previous checklist
+        fasilitasChecklist.innerHTML = '';
+        
+        // Get selected option
+        const selectedOption = this.options[this.selectedIndex];
+        const fasilitasData = selectedOption.getAttribute('data-fasilitas');
+
+        if (fasilitasData) {
+            const fasilitasArray = fasilitasData.split(',').map(item => item.trim());
+            
+            if (fasilitasArray.length > 0 && fasilitasArray[0] !== '') {
+                fasilitasArray.forEach(fasilitas => {
+                    const checkboxDiv = document.createElement('div');
+                    checkboxDiv.classList.add('form-check', 'form-check-inline');
+                    
+                    const checkboxInput = document.createElement('input');
+                    checkboxInput.classList.add('form-check-input');
+                    checkboxInput.type = 'checkbox';
+                    checkboxInput.name = 'fasilitas[]';
+                    checkboxInput.value = fasilitas;
+                    checkboxInput.id = 'fasilitas-' + fasilitas.replace(/\s+/g, '-').toLowerCase();
+                    
+                    const checkboxLabel = document.createElement('label');
+                    checkboxLabel.classList.add('form-check-label');
+                    checkboxLabel.htmlFor = checkboxInput.id;
+                    checkboxLabel.textContent = fasilitas;
+                    
+                    checkboxDiv.appendChild(checkboxInput);
+                    checkboxDiv.appendChild(checkboxLabel);
+                    fasilitasChecklist.appendChild(checkboxDiv);
+                });
+
+                fasilitasWrapper.style.display = 'block';
+            } else {
+                fasilitasWrapper.style.display = 'none';
+            }
+        } else {
+            fasilitasWrapper.style.display = 'none';
+        }
+    });
+    
+    // Trigger change event on page load if a room is already selected (e.g., from old input)
+    if (roomSelect.value) {
+        roomSelect.dispatchEvent(new Event('change'));
+    }
+
+    // Keep the rest of the existing script
+    const blockedDates = @json($blockedDates ?? []);
+    // ... (rest of the old script for date checking and availability)
+    const tanggalInput = document.getElementById('tanggal');
     const submitButton = document.getElementById('submitButton');
     const dateWarning = document.getElementById('date-warning');
-    const roomDetails = document.getElementById('room-details');
-    const roomInfoContent = document.getElementById('room-info-content');
     const checkAvailabilityButton = document.getElementById('checkAvailabilityButton');
     const availabilityResult = document.getElementById('availability-result');
     const availabilityMessage = document.getElementById('availability-message');
-    const existingReservations = document.getElementById('existing-reservations');
+    const existingReservationsList = document.getElementById('existing-reservations');
     const reservationList = document.getElementById('reservation-list');
     const jamMulai = document.getElementById('jam_mulai');
     const jamSelesai = document.getElementById('jam_selesai');
-
-    // Room selection handler
-    roomSelect.addEventListener('change', function() {
-        const selectedRoomId = this.value;
-        if (selectedRoomId) {
-            const selectedRoom = rooms.find(room => room.id == selectedRoomId);
-            if (selectedRoom) {
-                showRoomDetails(selectedRoom);
-            }
-        } else {
-            roomDetails.style.display = 'none';
-        }
-    });
-
-    function showRoomDetails(room) {
-        const facilities = room.fasilitas ? room.fasilitas.split(',').map(f => f.trim()) : [];
-        
-        roomInfoContent.innerHTML = `
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>Nama Ruangan:</strong> ${room.nama_ruangan}</p>
-                    <p><strong>Kapasitas:</strong> ${room.kapasitas} orang</p>
-                    <p><strong>Deskripsi:</strong> ${room.deskripsi || 'Tidak ada deskripsi'}</p>
-                </div>
-                <div class="col-md-6">
-                    <p><strong>Fasilitas:</strong></p>
-                    <ul class="list-unstyled">
-                        ${facilities.map(facility => `<li><i class="bi bi-check-circle-fill text-success me-2"></i>${facility}</li>`).join('')}
-                    </ul>
-                </div>
-            </div>
-        `;
-        
-        roomDetails.style.display = 'block';
-    }
 
     function checkDate() {
         const selectedDate = tanggalInput.value;
@@ -190,8 +195,12 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = false;
         }
     }
+    
+    tanggalInput.addEventListener('change', checkDate);
+    if (tanggalInput.value) {
+        checkDate();
+    }
 
-    // Availability check function
     checkAvailabilityButton.addEventListener('click', function() {
         const roomId = roomSelect.value;
         const tanggal = tanggalInput.value;
@@ -203,11 +212,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Show loading state
         checkAvailabilityButton.disabled = true;
         checkAvailabilityButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Mengecek...';
 
-        // Make AJAX request
         fetch('{{ route("reservations.check-availability") }}', {
             method: 'POST',
             headers: {
@@ -230,57 +237,42 @@ document.addEventListener('DOMContentLoaded', function() {
             showAvailabilityResult(false, 'Terjadi kesalahan saat mengecek ketersediaan.');
         })
         .finally(() => {
-            // Reset button state
             checkAvailabilityButton.disabled = false;
             checkAvailabilityButton.innerHTML = '<i class="bi bi-search"></i> Cek Ketersediaan';
         });
     });
 
-    function showAvailabilityResult(available, message, existingReservations = null) {
+    function showAvailabilityResult(available, message, existingReservationsData = null) {
         availabilityResult.style.display = 'block';
         
         if (available) {
             availabilityResult.firstElementChild.className = 'alert alert-success';
             availabilityMessage.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>' + message;
-            existingReservations.style.display = 'none';
+            existingReservationsList.style.display = 'none';
         } else {
             availabilityResult.firstElementChild.className = 'alert alert-danger';
             availabilityMessage.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>' + message;
             
-            if (existingReservations && existingReservations.length > 0) {
+            if (existingReservationsData && existingReservationsData.length > 0) {
                 reservationList.innerHTML = '';
-                existingReservations.forEach(reservation => {
+                existingReservationsData.forEach(reservation => {
                     const li = document.createElement('li');
                     li.innerHTML = `${reservation.jam_mulai} - ${reservation.jam_selesai}`;
                     reservationList.appendChild(li);
                 });
-                existingReservations.style.display = 'block';
+                existingReservationsList.style.display = 'block';
             } else {
-                existingReservations.style.display = 'none';
+                existingReservationsList.style.display = 'none';
             }
         }
     }
 
-    // Hide availability result when form inputs change
-    [roomSelect, tanggalInput, jamMulai, jamSelesai, dinasSelect].forEach(element => {
+    [roomSelect, tanggalInput, jamMulai, jamSelesai].forEach(element => {
         element.addEventListener('change', function() {
             availabilityResult.style.display = 'none';
         });
     });
 
-    // Check if there's a pre-selected room (for old input)
-    if (roomSelect.value) {
-        const selectedRoom = rooms.find(room => room.id == roomSelect.value);
-        if (selectedRoom) {
-            showRoomDetails(selectedRoom);
-        }
-    }
-
-    if (tanggalInput.value) {
-        checkDate();
-    }
-
-    tanggalInput.addEventListener('change', checkDate);
 });
 </script>
 @endsection

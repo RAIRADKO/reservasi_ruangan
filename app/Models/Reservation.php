@@ -17,6 +17,7 @@ class Reservation extends Model
         'jam_mulai',
         'jam_selesai',
         'keperluan',
+        'fasilitas_terpilih', // Ditambahkan
         'status',
         'rejection_reason',
         'checked_out_at', // Add this
@@ -94,5 +95,16 @@ class Reservation extends Model
     public function getTanggalAttribute($value)
     {
         return $this->asDateTime($value)->setTimezone('Asia/Jakarta');
+    }
+
+    /**
+     * Accessor untuk mendapatkan fasilitas terpilih sebagai array.
+     */
+    public function getFasilitasTerpilihArrayAttribute()
+    {
+        if ($this->fasilitas_terpilih) {
+            return explode(',', $this->fasilitas_terpilih);
+        }
+        return [];
     }
 }
