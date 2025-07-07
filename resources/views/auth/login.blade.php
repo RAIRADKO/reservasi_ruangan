@@ -40,7 +40,7 @@
                     </div>
                      <div class="mt-3 text-center">
                         <small class="text-muted">
-                            Bukan user biasa? <a href="{{ route('admin.login') }}">Login sebagai Admin</a>.
+                            Belum punya akun? <a href="{{ route('register') }}">Daftar Akun Baru</a>.
                         </small>
                     </div>
                 </form>
