@@ -22,7 +22,7 @@
                     <h6 class="text-muted mb-3">Langkah 1: Pindai QR Code Survei</h6>
                     <p>Silakan pindai QR Code yang telah disediakan di dalam ruangan menggunakan kamera ponsel Anda untuk mengisi survei kepuasan.</p>
                     {{-- The QR code is physically in the room, so we show a placeholder icon --}}
-                    <i class="bi bi-qr-code" style="font-size: 8rem; color: #6c757d;"></i>
+                    <img src="{{ asset('img\QR Command Center.jpg') }}" alt="QR Code Survei" style="width: 200px; height: 200px;" />
                     <p class="mt-2 text-muted small">QR Code terletak di dekat pintu keluar.</p>
                 </div>
 

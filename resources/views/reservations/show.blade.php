@@ -90,9 +90,9 @@
                             $startTime = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_mulai);
                             $endTime = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai);
                             $isPast = $endTime->isPast();
-                            $isOngoing = $startTime->isPast() && !$endTime->isPast();
+                            $isOngoing = $currentTime->between($startTime, $endTime);
+                            $canCheckout = $isOngoing || $isPast;
                         @endphp
-
                         @if($reservation->status == 'approved')
                             <div class="mt-4 p-3 bg-light rounded">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -100,17 +100,15 @@
                                         <h6 class="mb-1 fw-bold text-primary">
                                             <i class="bi bi-clock-history me-2"></i>Status Kehadiran
                                         </h6>
-                                        <p class="mb-0 text-muted small">
-                                            @if($isPast)
-                                                Waktu reservasi telah berakhir. Silakan lakukan check out.
-                                            @elseif($isOngoing)
-                                                Reservasi sedang berlangsung. Anda dapat melakukan check out sekarang.
-                                            @elseif($canCheckout)
-                                                Reservasi akan dimulai dalam 1 jam. Anda sudah dapat melakukan check out.
-                                            @else
-                                                Reservasi akan dimulai pada {{ $reservation->jam_mulai }}.
-                                            @endif
-                                        </p>
+                                    <p class="mb-0 text-muted small">
+                                        @if($isPast)
+                                            Waktu reservasi telah berakhir. Silakan lakukan check out.
+                                        @elseif($isOngoing)
+                                            Reservasi sedang berlangsung. Anda dapat melakukan check out sekarang.
+                                        @else
+                                            Reservasi akan dimulai pada {{ \Carbon\Carbon::parse($reservation->jam_mulai)->format('H:i') }}.
+                                        @endif
+                                    </p>
                                     </div>
                                     <div>
                                         @if($canCheckout)
