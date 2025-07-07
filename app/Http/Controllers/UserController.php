@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use App\Mail\ReservationCanceledAdminNotification;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -33,11 +35,24 @@ class UserController extends Controller
             ->where('id', $id)
             ->firstOrFail();
 
-        if ($reservation->status !== Reservation::STATUS_PENDING) {
-            return back()->with('error', 'Hanya reservasi pending yang bisa dibatalkan');
+        $allowedStatuses = [Reservation::STATUS_PENDING, Reservation::STATUS_APPROVED];
+
+        if (!in_array($reservation->status, $allowedStatuses)) {
+            return back()->with('error', 'Hanya reservasi dengan status pending atau disetujui yang bisa dibatalkan.');
         }
 
+        $wasApproved = $reservation->status === Reservation::STATUS_APPROVED;
+
         $reservation->update(['status' => Reservation::STATUS_CANCELED]);
+        
+        if ($wasApproved) {
+            // Jika reservasi yang dibatalkan sudah disetujui, kirim email ke admin
+            $adminEmail = config('mail.admin_address');
+            if ($adminEmail) {
+                Mail::to($adminEmail)->send(new ReservationCanceledAdminNotification($reservation));
+            }
+            return back()->with('success', 'Reservasi yang telah disetujui berhasil dibatalkan. Admin telah diberitahu.');
+        }
         
         return back()->with('success', 'Reservasi berhasil dibatalkan');
     }

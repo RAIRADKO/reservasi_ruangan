@@ -289,7 +289,6 @@
 </head>
 
 <body>
-    <!-- Mobile Header -->
     <div class="mobile-header d-lg-none position-fixed w-100 top-0">
         <div class="d-flex justify-content-between align-items-center p-3">
             <button class="mobile-toggle" type="button" onclick="toggleSidebar()">
@@ -319,15 +318,12 @@
         </div>
     </div>
 
-    <!-- Sidebar Overlay for Mobile -->
     <div class="sidebar-overlay d-lg-none" onclick="toggleSidebar()"></div>
 
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
             <nav class="col-lg-2 sidebar" id="sidebar">
                 <div class="h-100 d-flex flex-column">
-                    <!-- Desktop Header -->
                     <div class="text-center mb-4 pt-3 d-none d-lg-block">
                         <h4 class="text-white mb-0">
                             <i class="bi bi-shield-check me-2"></i>
@@ -335,7 +331,6 @@
                         </h4>
                     </div>
                     
-                    <!-- Navigation -->
                     <ul class="nav flex-column flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" 
@@ -381,7 +376,6 @@
                         </li>
                     </ul>
                     
-                    <!-- Sidebar Footer -->
                     <div class="sidebar-footer d-none d-lg-block">
                         <div class="d-flex justify-content-around align-items-center">
                             <a class="btn btn-outline-light" href="{{ route('home') }}" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Website">
@@ -398,9 +392,7 @@
                 </div>
             </nav>
 
-            <!-- Main Content -->
             <main class="col-lg-10 main-content">
-                <!-- Desktop Header -->
                 <div class="pt-3 pb-2 mb-3 border-bottom d-none d-lg-block">
                     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
                         <h1 class="h2 text-gray-800">@yield('title', 'Admin Panel')</h1>
@@ -415,7 +407,6 @@
                     </div>
                 </div>
 
-                <!-- Mobile Header Content -->
                 <div class="pt-3 pb-2 mb-3 border-bottom d-lg-none">
                     <h1 class="h2 text-gray-800 text-center">@yield('title', 'Admin Panel')</h1>
                 </div>
@@ -441,6 +432,28 @@
                 </div>
             </main>
         </div>
+    </div>
+    
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="confirmDeleteModalLabel"><i class="bi bi-exclamation-triangle-fill me-2"></i>Konfirmasi Penghapusan</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body fs-6 py-4" id="confirmDeleteModalBody">
+            Apakah Anda benar-benar yakin ingin menghapus item ini? Proses ini tidak dapat diurungkan.
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+            <form id="deleteForm" method="POST" action="" class="mb-0">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger"><i class="bi bi-trash-fill me-1"></i>Ya, Hapus</button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -524,6 +537,24 @@
             });
             
             observer.observe(sidebar, { attributes: true });
+        });
+
+        // Universal Delete Modal Handler
+        document.addEventListener('DOMContentLoaded', function () {
+            const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+            if (confirmDeleteModal) {
+                confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const deleteUrl = button.getAttribute('data-url');
+                    const confirmationMessage = button.getAttribute('data-message');
+        
+                    const modalBody = confirmDeleteModal.querySelector('#confirmDeleteModalBody');
+                    const deleteForm = confirmDeleteModal.querySelector('#deleteForm');
+        
+                    deleteForm.setAttribute('action', deleteUrl);
+                    modalBody.textContent = confirmationMessage || 'Apakah Anda yakin ingin menghapus item ini? Proses ini tidak dapat diurungkan.';
+                });
+            }
         });
     </script>
     

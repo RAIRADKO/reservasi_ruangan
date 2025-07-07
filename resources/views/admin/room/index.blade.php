@@ -37,13 +37,13 @@
                                         <a href="{{ route('admin.room.edit', $room->id) }}" class="btn btn-sm btn-warning">
                                             <i class="bi bi-pencil-fill"></i> Edit
                                         </a>
-                                        <form method="POST" action="{{ route('admin.room.destroy', $room->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus ruangan ini? Semua reservasi terkait akan dihapus.');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger">
-                                                <i class="bi bi-trash-fill"></i> Hapus
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-sm btn-danger" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#confirmDeleteModal" 
+                                                data-url="{{ route('admin.room.destroy', $room->id) }}" 
+                                                data-message="Apakah Anda yakin ingin menghapus ruangan '{{ $room->nama_ruangan }}'? Semua reservasi terkait juga akan dihapus.">
+                                            <i class="bi bi-trash-fill"></i> Hapus
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -75,13 +75,13 @@
                             <a href="{{ route('admin.room.edit', $room->id) }}" class="btn btn-sm btn-warning">
                                 <i class="bi bi-pencil-fill"></i>
                             </a>
-                            <form method="POST" action="{{ route('admin.room.destroy', $room->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus ruangan ini? Semua reservasi terkait akan dihapus.');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="bi bi-trash-fill"></i>
-                                </button>
-                            </form>
+                            <button type="button" class="btn btn-sm btn-danger" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#confirmDeleteModal" 
+                                    data-url="{{ route('admin.room.destroy', $room->id) }}" 
+                                    data-message="Apakah Anda yakin ingin menghapus ruangan '{{ $room->nama_ruangan }}'? Semua reservasi terkait juga akan dihapus.">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
                         </div>
                     </div>
                     @empty

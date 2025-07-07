@@ -66,14 +66,14 @@
                             </button>
                             
                             {{-- Tombol Hapus --}}
-                            <form method="POST" action="{{ route('admin.reservations.destroy', $reservation->id) }}" class="d-grid" onsubmit="return confirm('Hapus reservasi ini?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    <span class="d-none d-md-inline">Hapus</span>
-                                    <i class="bi bi-trash d-md-none"></i> {{-- Icon only on mobile --}}
-                                </button>
-                            </form>
+                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#confirmDeleteModal"
+                                    data-url="{{ route('admin.reservations.destroy', $reservation->id) }}"
+                                    data-message="Apakah Anda yakin ingin menghapus reservasi oleh {{ $reservation->nama }} pada tanggal {{ $reservation->tanggal_formatted }}?">
+                                <span class="d-none d-md-inline">Hapus</span>
+                                <i class="bi bi-trash d-md-none"></i>
+                            </button>
                         </div>
                     </td>
                 </tr>

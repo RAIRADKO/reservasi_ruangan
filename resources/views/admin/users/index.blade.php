@@ -35,15 +35,13 @@
                                        class="btn btn-warning btn-sm flex-grow-1">
                                         <i class="bi bi-pencil-fill me-1 d-none d-md-inline"></i> Edit
                                     </a>
-                                    <form method="POST" action="{{ route('admin.users.destroy', $user->id) }}" 
-                                          class="d-flex flex-grow-1" 
-                                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm w-100">
-                                            <i class="bi bi-trash-fill me-1 d-none d-md-inline"></i> Hapus
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-danger btn-sm flex-grow-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#confirmDeleteModal"
+                                            data-url="{{ route('admin.users.destroy', $user->id) }}"
+                                            data-message="Apakah Anda yakin ingin menghapus pengguna '{{ $user->name }}'?">
+                                        <i class="bi bi-trash-fill me-1 d-none d-md-inline"></i> Hapus
+                                    </button>
                                 </div>
                             </td>
                         </tr>

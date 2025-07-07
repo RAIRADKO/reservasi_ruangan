@@ -66,8 +66,8 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    @if($reservation->status == 'pending')
-                                    <form method="POST" action="{{ route('user.reservations.cancel', $reservation->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan reservasi ini?');">
+                                    @if($reservation->status == 'pending' || $reservation->status == 'approved')
+                                    <form method="POST" action="{{ route('user.reservations.cancel', $reservation->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan reservasi ini?{{ $reservation->status == 'approved' ? ' Admin akan diberitahu.' : '' }}');">
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Batalkan Reservasi">
@@ -85,7 +85,6 @@
                 </div>
             </div>
             
-            <!-- Mobile View -->
             <div class="d-block d-md-none">
                 <div class="list-group">
                     @foreach($reservations as $reservation)
@@ -115,9 +114,9 @@
                         <div class="mt-2 text-truncate">
                             <i class="bi bi-card-text me-1"></i> {{ $reservation->keperluan }}
                         </div>
-                        @if($reservation->status == 'pending')
+                        @if($reservation->status == 'pending' || $reservation->status == 'approved')
                         <div class="mt-3 d-flex justify-content-end">
-                            <form method="POST" action="{{ route('user.reservations.cancel', $reservation->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan reservasi ini?');">
+                            <form method="POST" action="{{ route('user.reservations.cancel', $reservation->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan reservasi ini?{{ $reservation->status == 'approved' ? ' Admin akan diberitahu.' : '' }}');">
                                 @csrf
                                 @method('PATCH')
                                 <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Batalkan Reservasi">
