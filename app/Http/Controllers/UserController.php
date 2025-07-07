@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use App\Mail\ReservationCanceledAdminNotification;
 use Illuminate\Support\Facades\Mail;
-use Carbon\Carbon; // Make sure Carbon is imported
+use Carbon\Carbon; // Pastikan Carbon diimpor
 
 class UserController extends Controller
 {
@@ -99,7 +99,7 @@ class UserController extends Controller
             abort(403, 'Akses ditolak.');
         }
 
-        // CORRECTED LINE: Use toDateString() to format the date correctly.
+        // PERBAIKAN: Gunakan toDateString() untuk memformat tanggal dengan benar.
         $endTime = Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai);
 
         // Logic Check: Ensure reservation is 'approved' and its time has passed
@@ -124,7 +124,7 @@ class UserController extends Controller
             abort(403, 'Akses ditolak.');
         }
 
-        // CORRECTED LINE: Use toDateString() to format the date correctly.
+        // PERBAIKAN: Gunakan toDateString() untuk memformat tanggal dengan benar.
         $endTime = Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai);
 
         // Logic Check

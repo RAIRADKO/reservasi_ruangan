@@ -14,9 +14,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ReservationApprovedUserNotification;
-use App\Mail\ReservationRejectedUserNotification; // Import Mailable baru
-use App\Exports\ReservationExport; // <-- Tambahkan use statement ini
-use Maatwebsite\Excel\Facades\Excel; // <-- Tambahkan use statement ini
+use App\Mail\ReservationRejectedUserNotification; 
+use App\Exports\ReservationExport; 
+use Maatwebsite\Excel\Facades\Excel; 
+
 
 class AdminController extends Controller
 {
@@ -24,14 +25,15 @@ class AdminController extends Controller
     {
         $pendingCount = Reservation::where('status', Reservation::STATUS_PENDING)->count();
         $approvedCount = Reservation::where('status', Reservation::STATUS_APPROVED)->count();
-        $userCount = User::count(); 
+        $completedCount = Reservation::where('status', Reservation::STATUS_COMPLETED)->count(); // TAMBAHKAN INI
+        $userCount = User::count();
 
         $reservations = Reservation::with(['user', 'roomInfo']) // Eager load roomInfo
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
             
-        return view('admin.dashboard', compact('pendingCount', 'approvedCount', 'reservations', 'userCount'));
+        return view('admin.dashboard', compact('pendingCount', 'approvedCount', 'completedCount', 'reservations', 'userCount')); // PERBARUI INI
     }
 
     public function reservations()

@@ -27,6 +27,7 @@
                 </a>
             </div>
         @else
+            {{-- Tampilan Desktop --}}
             <div class="d-none d-md-block">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
@@ -41,6 +42,9 @@
                         </thead>
                         <tbody>
                             @foreach($reservations as $reservation)
+                            @php
+                                $isPast = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai)->isPast();
+                            @endphp
                             <tr class='clickable-row' data-href="{{ route('reservations.show', $reservation->id) }}">
                                 <td>
                                     <a href="{{ route('reservations.show', $reservation->id) }}" class="text-decoration-none fw-bold">
@@ -54,6 +58,7 @@
                                         @if($reservation->status == 'approved') bg-success-subtle text-success-emphasis border border-success-subtle
                                         @elseif($reservation->status == 'pending') bg-warning-subtle text-warning-emphasis border border-warning-subtle
                                         @elseif($reservation->status == 'rejected') bg-danger-subtle text-danger-emphasis border border-danger-subtle
+                                        @elseif($reservation->status == 'completed') bg-primary-subtle text-primary-emphasis border border-primary-subtle
                                         @else bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle @endif">
                                         {{ ucfirst($reservation->status) }}
                                     </span>
@@ -66,14 +71,19 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    @if($reservation->status == 'pending' || $reservation->status == 'approved')
-                                    <form method="POST" action="{{ route('user.reservations.cancel', $reservation->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan reservasi ini?{{ $reservation->status == 'approved' ? ' Admin akan diberitahu.' : '' }}');">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Batalkan Reservasi">
-                                            <i class="bi bi-x-circle"></i>
-                                        </button>
-                                    </form>
+                                    {{-- PERBAIKAN LOGIKA TOMBOL AKSI --}}
+                                    @if($reservation->status == 'approved' && $isPast)
+                                        <a href="{{ route('user.reservations.checkout', $reservation->id) }}" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Lakukan Check Out" onclick="event.stopPropagation()">
+                                            <i class="bi bi-box-arrow-right"></i>
+                                        </a>
+                                    @elseif($reservation->status == 'pending' || ($reservation->status == 'approved' && !$isPast))
+                                        <form method="POST" action="{{ route('user.reservations.cancel', $reservation->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan reservasi ini?{{ $reservation->status == 'approved' ? ' Admin akan diberitahu.' : '' }}');" onclick="event.stopPropagation()">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Batalkan Reservasi">
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
+                                        </form>
                                     @else
                                         -
                                     @endif
@@ -85,53 +95,58 @@
                 </div>
             </div>
             
+            {{-- Tampilan Mobile --}}
             <div class="d-block d-md-none">
                 <div class="list-group">
                     @foreach($reservations as $reservation)
-                    <a href="{{ route('reservations.show', $reservation->id) }}" class="list-group-item list-group-item-action">
-                        <div class="d-flex justify-content-between">
-                            <div class="fw-bold">{{ $reservation->tanggal->isoFormat('D MMM Y') }}</div>
-                            <div>
-                                <span class="badge rounded-pill
-                                    @if($reservation->status == 'approved') bg-success-subtle text-success-emphasis border border-success-subtle
-                                    @elseif($reservation->status == 'pending') bg-warning-subtle text-warning-emphasis border border-warning-subtle
-                                    @elseif($reservation->status == 'rejected') bg-danger-subtle text-danger-emphasis border border-danger-subtle
-                                    @else bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle @endif">
-                                    {{ ucfirst($reservation->status) }}
-                                </span>
-                                @if($reservation->status == 'rejected' && $reservation->rejection_reason)
-                                    <i class="bi bi-info-circle text-danger ms-1" 
-                                       data-bs-toggle="tooltip" 
-                                       data-bs-placement="top"
-                                       title="Alasan: {{ $reservation->rejection_reason }}">
-                                    </i>
-                                @endif
+                    @php
+                        $isPast = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai)->isPast();
+                    @endphp
+                    <div class="list-group-item list-group-item-action p-3">
+                        <a href="{{ route('reservations.show', $reservation->id) }}" class="text-decoration-none text-dark d-block">
+                            <div class="d-flex justify-content-between">
+                                <div class="fw-bold">{{ $reservation->tanggal->isoFormat('D MMM Y') }}</div>
+                                <div>
+                                    <span class="badge rounded-pill
+                                        @if($reservation->status == 'approved') bg-success-subtle text-success-emphasis border border-success-subtle
+                                        @elseif($reservation->status == 'pending') bg-warning-subtle text-warning-emphasis border border-warning-subtle
+                                        @elseif($reservation->status == 'rejected') bg-danger-subtle text-danger-emphasis border border-danger-subtle
+                                        @else bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle @endif">
+                                        {{ ucfirst($reservation->status) }}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="mt-2">
-                            <i class="bi bi-clock me-1"></i> {{ $reservation->jam_range }}
-                        </div>
-                        <div class="mt-2 text-truncate">
-                            <i class="bi bi-card-text me-1"></i> {{ $reservation->keperluan }}
-                        </div>
-                        @if($reservation->status == 'pending' || $reservation->status == 'approved')
+                            <div class="mt-2">
+                                <i class="bi bi-clock me-1"></i> {{ $reservation->jam_range }}
+                            </div>
+                            <div class="mt-2 text-truncate">
+                                <i class="bi bi-card-text me-1"></i> {{ $reservation->keperluan }}
+                            </div>
+                        </a>
                         <div class="mt-3 d-flex justify-content-end">
-                            <form method="POST" action="{{ route('user.reservations.cancel', $reservation->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan reservasi ini?{{ $reservation->status == 'approved' ? ' Admin akan diberitahu.' : '' }}');">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Batalkan Reservasi">
-                                    <i class="bi bi-x-circle me-1"></i> Batalkan
-                                </button>
-                            </form>
+                            {{-- PERBAIKAN LOGIKA TOMBOL AKSI MOBILE --}}
+                             @if($reservation->status == 'approved' && $isPast)
+                                <a href="{{ route('user.reservations.checkout', $reservation->id) }}" class="btn btn-sm btn-info">
+                                    <i class="bi bi-box-arrow-right me-1"></i> Check Out
+                                </a>
+                            @elseif($reservation->status == 'pending' || ($reservation->status == 'approved' && !$isPast))
+                                <form method="POST" action="{{ route('user.reservations.cancel', $reservation->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan reservasi ini?{{ $reservation->status == 'approved' ? ' Admin akan diberitahu.' : '' }}');">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Batalkan Reservasi">
+                                        <i class="bi bi-x-circle me-1"></i> Batalkan
+                                    </button>
+                                </form>
+                            @endif
                         </div>
-                        @endif
-                    </a>
+                    </div>
                     @endforeach
                 </div>
             </div>
             
             <div class="d-flex justify-content-center justify-content-md-end mt-4">
-                {{ $reservations->links('pagination::bootstrap-5') }}            </div>
+                {{ $reservations->links('pagination::bootstrap-5') }}
+            </div>
         @endif
     </div>
 </div>
