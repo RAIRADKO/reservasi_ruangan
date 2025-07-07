@@ -2,41 +2,44 @@
 
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+    <div class="col-12 col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Profil Pengguna</h5>
                 <a href="{{ route('home') }}" class="btn btn-sm btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> Kembali
+                    <i class="bi bi-arrow-left me-1 d-none d-md-inline"></i>
+                    <span class="d-md-none">Kembali</span>
+                    <span class="d-none d-md-inline">Kembali</span>
                 </a>
             </div>
 
             <div class="card-body">
                 <div class="row align-items-center">
-                    <div class="col-md-3 text-center">
+                    <div class="col-12 col-md-3 text-center mb-4 mb-md-0">
                          <i class="bi bi-person-circle display-1 text-primary"></i>
                     </div>
-                    <div class="col-md-9">
-                        <div class="mb-3">
+                    <div class="col-12 col-md-9">
+                        <div class="mb-3 border-bottom pb-2">
                             <label class="form-label text-muted small">Nama Lengkap</label>
-                            <p class="fs-5 fw-bold">{{ $user->name }}</p>
+                            <p class="fs-5 fw-bold mb-0">{{ $user->name }}</p>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-3 border-bottom pb-2">
                             <label class="form-label text-muted small">NIP</label>
-                            <p class="fs-5">{{ $user->formatted_nip }}</p>
+                            <p class="fs-5 mb-0">{{ $user->formatted_nip }}</p>
                         </div>
                          <div class="mb-3">
                             <label class="form-label text-muted small">Email</label>
-                            <p class="fs-5">{{ $user->email }}</p>
+                            <p class="fs-5 mb-0">{{ $user->email }}</p>
                         </div>
                     </div>
                 </div>
 
-                <hr>
+                <hr class="my-4">
 
-                <div class="d-grid mt-4">
-                    <a href="{{ route('user.reservations') }}" class="btn btn-primary">
-                        <i class="bi bi-calendar-check-fill me-2"></i> Lihat Semua Reservasi Saya
+                <div class="d-grid">
+                    <a href="{{ route('user.reservations') }}" class="btn btn-primary py-2">
+                        <i class="bi bi-calendar-check-fill me-2"></i> 
+                        Lihat Semua Reservasi Saya
                     </a>
                 </div>
             </div>

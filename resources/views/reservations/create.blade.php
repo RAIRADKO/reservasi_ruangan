@@ -65,26 +65,32 @@
             </div>
 
             <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="tanggal" class="form-label">Tanggal</label>
-                        <input type="date" class="form-control" id="tanggal" name="tanggal" min="{{ date('Y-m-d') }}" value="{{ old('tanggal') }}" required>
-                        <div id="date-warning" class="invalid-feedback d-block" style="display: none;"></div>
-                    </div>
+                <!-- Tanggal -->
+                <div class="col-12 col-md-6 mb-3">
+                    <label for="tanggal" class="form-label">Tanggal</label>
+                    <input type="date" class="form-control" id="tanggal" name="tanggal" min="{{ date('Y-m-d') }}" value="{{ old('tanggal') }}" required>
+                    <div id="date-warning" class="invalid-feedback d-block" style="display: none;"></div>
                 </div>
-                <div class="col-md-3">
-                    <div class="mb-3">
-                        <label for="jam_mulai" class="form-label">Jam Mulai</label>
-                        <input type="time" class="form-control" id="jam_mulai" name="jam_mulai" min="{{ config('room.operating_hours.start') }}" max="{{ config('room.operating_hours.end') }}" value="{{ old('jam_mulai') }}" required>
-                        <div class="form-text">Min: {{ config('room.operating_hours.start') }}</div>
-                    </div>
+                
+                <!-- Jam Mulai -->
+                <div class="col-6 col-md-3 mb-3">
+                    <label for="jam_mulai" class="form-label">Jam Mulai</label>
+                    <input type="time" class="form-control" id="jam_mulai" name="jam_mulai" min="{{ config('room.operating_hours.start') }}" max="{{ config('room.operating_hours.end') }}" value="{{ old('jam_mulai') }}" required>
+                    <div class="form-text d-none d-md-block">Min: {{ config('room.operating_hours.start') }}</div>
                 </div>
-                <div class="col-md-3">
-                    <div class="mb-3">
-                        <label for="jam_selesai" class="form-label">Jam Selesai</label>
-                        <input type="time" class="form-control" id="jam_selesai" name="jam_selesai" min="{{ config('room.operating_hours.start') }}" max="{{ config('room.operating_hours.end') }}" value="{{ old('jam_selesai') }}" required>
-                        <div class="form-text">Max: {{ config('room.operating_hours.end') }}</div>
-                    </div>
+                
+                <!-- Jam Selesai -->
+                <div class="col-6 col-md-3 mb-3">
+                    <label for="jam_selesai" class="form-label">Jam Selesai</label>
+                    <input type="time" class="form-control" id="jam_selesai" name="jam_selesai" min="{{ config('room.operating_hours.start') }}" max="{{ config('room.operating_hours.end') }}" value="{{ old('jam_selesai') }}" required>
+                    <div class="form-text d-none d-md-block">Max: {{ config('room.operating_hours.end') }}</div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <div>
+                    <small class="d-block d-md-none text-muted">Min: {{ config('room.operating_hours.start') }}</small>
+                    <small class="d-block d-md-none text-muted">Max: {{ config('room.operating_hours.end') }}</small>
                 </div>
             </div>
 
@@ -105,8 +111,8 @@
                 <textarea class="form-control" id="keperluan" name="keperluan" rows="3" required>{{ old('keperluan') }}</textarea>
             </div>
 
-            <div class="mb-3">
-                <button type="button" id="checkAvailabilityButton" class="btn btn-outline-info me-2">
+            <div class="d-flex flex-column flex-md-row gap-2">
+                <button type="button" id="checkAvailabilityButton" class="btn btn-outline-info mb-2 mb-md-0">
                     <i class="bi bi-search"></i> Cek Ketersediaan
                 </button>
                 <button type="submit" id="submitButton" class="btn btn-primary">Ajukan Reservasi</button>

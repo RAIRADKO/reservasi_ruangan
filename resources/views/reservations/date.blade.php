@@ -5,9 +5,9 @@
     <!-- Header Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center bg-gradient-primary text-white p-4 rounded-3 shadow-sm">
-                <div>
-                    <h1 class="mb-1 fw-bold">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center bg-gradient-primary text-white p-3 p-md-4 rounded-3 shadow-sm">
+                <div class="mb-3 mb-md-0 text-center text-md-start">
+                    <h1 class="mb-1 fw-bold h4 h-md-3">
                         <i class="bi bi-calendar-event me-2"></i>
                         Reservasi pada Tanggal
                     </h1>
@@ -21,7 +21,7 @@
                         </small>
                     @endif
                 </div>
-                <a href="{{ route('home') }}" class="btn btn-light btn-lg shadow-sm">
+                <a href="{{ route('home') }}" class="btn btn-light btn-sm btn-md-lg shadow-sm mt-2 mt-md-0">
                     <i class="bi bi-arrow-left me-2"></i>
                     Kembali ke Kalender
                 </a>
@@ -36,12 +36,12 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <div class="row align-items-center">
-                        <div class="col-md-3">
+                        <div class="col-12 col-md-3 mb-2 mb-md-0">
                             <label for="room-filter" class="form-label fw-bold">
                                 <i class="bi bi-funnel me-2"></i>Filter Ruangan:
                             </label>
                         </div>
-                        <div class="col-md-9">
+                        <div class="col-12 col-md-9">
                             <select id="room-filter" class="form-select" onchange="filterByRoom()">
                                 <option value="{{ route('reservations.date', ['date' => $date]) }}">Semua Ruangan</option>
                                 @foreach($rooms as $roomOption)
@@ -66,7 +66,7 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom-0 py-3">
-                    <h4 class="mb-0 fw-bold">
+                    <h4 class="mb-0 fw-bold h5">
                         <i class="bi bi-door-closed me-2 text-primary"></i>
                         Status Ruangan
                     </h4>
@@ -79,7 +79,7 @@
                         @endphp
                         
                         @foreach($allRooms as $roomItem)
-                        <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="col-12 col-md-6 col-lg-4 mb-3">
                             <div class="room-status-card p-3 rounded-3 h-100 
                                 {{ $roomReservations->has($roomItem->id) ? 'bg-danger bg-opacity-10 border-danger' : 'bg-success bg-opacity-10 border-success' }}">
                                 <div class="d-flex align-items-center justify-content-between">
@@ -133,10 +133,10 @@
             <div class="col-12">
                 <div class="text-center py-5">
                     <div class="mb-4">
-                        <i class="bi bi-calendar-x text-muted" style="font-size: 4rem;"></i>
+                        <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
                     </div>
-                    <h3 class="text-muted mb-2">Tidak Ada Reservasi</h3>
-                    <p class="text-muted fs-5">Tidak ada reservasi yang disetujui pada tanggal ini.</p>
+                    <h3 class="text-muted h5 mb-2">Tidak Ada Reservasi</h3>
+                    <p class="text-muted">Tidak ada reservasi yang disetujui pada tanggal ini.</p>
                 </div>
             </div>
         </div>
@@ -146,57 +146,59 @@
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white border-bottom-0 py-3">
-                        <h4 class="mb-0 fw-bold">
+                        <h4 class="mb-0 fw-bold h5">
                             <i class="bi bi-bar-chart-line me-2 text-primary"></i>
                             Jadwal Visual
                         </h4>
                     </div>
                     <div class="card-body">
-                        <div class="schedule-timeline position-relative">
-                            @php
-                                $startHour = 8;
-                                $endHour = 17;
-                                $colors = ['bg-primary', 'bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-secondary'];
-                            @endphp
-
-                            <!-- Time markers -->
-                            <div class="time-markers mb-3">
-                                @for($hour = $startHour; $hour <= $endHour; $hour++)
-                                    <div class="time-marker" 
-                                         style="left: {{ (($hour - $startHour) / ($endHour - $startHour)) * 100 }}%;">
-                                        {{ sprintf('%02d:00', $hour) }}
-                                    </div>
-                                @endfor
-                            </div>
-
-                            <!-- Reservations timeline -->
-                            <div class="reservations-timeline">
-                                @foreach($reservations as $index => $reservation)
+                        <div class="schedule-timeline-wrapper" style="overflow-x: auto;">
+                            <div class="schedule-timeline position-relative" style="min-width: 600px;">
                                 @php
-                                    $startTime = \Carbon\Carbon::parse($reservation->jam_mulai);
-                                    $endTime = \Carbon\Carbon::parse($reservation->jam_selesai);
-
-                                    $startPosition = (($startTime->hour - $startHour) * 60 + $startTime->minute) / (($endHour - $startHour) * 60);
-                                    $duration = $startTime->diffInMinutes($endTime) / (($endHour - $startHour) * 60);
-                                    $colorClass = $colors[$index % count($colors)];
+                                    $startHour = 8;
+                                    $endHour = 17;
+                                    $colors = ['bg-primary', 'bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-secondary'];
                                 @endphp
-                                <div class="reservation-block {{ $colorClass }} shadow-sm mb-3 rounded-3 position-relative" 
-                                     style="left: {{ $startPosition * 100 }}%; 
-                                            width: {{ $duration * 100 }}%;
-                                            height: 60px;">
-                                    <div class="d-flex justify-content-between align-items-center h-100 px-3 text-white">
-                                        <div>
-                                            <div class="fw-bold">{{ $reservation->nama }}</div>
-                                            <small class="opacity-75">{{ Str::limit($reservation->keperluan, 20) }}</small>
+
+                                <!-- Time markers -->
+                                <div class="time-markers mb-3">
+                                    @for($hour = $startHour; $hour <= $endHour; $hour++)
+                                        <div class="time-marker" 
+                                             style="left: {{ (($hour - $startHour) / ($endHour - $startHour)) * 100 }}%;">
+                                            {{ sprintf('%02d:00', $hour) }}
                                         </div>
-                                        <div class="text-end">
-                                            <small class="fw-bold">
-                                                {{ date('H:i', strtotime($reservation->jam_mulai)) }}-{{ date('H:i', strtotime($reservation->jam_selesai)) }}
-                                            </small>
+                                    @endfor
+                                </div>
+
+                                <!-- Reservations timeline -->
+                                <div class="reservations-timeline">
+                                    @foreach($reservations as $index => $reservation)
+                                    @php
+                                        $startTime = \Carbon\Carbon::parse($reservation->jam_mulai);
+                                        $endTime = \Carbon\Carbon::parse($reservation->jam_selesai);
+
+                                        $startPosition = (($startTime->hour - $startHour) * 60 + $startTime->minute) / (($endHour - $startHour) * 60);
+                                        $duration = $startTime->diffInMinutes($endTime) / (($endHour - $startHour) * 60);
+                                        $colorClass = $colors[$index % count($colors)];
+                                    @endphp
+                                    <div class="reservation-block {{ $colorClass }} shadow-sm mb-3 rounded-3 position-relative" 
+                                         style="left: {{ $startPosition * 100 }}%; 
+                                                width: {{ $duration * 100 }}%;
+                                                height: 60px;">
+                                        <div class="d-flex justify-content-between align-items-center h-100 px-3 text-white">
+                                            <div>
+                                                <div class="fw-bold">{{ $reservation->nama }}</div>
+                                                <small class="opacity-75 d-none d-md-block">{{ Str::limit($reservation->keperluan, 20) }}</small>
+                                            </div>
+                                            <div class="text-end">
+                                                <small class="fw-bold">
+                                                    {{ date('H:i', strtotime($reservation->jam_mulai)) }}-{{ date('H:i', strtotime($reservation->jam_selesai)) }}
+                                                </small>
+                                            </div>
                                         </div>
                                     </div>
+                                    @endforeach
                                 </div>
-                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -209,7 +211,7 @@
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white border-bottom-0 py-3">
-                        <h4 class="mb-0 fw-bold">
+                        <h4 class="mb-0 fw-bold h5">
                             <i class="bi bi-table me-2 text-primary"></i>
                             Detail Reservasi
                         </h4>
@@ -222,13 +224,13 @@
                                         <th class="border-0 fw-bold py-3">
                                             <i class="bi bi-clock me-2"></i>Waktu
                                         </th>
-                                        <th class="border-0 fw-bold py-3">
+                                        <th class="border-0 fw-bold py-3 d-none d-md-table-cell">
                                             <i class="bi bi-door-open me-2"></i>Ruangan
                                         </th>
                                         <th class="border-0 fw-bold py-3">
                                             <i class="bi bi-person me-2"></i>Nama
                                         </th>
-                                        <th class="border-0 fw-bold py-3">
+                                        <th class="border-0 fw-bold py-3 d-none d-md-table-cell">
                                             <i class="bi bi-journal-text me-2"></i>Keperluan
                                         </th>
                                         <th class="border-0 fw-bold py-3">
@@ -248,7 +250,7 @@
                                                 </strong>
                                             </div>
                                         </td>
-                                        <td class="py-3">
+                                        <td class="py-3 d-none d-md-table-cell">
                                             <div class="d-flex align-items-center">
                                                 <i class="bi bi-door-closed-fill text-primary me-2"></i>
                                                 <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1">
@@ -264,7 +266,7 @@
                                                 <strong>{{ $reservation->nama }}</strong>
                                             </div>
                                         </td>
-                                        <td class="py-3">
+                                        <td class="py-3 d-none d-md-table-cell">
                                             <span class="text-muted">{{ $reservation->keperluan }}</span>
                                         </td>
                                         <td class="py-3">
@@ -273,7 +275,7 @@
                                                 $end = \Carbon\Carbon::parse($reservation->jam_selesai);
                                                 $duration = $start->diff($end);
                                             @endphp
-                                            <span class="badge bg-light text-dark fs-6">
+                                            <span class="badge bg-light text-dark">
                                                 {{ $duration->h }} jam {{ $duration->i }} menit
                                             </span>
                                         </td>
@@ -296,12 +298,18 @@
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
 
+    .schedule-timeline-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
     .schedule-timeline {
         min-height: 200px;
         background: linear-gradient(90deg, #f8f9fa 0%, #ffffff 100%);
         border-radius: 0.5rem;
         padding: 20px;
         position: relative;
+        min-width: 600px;
     }
 
     .time-markers {
@@ -401,6 +409,7 @@
     @media (max-width: 768px) {
         .schedule-timeline {
             padding: 15px;
+            min-width: 100%;
         }
 
         .reservation-block {
@@ -414,6 +423,44 @@
         .time-marker {
             font-size: 0.7rem;
             padding: 1px 4px;
+        }
+        
+        .table th, .table td {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .avatar-circle {
+            width: 30px;
+            height: 30px;
+            font-size: 0.8rem;
+        }
+        
+        .card-header h4 {
+            font-size: 1.1rem;
+        }
+        
+        .bg-gradient-primary h1 {
+            font-size: 1.5rem !important;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .bg-gradient-primary h1 {
+            font-size: 1.3rem !important;
+        }
+        
+        .bg-gradient-primary p {
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .room-status-card {
+            padding: 15px !important;
         }
     }
 </style>

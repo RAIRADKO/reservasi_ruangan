@@ -103,6 +103,80 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+        
+        /* Mobile optimizations */
+        @media (max-width: 991.98px) {
+            .navbar-brand span {
+                display: none;
+            }
+            
+            .navbar {
+                height: 70px;
+                padding: 0.5rem 1rem;
+            }
+            
+            body {
+                padding-top: 70px;
+            }
+            
+            .navbar-toggler {
+                padding: 0.25rem 0.5rem;
+                font-size: 1.25rem;
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            .navbar-brand {
+                font-size: 1rem;
+            }
+            
+            .navbar-nav .nav-link {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .btn-register {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.875rem;
+            }
+            
+            .alert {
+                font-size: 0.875rem;
+            }
+            
+            .footer {
+                font-size: 0.875rem;
+            }
+        }
+        
+        @media (max-width: 575.98px) {
+            .navbar {
+                height: 60px;
+            }
+            
+            body {
+                padding-top: 60px;
+            }
+            
+            .navbar-brand {
+                font-size: 0.9rem;
+            }
+            
+            .navbar-toggler-icon {
+                width: 1.2em;
+                height: 1.2em;
+            }
+            
+            .dropdown-item {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+            
+            .main {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+        }
     </style>
     
     @yield('styles')

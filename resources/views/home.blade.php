@@ -4,26 +4,33 @@
 
 @section('content')
 <div class="row g-4">
-    <div class="col-lg-7">
+    <!-- Kolom Informasi Ruangan -->
+    <div class="col-lg-7 col-12">
         <div class="card h-100">
             <div class="card-header bg-white py-3">
                 <h5 class="mb-0">Informasi Ruangan</h5>
             </div>
             <div class="card-body">
                 <div class="row g-4">
-                    <div class="col-md-5">
-                        <img src="{{ asset('img/Lambang_Kabupaten_Purworejo.png') }}" class="img-fluid rounded" alt="{{ $room->nama_ruangan }}">
+                    <!-- Gambar ruangan - di mobile akan full width -->
+                    <div class="col-md-5 col-12 mb-3 mb-md-0">
+                        <img src="{{ asset('img/Lambang_Kabupaten_Purworejo.png') }}" class="img-fluid rounded w-100" alt="{{ $room->nama_ruangan }}">
                     </div>
-                    <div class="col-md-7">
+                    
+                    <!-- Detail ruangan - di mobile akan full width -->
+                    <div class="col-md-7 col-12">
                         <h4 class="card-title fw-bold">{{ $room->nama_ruangan }}</h4>
                         <p class="card-text text-muted">{{ $room->deskripsi }}</p>
                         <hr>
                         <div class="row">
-                            <div class="col-6">
+                            <!-- Kapasitas - di mobile akan full width -->
+                            <div class="col-12 col-sm-6 mb-3 mb-sm-0">
                                 <p class="mb-1"><i class="bi bi-people-fill me-2 text-primary"></i><strong>Kapasitas</strong></p>
                                 <p>{{ $room->kapasitas }} orang</p>
                             </div>
-                            <div class="col-6">
+                            
+                            <!-- Fasilitas - di mobile akan full width -->
+                            <div class="col-12 col-sm-6">
                                 <p class="mb-1"><i class="bi bi-star-fill me-2 text-warning"></i><strong>Fasilitas</strong></p>
                                 <ul class="list-unstyled">
                                     @foreach($room->fasilitas_array as $fasilitas)
@@ -38,22 +45,23 @@
         </div>
     </div>
 
-    <div class="col-lg-5">
+    <!-- Kolom Aksi Reservasi -->
+    <div class="col-lg-5 col-12 mt-4 mt-lg-0">
         <div class="card h-100 bg-light border-0">
-             <div class="card-body text-center d-flex flex-column justify-content-center">
-                 <h5 class="card-title mb-3">Siap untuk Rapat?</h5>
-                 @auth
-                    <p class="text-muted">Ruangan tersedia untuk reservasi. Klik tombol di bawah untuk memulai.</p>
-                    <div class="d-grid gap-2">
-                        <a href="{{ route('reservations.create') }}" class="btn btn-primary btn-lg">
+            <div class="card-body text-center d-flex flex-column justify-content-center py-4">
+                <h5 class="card-title mb-3">Siap untuk Rapat?</h5>
+                @auth
+                    <p class="text-muted mb-3">Ruangan tersedia untuk reservasi. Klik tombol di bawah untuk memulai.</p>
+                    <div class="d-grid">
+                        <a href="{{ route('reservations.create') }}" class="btn btn-primary btn-lg py-2">
                             <i class="bi bi-plus-circle-fill me-2"></i>Buat Reservasi Baru
                         </a>
                     </div>
                 @else
-                    <p class="text-muted">Silakan login terlebih dahulu untuk dapat melakukan reservasi ruangan.</p>
+                    <p class="text-muted mb-3">Silakan login terlebih dahulu untuk dapat melakukan reservasi ruangan.</p>
                     <div class="d-grid gap-2">
-                        <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
-                        <a href="{{ route('register') }}" class="btn btn-outline-secondary mt-2">Register</a>
+                        <a href="{{ route('login') }}" class="btn btn-primary py-2">Login</a>
+                        <a href="{{ route('register') }}" class="btn btn-outline-secondary py-2 mt-2">Register</a>
                     </div>
                 @endauth
             </div>
@@ -61,17 +69,24 @@
     </div>
 </div>
 
+<!-- Kalender Ketersediaan -->
 <div class="card mt-4">
-    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Kalender Ketersediaan</h5>
-        <small class="text-muted">
-            <span class="badge bg-danger me-2">Penuh</span>
-            <span class="badge bg-light text-dark border me-2">Tersedia</span>
-            Klik pada tanggal untuk melihat detail jadwal.
-        </small>
+    <div class="card-header bg-white">
+        <!-- Header difleksibelkan untuk mobile -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+            <h5 class="mb-2 mb-md-0">Kalender Ketersediaan</h5>
+            <div class="d-flex flex-wrap align-items-center mt-2 mt-md-0">
+                <span class="badge bg-danger me-2 mb-1">Penuh</span>
+                <span class="badge bg-light text-dark border me-2 mb-1">Tersedia</span>
+                <small class="text-muted">Klik tanggal untuk detail jadwal</small>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        <div id="calendar"></div>
+    <div class="card-body p-0">
+        <!-- Wrapper untuk scroll horizontal di mobile -->
+        <div class="overflow-auto">
+            <div id="calendar" class="p-2" style="min-width: 300px;"></div>
+        </div>
     </div>
 </div>
 @endsection
@@ -90,7 +105,7 @@
                 start: date,
                 allDay: true,
                 display: 'background',
-                color: '#f8d7da' // Warna merah muda untuk menandai hari penuh
+                color: '#f8d7da'
             };
         });
         
@@ -101,8 +116,10 @@
             locale: 'id',
             height: 'auto',
             events: events,
+            // Responsif untuk ukuran layar kecil
+            contentHeight: 'auto',
+            aspectRatio: 1,
             dayCellDidMount: function(info) {
-                // Tambahkan tooltip
                 info.el.setAttribute('data-bs-toggle', 'tooltip');
                 info.el.setAttribute('data-bs-placement', 'top');
                 info.el.setAttribute('title', 'Lihat Jadwal ' + info.date.toLocaleDateString('id-ID'));
@@ -115,7 +132,6 @@
         
         calendar.render();
 
-        // Inisialisasi tooltip Bootstrap
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
           return new bootstrap.Tooltip(tooltipTriggerEl)
@@ -127,12 +143,37 @@
 @section('styles')
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
 <style>
+    /* Responsif untuk kalender */
+    .fc .fc-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .fc-toolbar-chunk {
+        margin-bottom: 10px;
+    }
+    @media (min-width: 768px) {
+        .fc .fc-toolbar {
+            flex-direction: row;
+            align-items: center;
+        }
+    }
+    
     .fc-daygrid-day-frame:hover {
         background-color: #e9ecef;
         cursor: pointer;
     }
     .fc-day-today {
         background-color: rgba(13, 110, 253, 0.1) !important;
+    }
+    
+    /* Padding tambahan untuk mobile */
+    @media (max-width: 767px) {
+        .card-body {
+            padding: 1.25rem;
+        }
+        .fc-header-toolbar {
+            padding: 0 10px;
+        }
     }
 </style>
 @endsection
