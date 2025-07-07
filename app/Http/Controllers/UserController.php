@@ -38,12 +38,14 @@ class UserController extends Controller
         $allowedStatuses = [Reservation::STATUS_PENDING, Reservation::STATUS_APPROVED];
 
         if (!in_array($reservation->status, $allowedStatuses)) {
-            return back()->with('error', 'Hanya reservasi dengan status pending atau disetujui yang bisa dibatalkan.');
+            return redirect()->route('user.reservations')->with('error', 'Hanya reservasi dengan status pending atau disetujui yang bisa dibatalkan.');
         }
 
         $wasApproved = $reservation->status === Reservation::STATUS_APPROVED;
 
-        $reservation->update(['status' => Reservation::STATUS_CANCELED]);
+        // Mengubah metode update menjadi lebih eksplisit
+        $reservation->status = Reservation::STATUS_CANCELED;
+        $reservation->save();
         
         if ($wasApproved) {
             // Jika reservasi yang dibatalkan sudah disetujui, kirim email ke admin
@@ -51,10 +53,10 @@ class UserController extends Controller
             if ($adminEmail) {
                 Mail::to($adminEmail)->send(new ReservationCanceledAdminNotification($reservation));
             }
-            return back()->with('success', 'Reservasi yang telah disetujui berhasil dibatalkan. Admin telah diberitahu.');
+            return redirect()->route('user.reservations')->with('success', 'Reservasi yang telah disetujui berhasil dibatalkan. Admin telah diberitahu.');
         }
         
-        return back()->with('success', 'Reservasi berhasil dibatalkan');
+        return redirect()->route('user.reservations')->with('success', 'Reservasi berhasil dibatalkan');
     }
 
     /**
