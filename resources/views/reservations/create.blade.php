@@ -40,7 +40,7 @@
             <div class="mb-3">
                 <label for="room_info_id" class="form-label">Pilih Ruangan</label>
                 <select class="form-select" id="room_info_id" name="room_info_id" required>
-                    <option value="">-- Pilih Ruangan --</option>
+                    <option value="" disabled {{ old('room_info_id') ? '' : 'selected' }}>-- Pilih Ruangan --</option>
                     @foreach($rooms as $room)
                         <option value="{{ $room->id }}" {{ old('room_info_id') == $room->id ? 'selected' : '' }}>
                             {{ $room->nama_ruangan }} (Kapasitas: {{ $room->kapasitas }} orang)

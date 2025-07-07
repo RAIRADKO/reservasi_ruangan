@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="row g-4">
-    <!-- Kolom Informasi Aplikasi -->
     <div class="col-lg-7 col-12">
         <div class="card h-100">
             <div class="card-header bg-white py-3">
@@ -15,7 +14,6 @@
             </div>
             <div class="card-body">
                 <div class="row g-4">
-                    <!-- Logo/Gambar aplikasi - di mobile akan full width -->
                     <div class="col-md-5 col-12 mb-3 mb-md-0">
                         <div class="text-center">
                             <img src="{{ asset('img/Lambang_Kabupaten_Purworejo.png') }}" 
@@ -25,7 +23,6 @@
                         </div>
                     </div>
                     
-                    <!-- Informasi aplikasi - di mobile akan full width -->
                     <div class="col-md-7 col-12">
                         <h4 class="card-title fw-bold text-primary">Sistem Reservasi Ruangan</h4>
                         <p class="card-text text-muted mb-3">
@@ -34,7 +31,6 @@
                         </p>
                         
                         <div class="row g-3">
-                            <!-- Fitur Utama -->
                             <div class="col-12">
                                 <h6 class="fw-bold mb-2">
                                     <i class="bi bi-star-fill me-2 text-warning"></i>
@@ -66,7 +62,6 @@
         </div>
     </div>
 
-    <!-- Kolom Aksi Reservasi -->
     <div class="col-lg-5 col-12 mt-4 mt-lg-0">
         <div class="card h-100 bg-gradient-primary text-white border-0">
             <div class="card-body text-center d-flex flex-column justify-content-center py-4">
@@ -81,7 +76,6 @@
                         Siap untuk melakukan reservasi ruangan?
                     </p>
                     
-                    <!-- Informasi ruangan yang tersedia -->
                     <div class="bg-white bg-opacity-10 rounded p-3 mb-3">
                         <h6 class="mb-2">Ruangan Tersedia</h6>
                         <div class="d-flex align-items-center justify-content-center">
@@ -98,9 +92,8 @@
                         </a>
                     </div>
                     
-                    <!-- Link ke riwayat reservasi -->
                     <div class="mt-3">
-                        <a href="{{ route('reservations.index') }}" class="btn btn-outline-light btn-sm">
+                        <a href="{{ route('user.reservations') }}" class="btn btn-outline-light btn-sm">
                             <i class="bi bi-clock-history me-1"></i>
                             Lihat Riwayat Reservasi
                         </a>
@@ -110,7 +103,6 @@
                         Silakan login terlebih dahulu untuk dapat melakukan reservasi ruangan.
                     </p>
                     
-                    <!-- Keuntungan menggunakan sistem -->
                     <div class="bg-white bg-opacity-10 rounded p-3 mb-3">
                         <h6 class="mb-2">Mengapa Menggunakan Sistem Ini?</h6>
                         <ul class="list-unstyled text-start">
@@ -145,7 +137,6 @@
     </div>
 </div>
 
-<!-- Panduan Penggunaan -->
 <div class="card mt-4">
     <div class="card-header bg-white">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
@@ -158,7 +149,6 @@
     </div>
     <div class="card-body">
         <div class="row g-4">
-            <!-- Langkah 1 -->
             <div class="col-md-3 col-6">
                 <div class="text-center">
                     <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
@@ -170,7 +160,6 @@
                 </div>
             </div>
             
-            <!-- Langkah 2 -->
             <div class="col-md-3 col-6">
                 <div class="text-center">
                     <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
@@ -182,7 +171,6 @@
                 </div>
             </div>
             
-            <!-- Langkah 3 -->
             <div class="col-md-3 col-6">
                 <div class="text-center">
                     <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
@@ -194,7 +182,6 @@
                 </div>
             </div>
             
-            <!-- Langkah 4 -->
             <div class="col-md-3 col-6">
                 <div class="text-center">
                     <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
@@ -209,10 +196,8 @@
     </div>
 </div>
 
-<!-- Kalender Ketersediaan -->
 <div class="card mt-4">
     <div class="card-header bg-white">
-        <!-- Header difleksibelkan untuk mobile -->
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
             <h5 class="mb-2 mb-md-0">
                 <i class="bi bi-calendar3 me-2 text-primary"></i>
@@ -230,7 +215,6 @@
         </div>
     </div>
     <div class="card-body p-0">
-        <!-- Wrapper untuk scroll horizontal di mobile -->
         <div class="overflow-auto">
             <div id="calendar" class="p-2" style="min-width: 300px;"></div>
         </div>
