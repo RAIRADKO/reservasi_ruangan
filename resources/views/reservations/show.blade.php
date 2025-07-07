@@ -83,6 +83,90 @@
                 <h6 class="text-muted h6"><i class="bi bi-card-text me-2"></i>Keperluan</h6>
                 <p class="lead fs-6">{{ $reservation->keperluan }}</p>
 
+                {{-- Check Out Button Section di bagian bawah --}}
+                {{-- DEBUG INFO - Hapus setelah selesai debug --}}
+                <div class="alert alert-info mt-4">
+                    <h6>Debug Info:</h6>
+                    <p><strong>Auth Check:</strong> {{ Auth::check() ? 'Logged In' : 'Not Logged In' }}</p>
+                    @auth
+                        <p><strong>User ID:</strong> {{ Auth::id() }}</p>
+                        <p><strong>Reservation User ID:</strong> {{ $reservation->user_id }}</p>
+                        <p><strong>Is Owner:</strong> {{ Auth::id() == $reservation->user_id ? 'Yes' : 'No' }}</p>
+                        <p><strong>Status:</strong> {{ $reservation->status }}</p>
+                        <p><strong>Tanggal:</strong> {{ $reservation->tanggal->toDateString() }}</p>
+                        <p><strong>Jam Mulai:</strong> {{ $reservation->jam_mulai }}</p>
+                        <p><strong>Jam Selesai:</strong> {{ $reservation->jam_selesai }}</p>
+                        
+                        @php
+                            // Set timezone to Indonesia (WIB = UTC+7)
+                            $currentTime = \Carbon\Carbon::now('Asia/Jakarta');
+                            
+                            // Parse reservation times with timezone
+                            $startTime = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_mulai, 'Asia/Jakarta');
+                            $endTime = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai, 'Asia/Jakarta');
+                            
+                            $isPast = $currentTime->isAfter($endTime);
+                            $isOngoing = $currentTime->isBetween($startTime, $endTime);
+                            
+                            // For testing - allow checkout if within 1 hour of start time or after
+                            $canCheckout = $currentTime->isAfter($startTime->copy()->subHour()) || $isPast || $isOngoing;
+                        @endphp
+                        
+                        <p><strong>Current Time (Jakarta):</strong> {{ $currentTime->format('Y-m-d H:i:s') }}</p>
+                        <p><strong>Start Time (Jakarta):</strong> {{ $startTime->format('Y-m-d H:i:s') }}</p>
+                        <p><strong>End Time (Jakarta):</strong> {{ $endTime->format('Y-m-d H:i:s') }}</p>
+                        <p><strong>Is Past:</strong> {{ $isPast ? 'Yes' : 'No' }}</p>
+                        <p><strong>Is Ongoing:</strong> {{ $isOngoing ? 'Yes' : 'No' }}</p>
+                        <p><strong>Can Checkout:</strong> {{ $canCheckout ? 'Yes' : 'No' }}</p>
+                        <p><strong>Should Show Button:</strong> {{ $canCheckout && $reservation->status == 'approved' && Auth::id() == $reservation->user_id ? 'Yes' : 'No' }}</p>
+                    @endauth
+                </div>
+
+                @auth
+                    @if(Auth::id() == $reservation->user_id)
+                        @php
+                            $currentTime = \Carbon\Carbon::now();
+                            $startTime = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_mulai);
+                            $endTime = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai);
+                            $isPast = $endTime->isPast();
+                            $isOngoing = $startTime->isPast() && !$endTime->isPast();
+                        @endphp
+
+                        @if($reservation->status == 'approved')
+                            <div class="mt-4 p-3 bg-light rounded">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1 fw-bold text-primary">
+                                            <i class="bi bi-clock-history me-2"></i>Status Kehadiran
+                                        </h6>
+                                        <p class="mb-0 text-muted small">
+                                            @if($isPast)
+                                                Waktu reservasi telah berakhir. Silakan lakukan check out.
+                                            @elseif($isOngoing)
+                                                Reservasi sedang berlangsung. Anda dapat melakukan check out sekarang.
+                                            @elseif($canCheckout)
+                                                Reservasi akan dimulai dalam 1 jam. Anda sudah dapat melakukan check out.
+                                            @else
+                                                Reservasi akan dimulai pada {{ $reservation->jam_mulai }}.
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <div>
+                                        @if($canCheckout)
+                                            <a href="{{ route('user.reservations.checkout', $reservation->id) }}" 
+                                               class="btn btn-success btn-sm" 
+                                               onclick="return confirm('Apakah Anda yakin ingin melakukan check out?')">
+                                                <i class="bi bi-check2-square me-1"></i> Check Out
+                                            </a>
+                                        @else
+                                            <span class="badge bg-info">Belum Waktunya</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    @endif
+                @endauth
             </div>
         </div>
     </div>

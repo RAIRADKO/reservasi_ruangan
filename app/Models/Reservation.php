@@ -90,4 +90,9 @@ class Reservation extends Model
     {
         return $this->tanggal->format('d M Y');
     }
+
+    public function getTanggalAttribute($value)
+    {
+        return $this->asDateTime($value)->setTimezone('Asia/Jakarta');
+    }
 }
