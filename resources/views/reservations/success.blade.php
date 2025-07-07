@@ -9,6 +9,6 @@
 </div>
 <div class="d-flex flex-column flex-sm-row justify-content-between gap-2">
     <a href="{{ route('home') }}" class="btn btn-outline-primary">Kembali ke Home</a>
-    <a href="{{ route('user.profile') }}" class="btn btn-primary">Lihat Profil</a>
+    <a href="{{ route('user.reservations') }}" class="btn btn-primary">Lihat Reservasi</a>
 </div>
 @endsection

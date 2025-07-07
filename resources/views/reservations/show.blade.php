@@ -12,20 +12,6 @@
                     Detail Reservasi
                 </h5>
                 <div class="d-flex gap-2">
-                    @auth
-                        @if(Auth::id() == $reservation->user_id)
-                            @php
-                                $isPast = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai)->isPast();
-                            @endphp
-
-                            @if($reservation->status == 'approved' && $isPast && is_null($reservation->checked_out_at))
-                                <a href="{{ route('user.reservations.checkout', $reservation->id) }}" class="btn btn-sm btn-success mt-2 mt-md-0">
-                                    <i class="bi bi-check2-square"></i> Check Out
-                                </a>
-                            @endif
-                        @endif
-                    @endauth
-
                     <a href="{{ route('user.reservations') }}" class="btn btn-sm btn-outline-secondary mt-2 mt-md-0">
                         <i class="bi bi-arrow-left"></i> Kembali ke Riwayat
                     </a>
@@ -84,6 +70,24 @@
                 @else
                     <p class="text-muted fst-italic">Tidak ada fasilitas tambahan yang dipilih.</p>
                 @endif
+
+                {{-- Check Out Button - Moved to bottom of details --}}
+                @auth
+                    @if(Auth::id() == $reservation->user_id)
+                        @php
+                            $isPast = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai)->isPast();
+                        @endphp
+
+                        @if($reservation->status == 'approved' && $isPast && is_null($reservation->checked_out_at))
+                            <hr>
+                            <div class="d-flex justify-content-center mt-4">
+                                <a href="{{ route('user.reservations.checkout', $reservation->id) }}" class="btn btn-success">
+                                    <i class="bi bi-check2-square me-2"></i> Check Out Sekarang
+                                </a>
+                            </div>
+                        @endif
+                    @endif
+                @endauth
             </div>
         </div>
     </div>
