@@ -42,15 +42,29 @@
                               id="fasilitas" name="fasilitas" rows="3" required>{{ old('fasilitas', $room->fasilitas) }}</textarea>
                     @error('fasilitas')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
-                <div class="mb-4">
+                <div class="mb-3">
                     <label for="foto" class="form-label">Foto Ruangan</label>
                     <input class="form-control @error('foto') is-invalid @enderror" 
                            type="file" id="foto" name="foto">
+                    <div class="form-text">Kosongkan jika tidak ingin mengubah foto.</div>
                     @error('foto')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     @if($room->foto)
-                        <div class="mt-3 d-flex flex-column align-items-center">
+                        <div class="mt-3">
                             <img src="{{ $room->foto_url }}" alt="Foto Ruangan" class="img-fluid rounded" style="max-height: 200px;">
-                            <div class="text-muted mt-2">Foto saat ini</div>
+                            <div class="text-muted mt-1 small">Foto saat ini</div>
+                        </div>
+                    @endif
+                </div>
+                <div class="mb-4">
+                    <label for="qr_code" class="form-label">Gambar QR Code Survei</label>
+                    <input class="form-control @error('qr_code') is-invalid @enderror" 
+                           type="file" id="qr_code" name="qr_code">
+                    <div class="form-text">Kosongkan jika tidak ingin mengubah QR Code.</div>
+                    @error('qr_code')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    @if($room->qr_code_path)
+                        <div class="mt-3">
+                            <img src="{{ $room->qr_code_url }}" alt="QR Code" class="img-fluid rounded bg-light p-2" style="max-height: 150px;">
+                            <div class="text-muted mt-1 small">QR Code saat ini</div>
                         </div>
                     @endif
                 </div>

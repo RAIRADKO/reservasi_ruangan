@@ -21,9 +21,9 @@
                 <div class="text-center my-4">
                     <h6 class="text-muted mb-3">Langkah 1: Pindai QR Code Survei</h6>
                     <p>Silakan pindai QR Code yang telah disediakan di dalam ruangan menggunakan kamera ponsel Anda untuk mengisi survei kepuasan.</p>
-                    {{-- The QR code is physically in the room, so we show a placeholder icon --}}
-                    <img src="{{ asset('img\QR Command Center.jpg') }}" alt="QR Code Survei" style="width: 200px; height: 200px;" />
-                    <p class="mt-2 text-muted small">QR Code terletak di dekat pintu keluar.</p>
+                    {{-- Menampilkan QR Code dinamis berdasarkan ruangan --}}
+                    <img src="{{ $reservation->roomInfo->qr_code_url }}" alt="QR Code Survei untuk {{ $reservation->roomInfo->nama_ruangan }}" style="width: 200px; height: 200px;" />
+                    <p class="mt-2 text-muted small">Pindai QR Code untuk ruangan <strong>{{ $reservation->roomInfo->nama_ruangan }}</strong> yang terletak di dekat pintu keluar.</p>
                 </div>
 
                 <hr>

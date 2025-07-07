@@ -39,11 +39,18 @@
                               id="fasilitas" name="fasilitas" rows="3" required>{{ old('fasilitas') }}</textarea>
                     @error('fasilitas')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
-                <div class="mb-4">
+                <div class="mb-3">
                     <label for="foto" class="form-label">Foto Ruangan</label>
                     <input class="form-control @error('foto') is-invalid @enderror" 
                            type="file" id="foto" name="foto">
                     @error('foto')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+                <div class="mb-4">
+                    <label for="qr_code" class="form-label">Gambar QR Code Survei</label>
+                    <input class="form-control @error('qr_code') is-invalid @enderror" 
+                           type="file" id="qr_code" name="qr_code">
+                    <div class="form-text">Unggah gambar QR Code spesifik untuk ruangan ini.</div>
+                    @error('qr_code')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                     <button type="submit" class="btn btn-primary px-4 py-2">

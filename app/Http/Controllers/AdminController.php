@@ -118,6 +118,7 @@ class AdminController extends Controller
             'kapasitas' => 'required|integer|min:1',
             'fasilitas' => 'required|string',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'qr_code' => 'nullable|image|mimes:jpeg,png,jpg|max:1024', // Tambahkan validasi QR Code
         ]);
         
         $data = $request->only(['nama_ruangan', 'deskripsi', 'kapasitas', 'fasilitas']);
@@ -125,6 +126,11 @@ class AdminController extends Controller
         if ($request->hasFile('foto')) {
             $path = $request->file('foto')->store('room_photos', 'public');
             $data['foto'] = $path;
+        }
+
+        if ($request->hasFile('qr_code')) { // Tambahkan logika untuk menyimpan QR Code
+            $path = $request->file('qr_code')->store('room_qrcodes', 'public');
+            $data['qr_code_path'] = $path;
         }
         
         RoomInfo::create($data);
@@ -145,18 +151,27 @@ class AdminController extends Controller
             'kapasitas' => 'required|integer|min:1',
             'fasilitas' => 'required|string',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'qr_code' => 'nullable|image|mimes:jpeg,png,jpg|max:1024', // Tambahkan validasi QR Code
         ]);
         
         $data = $request->only(['nama_ruangan', 'deskripsi', 'kapasitas', 'fasilitas']);
         
         if ($request->hasFile('foto')) {
             if ($room->foto) {
-                Storage::delete('public/' . $room->foto);
+                Storage::disk('public')->delete($room->foto);
             }
             $path = $request->file('foto')->store('room_photos', 'public');
             $data['foto'] = $path;
         }
         
+        if ($request->hasFile('qr_code')) { // Tambahkan logika untuk memperbarui QR Code
+            if ($room->qr_code_path) {
+                Storage::disk('public')->delete($room->qr_code_path);
+            }
+            $path = $request->file('qr_code')->store('room_qrcodes', 'public');
+            $data['qr_code_path'] = $path;
+        }
+
         $room->update($data);
         
         return redirect()->route('admin.room.index')->with('success', 'Informasi ruangan berhasil diperbarui.');
@@ -166,6 +181,9 @@ class AdminController extends Controller
     {
         if ($room->foto) {
             Storage::delete('public/' . $room->foto);
+        }
+        if ($room->qr_code_path) { // Hapus juga QR code jika ada
+            Storage::disk('public')->delete($room->qr_code_path);
         }
         $room->delete();
         return redirect()->route('admin.room.index')->with('success', 'Ruangan berhasil dihapus.');
