@@ -39,6 +39,7 @@
                 </tr>
                 <tr>
                     <td>📅 Tanggal</td>
+                    {{-- PERBAIKAN DI BARIS INI --}}
                     <td>{{ $reservation->tanggal->isoFormat('dddd, D MMMM YYYY') }}</td>
                 </tr>
                 <tr>

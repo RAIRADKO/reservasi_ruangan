@@ -195,5 +195,14 @@
             });
         });
     });
+
+    const cancelForms = document.querySelectorAll('.clickable-row form');
+        cancelForms.forEach(form => {
+            form.addEventListener('click', function(event) {
+                // Mencegah event klik pada form menyebar ke elemen <tr>
+                event.stopPropagation();
+            });
+        });
+
 </script>
 @endsection
