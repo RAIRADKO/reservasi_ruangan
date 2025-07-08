@@ -72,6 +72,11 @@
             background: #212529;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             z-index: 1030;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            left: 0;
+            right: 0;
         }
         
         .mobile-toggle {
@@ -80,18 +85,27 @@
             border: none;
             background: none;
             padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
         }
         
-        .mobile-toggle:hover {
+        .mobile-toggle:hover,
+        .mobile-toggle:focus {
             color: #fff;
             background: rgba(255,255,255,0.1);
             border-radius: 0.375rem;
+            outline: none;
+        }
+        
+        .mobile-toggle:active {
+            transform: scale(0.95);
         }
         
         .sidebar {
             background: #212529;
             box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
             z-index: 1025;
+            transition: all 0.3s ease-in-out;
         }
         
         .sidebar .nav-link {
@@ -134,6 +148,7 @@
                 top: 0;
                 height: 100vh;
                 overflow-y: auto;
+                transform: translateX(0);
             }
             
             .main-content {
@@ -151,16 +166,16 @@
             .sidebar {
                 position: fixed;
                 top: 0;
-                left: -100%;
+                left: 0;
                 width: 280px;
                 height: 100vh;
-                transition: left 0.3s ease-in-out;
                 overflow-y: auto;
                 padding-top: 60px;
+                transform: translateX(-100%);
             }
             
             .sidebar.show {
-                left: 0;
+                transform: translateX(0);
             }
             
             .sidebar-overlay {
@@ -231,7 +246,11 @@
         @media (max-width: 575.98px) {
             .sidebar {
                 width: 100%;
-                left: -100%;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
             }
             
             .main-content {
@@ -283,23 +302,38 @@
                 max-width: 150px;
             }
         }
+        
+        /* Prevent body scroll when sidebar is open */
+        body.sidebar-open {
+            overflow: hidden;
+        }
+        
+        /* Hamburger icon animation */
+        .mobile-toggle .hamburger-icon {
+            display: inline-block;
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .mobile-toggle.active .hamburger-icon {
+            transform: rotate(90deg);
+        }
     </style>
     
     @yield('styles')
 </head>
 
 <body>
-    <div class="mobile-header d-lg-none position-fixed w-100 top-0">
+    <div class="mobile-header d-lg-none">
         <div class="d-flex justify-content-between align-items-center p-3">
-            <button class="mobile-toggle" type="button" onclick="toggleSidebar()">
-                <i class="bi bi-list"></i>
+            <button class="mobile-toggle" type="button" id="sidebarToggle" aria-label="Toggle sidebar">
+                <i class="bi bi-list hamburger-icon"></i>
             </button>
             <h5 class="text-white mb-0">
                 <i class="bi bi-shield-check me-2"></i>
                 Admin Panel
             </h5>
             <div class="dropdown">
-                <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-person-circle"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
@@ -318,7 +352,7 @@
         </div>
     </div>
 
-    <div class="sidebar-overlay d-lg-none" onclick="toggleSidebar()"></div>
+    <div class="sidebar-overlay d-lg-none" id="sidebarOverlay"></div>
 
     <div class="container-fluid">
         <div class="row">
@@ -459,84 +493,119 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Sidebar toggle function
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.querySelector('.sidebar-overlay');
-            
-            sidebar.classList.toggle('show');
-            overlay.classList.toggle('show');
-        }
-
-        // Close sidebar when clicking on overlay
-        document.querySelector('.sidebar-overlay').addEventListener('click', function() {
-            toggleSidebar();
-        });
-
-        // Close sidebar when clicking on nav links (mobile)
-        document.querySelectorAll('.sidebar .nav-link').forEach(function(link) {
-            link.addEventListener('click', function() {
-                if (window.innerWidth < 992) {
-                    toggleSidebar();
-                }
-            });
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 992) {
-                const sidebar = document.getElementById('sidebar');
-                const overlay = document.querySelector('.sidebar-overlay');
-                sidebar.classList.remove('show');
-                overlay.classList.remove('show');
+        // Improved sidebar toggle functionality
+        class SidebarToggle {
+            constructor() {
+                this.sidebar = document.getElementById('sidebar');
+                this.overlay = document.getElementById('sidebarOverlay');
+                this.toggleButton = document.getElementById('sidebarToggle');
+                this.body = document.body;
+                this.isOpen = false;
+                
+                this.init();
             }
-        });
-        
-        // Auto-dismiss alerts after 5 seconds
-        setTimeout(function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                if (alert.classList.contains('show')) {
-                    const bsAlert = new bootstrap.Alert(alert);
-                    bsAlert.close();
+            
+            init() {
+                // Toggle button event
+                if (this.toggleButton) {
+                    this.toggleButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.toggle();
+                    });
                 }
-            });
-        }, 5000);
+                
+                // Overlay click event
+                if (this.overlay) {
+                    this.overlay.addEventListener('click', () => {
+                        this.close();
+                    });
+                }
+                
+                // Close sidebar when clicking nav links on mobile
+                const navLinks = document.querySelectorAll('.sidebar .nav-link');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (window.innerWidth < 992) {
+                            this.close();
+                        }
+                    });
+                });
+                
+                // Handle window resize
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth >= 992) {
+                        this.close();
+                    }
+                });
+                
+                // Handle escape key
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && this.isOpen) {
+                        this.close();
+                    }
+                });
+            }
+            
+            toggle() {
+                if (this.isOpen) {
+                    this.close();
+                } else {
+                    this.open();
+                }
+            }
+            
+            open() {
+                if (this.sidebar && this.overlay) {
+                    this.sidebar.classList.add('show');
+                    this.overlay.classList.add('show');
+                    this.body.classList.add('sidebar-open');
+                    this.toggleButton.classList.add('active');
+                    this.isOpen = true;
+                }
+            }
+            
+            close() {
+                if (this.sidebar && this.overlay) {
+                    this.sidebar.classList.remove('show');
+                    this.overlay.classList.remove('show');
+                    this.body.classList.remove('sidebar-open');
+                    this.toggleButton.classList.remove('active');
+                    this.isOpen = false;
+                }
+            }
+        }
         
-        // Add slide-up animation to cards
+        // Initialize sidebar toggle when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
+            new SidebarToggle();
+            
+            // Auto-dismiss alerts after 5 seconds
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    if (alert.classList.contains('show')) {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    }
+                });
+            }, 5000);
+            
             // Initialize tooltips for desktop
             if (window.innerWidth >= 992) {
-                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
                 var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                  return new bootstrap.Tooltip(tooltipTriggerEl)
-                })
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
             }
 
+            // Add slide-up animation to cards
             const cards = document.querySelectorAll('.card');
             cards.forEach(function(card, index) {
                 setTimeout(function() {
                     card.classList.add('slide-up');
                 }, index * 100);
             });
-        });
-
-        // Prevent body scroll when sidebar is open on mobile
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebar = document.getElementById('sidebar');
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.attributeName === 'class') {
-                        if (sidebar.classList.contains('show')) {
-                            document.body.style.overflow = 'hidden';
-                        } else {
-                            document.body.style.overflow = '';
-                        }
-                    }
-                });
-            });
-            
-            observer.observe(sidebar, { attributes: true });
         });
 
         // Universal Delete Modal Handler

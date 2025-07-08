@@ -30,7 +30,7 @@ class AdminController extends Controller
 
         $reservations = Reservation::with(['user', 'roomInfo']) // Eager load roomInfo
             ->orderBy('created_at', 'desc')
-            ->take(10)
+            ->take(5)
             ->get();
             
         return view('admin.dashboard', compact('pendingCount', 'approvedCount', 'completedCount', 'reservations', 'userCount')); // PERBARUI INI
