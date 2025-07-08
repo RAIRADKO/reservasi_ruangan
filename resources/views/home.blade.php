@@ -149,7 +149,7 @@
     </div>
     <div class="card-body">
         <div class="row g-4">
-            <div class="col-md-3 col-6">
+            <div class="col-lg-2 col-md-4 col-6">
                 <div class="text-center">
                     <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
                          style="width: 50px; height: 50px;">
@@ -160,7 +160,7 @@
                 </div>
             </div>
             
-            <div class="col-md-3 col-6">
+            <div class="col-lg-2 col-md-4 col-6">
                 <div class="text-center">
                     <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
                          style="width: 50px; height: 50px;">
@@ -171,7 +171,7 @@
                 </div>
             </div>
             
-            <div class="col-md-3 col-6">
+            <div class="col-lg-2 col-md-4 col-6">
                 <div class="text-center">
                     <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
                          style="width: 50px; height: 50px;">
@@ -182,7 +182,7 @@
                 </div>
             </div>
             
-            <div class="col-md-3 col-6">
+            <div class="col-lg-2 col-md-4 col-6">
                 <div class="text-center">
                     <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
                          style="width: 50px; height: 50px;">
@@ -190,6 +190,28 @@
                     </div>
                     <h6 class="fw-bold">Konfirmasi</h6>
                     <p class="text-muted small">Tunggu konfirmasi dan gunakan ruangan</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="text-center">
+                    <div class="bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
+                         style="width: 50px; height: 50px;">
+                        <span class="fw-bold">5</span>
+                    </div>
+                    <h6 class="fw-bold">Check Out</h6>
+                    <p class="text-muted small">Lakukan check out setelah selesai menggunakan ruangan</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="text-center">
+                    <div class="bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
+                         style="width: 50px; height: 50px;">
+                        <span class="fw-bold">6</span>
+                    </div>
+                    <h6 class="fw-bold">Isi Survey</h6>
+                    <p class="text-muted small">Berikan penilaian dan feedback untuk meningkatkan layanan</p>
                 </div>
             </div>
         </div>
@@ -358,8 +380,16 @@
         }
         
         /* Adjust panduan penggunaan untuk mobile */
-        .col-6 .text-center p {
+        .col-6 .text-center p,
+        .col-lg-2 .text-center p {
             font-size: 0.75rem;
+        }
+        
+        /* Responsive grid untuk panduan penggunaan */
+        @media (max-width: 991px) {
+            .col-lg-2 {
+                margin-bottom: 1rem;
+            }
         }
     }
     
