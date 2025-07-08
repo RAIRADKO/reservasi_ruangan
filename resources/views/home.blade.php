@@ -5,55 +5,57 @@
 @section('content')
 <div class="row g-4">
     <div class="col-lg-7 col-12">
-        <div class="card h-100">
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h5 class="mb-0 fw-bold">
                     <i class="bi bi-info-circle me-2 text-primary"></i>
                     Tentang CommandBook
                 </h5>
             </div>
             <div class="card-body">
-                <div class="row g-4">
+                <div class="row g-4 align-items-center">
                     <div class="col-md-5 col-12 mb-3 mb-md-0">
-                        <div class="text-center">
+                        <div class="text-center p-3 bg-light rounded">
                             <img src="{{ asset('img/Lambang_Kabupaten_Purworejo.png') }}" 
                                  class="img-fluid rounded" 
                                  alt="Logo Kabupaten Purworejo"
-                                 style="max-height: 200px; width: auto;">
+                                 style="max-height: 180px; width: auto;">
                         </div>
                     </div>
                     
                     <div class="col-md-7 col-12">
-                        <h4 class="card-title fw-bold text-primary">CommandBook</h4>
-                        <p class="card-text text-muted mb-3">
+                        <h4 class="card-title fw-bold text-primary mb-3">CommandBook</h4>
+                        <p class="card-text mb-4">
                             Aplikasi digital untuk memudahkan reservasi ruangan rapat di lingkungan 
                             Pemerintah Kabupaten Purworejo dengan sistem yang terintegrasi dan efisien.
                         </p>
                         
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <h6 class="fw-bold mb-2">
-                                    <i class="bi bi-star-fill me-2 text-warning"></i>
-                                    Fitur Utama
-                                </h6>
-                                <ul class="list-unstyled">
-                                    <li class="mb-1">
+                        <div class="bg-light p-3 rounded">
+                            <h6 class="fw-bold mb-3 d-flex align-items-center">
+                                <i class="bi bi-stars me-2 text-warning"></i>
+                                Fitur Utama
+                            </h6>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-2">
                                         <i class="bi bi-check-circle-fill me-2 text-success"></i>
-                                        <small>Reservasi online 24/7</small>
-                                    </li>
-                                    <li class="mb-1">
+                                        <span>Reservasi online 24/7</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
                                         <i class="bi bi-check-circle-fill me-2 text-success"></i>
-                                        <small>Kalender ketersediaan real-time</small>
-                                    </li>
-                                    <li class="mb-1">
+                                        <span>Manajemen multi-instansi</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-2">
                                         <i class="bi bi-check-circle-fill me-2 text-success"></i>
-                                        <small>Manajemen multi-instansi</small>
-                                    </li>
-                                    <li class="mb-1">
+                                        <span>Kalender real-time</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
                                         <i class="bi bi-check-circle-fill me-2 text-success"></i>
-                                        <small>Notifikasi otomatis</small>
-                                    </li>
-                                </ul>
+                                        <span>Notifikasi otomatis</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -63,61 +65,58 @@
     </div>
 
     <div class="col-lg-5 col-12 mt-4 mt-lg-0">
-        <div class="card h-100 bg-custom-dark text-white border-0">
-            <div class="card-body text-center d-flex flex-column justify-content-center py-4">
-                <div class="mb-3">
-                    <i class="bi bi-calendar-check display-4 mb-3"></i>
-                    <h5 class="card-title mb-3">Mulai Reservasi Ruangan</h5>
+        <div class="card h-100 border-0 shadow-sm bg-gradient-primary">
+            <div class="card-body text-center d-flex flex-column justify-content-center py-4 px-3">
+                <div class="mb-4">
+                    <i class="bi bi-calendar-check text-white display-5"></i>
+                    <h5 class="card-title text-white mb-3">Mulai Reservasi Ruangan</h5>
                 </div>
                 
                 @auth
-                    <p class="mb-3 opacity-75">
-                        Halo, <strong>{{ Auth::user()->name }}</strong>!<br>
+                    <p class="mb-4 text-white text-opacity-85">
+                        Halo, <strong class="text-white">{{ Auth::user()->name }}</strong>!<br>
                         Siap untuk melakukan reservasi ruangan?
                     </p>
                                         
-                    <div class="d-grid">
-                        <a href="{{ route('reservations.create') }}" class="btn btn-light btn-lg py-2">
+                    <div class="d-grid mb-3">
+                        <a href="{{ route('reservations.create') }}" class="btn btn-light btn-lg py-2 fw-bold rounded-pill shadow-sm">
                             <i class="bi bi-plus-circle-fill me-2"></i>
                             Buat Reservasi Baru
                         </a>
                     </div>
                     
-                    <div class="mt-3">
-                        <a href="{{ route('user.reservations') }}" class="btn btn-outline-light btn-sm">
+                    <div class="mt-2">
+                        <a href="{{ route('user.reservations') }}" class="btn btn-outline-light btn-sm rounded-pill">
                             <i class="bi bi-clock-history me-1"></i>
                             Lihat Riwayat Reservasi
                         </a>
                     </div>
                 @else
-                    <p class="mb-3 opacity-75">
+                    <p class="mb-4 text-white text-opacity-85">
                         Silakan login terlebih dahulu untuk dapat melakukan reservasi ruangan.
                     </p>
                     
-                    <div class="bg-white bg-opacity-10 rounded p-3 mb-3">
-                        <h6 class="mb-2">Mengapa Menggunakan Sistem Ini?</h6>
-                        <ul class="list-unstyled text-start">
-                            <li class="mb-1">
-                                <i class="bi bi-shield-check me-2"></i>
-                                <small>Aman dan terpercaya</small>
-                            </li>
-                            <li class="mb-1">
-                                <i class="bi bi-lightning-charge me-2"></i>
-                                <small>Cepat dan mudah</small>
-                            </li>
-                            <li class="mb-1">
-                                <i class="bi bi-phone me-2"></i>
-                                <small>Akses dari mana saja</small>
-                            </li>
-                        </ul>
+                    <div class="bg-white bg-opacity-10 rounded p-3 mb-4">
+                        <h6 class="mb-3 text-white">Mengapa Menggunakan Sistem Ini?</h6>
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            <span class="badge bg-white bg-opacity-20 text-white py-2">
+                                <i class="bi bi-shield-check me-1"></i>Aman
+                            </span>
+                            <span class="badge bg-white bg-opacity-20 text-white py-2">
+                                <i class="bi bi-lightning me-1"></i>Cepat
+                            </span>
+                            <span class="badge bg-white bg-opacity-20 text-white py-2">
+                                <i class="bi bi-phone me-1"></i>Akses Mobile
+                            </span>
+                        </div>
                     </div>
                     
-                    <div class="d-grid gap-2">
-                        <a href="{{ route('login') }}" class="btn btn-light py-2">
+                    <div class="d-grid gap-3">
+                        <a href="{{ route('login') }}" class="btn btn-light py-2 fw-bold rounded-pill shadow-sm">
                             <i class="bi bi-box-arrow-in-right me-2"></i>
-                            Login
+                            Login Sekarang
                         </a>
-                        <a href="{{ route('register') }}" class="btn btn-outline-light py-2">
+                        <a href="{{ route('register') }}" class="btn btn-outline-light py-2 rounded-pill">
                             <i class="bi bi-person-plus me-2"></i>
                             Daftar Akun Baru
                         </a>
@@ -128,167 +127,195 @@
     </div>
 </div>
 
-<div class="card mt-4">
-    <div class="card-header bg-white">
-        <h5 class="mb-0">
-            <i class="bi bi-people me-2 text-info"></i>
-            Statistik Pengunjung
-        </h5>
+<div class="row mt-4 g-4">
+    <div class="col-md-6">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-people me-2 text-info"></i>
+                    Statistik Pengunjung
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center g-3">
+                    <div class="col-md-4 col-12">
+                        <div class="border rounded p-3 bg-light h-100">
+                            <div class="text-primary mb-2">
+                                <i class="bi bi-sun display-6"></i>
+                            </div>
+                            <h3 class="text-primary fw-bold">{{ $todayVisitors }}</h3>
+                            <p class="mb-0">Hari Ini</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-12">
+                        <div class="border rounded p-3 bg-light h-100">
+                            <div class="text-success mb-2">
+                                <i class="bi bi-calendar-month display-6"></i>
+                            </div>
+                            <h3 class="text-success fw-bold">{{ $monthlyVisitors }}</h3>
+                            <p class="mb-0">Bulan Ini</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-12">
+                        <div class="border rounded p-3 bg-light h-100">
+                            <div class="text-info mb-2">
+                                <i class="bi bi-graph-up display-6"></i>
+                            </div>
+                            <h3 class="text-info fw-bold">{{ $totalVisitors }}</h3>
+                            <p class="mb-0">Total</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        <div class="row text-center">
-            <div class="col-md-4 col-12 mb-3 mb-md-0">
-                <div class="border rounded p-3">
-                    <h3 class="text-primary">{{ $todayVisitors }}</h3>
-                    <p class="mb-0 text-muted">Hari Ini</p>
-                </div>
+
+    <div class="col-md-6">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-calendar-event me-2 text-success"></i>
+                    Acara Hari Ini ({{ now()->format('d F Y') }})
+                </h5>
             </div>
-            <div class="col-md-4 col-12 mb-3 mb-md-0">
-                <div class="border rounded p-3">
-                    <h3 class="text-success">{{ $monthlyVisitors }}</h3>
-                    <p class="mb-0 text-muted">Bulan Ini</p>
-                </div>
-            </div>
-            <div class="col-md-4 col-12">
-                <div class="border rounded p-3">
-                    <h3 class="text-info">{{ $totalVisitors }}</h3>
-                    <p class="mb-0 text-muted">Total</p>
-                </div>
+            <div class="card-body">
+                @if(count($todayEvents) > 0)
+                    <div class="list-group">
+                        @foreach($todayEvents as $event)
+                            <div class="list-group-item border-0 py-2 px-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 36px; height: 36px;">
+                                        <i class="bi bi-calendar-check"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">{{ $event->roomInfo->nama_ruangan }}</h6>
+                                        <small class="text-muted">
+                                            {{ date('H:i', strtotime($event->jam_mulai)) }} - {{ date('H:i', strtotime($event->jam_selesai)) }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-4">
+                        <i class="bi bi-calendar-x display-4 text-muted mb-3"></i>
+                        <p class="text-muted mb-0">Tidak ada acara yang dijadwalkan hari ini</p>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
 </div>
 
-<div class="card mt-4">
-    <div class="card-header bg-white">
-        <h5 class="mb-0">
-            <i class="bi bi-calendar-event me-2 text-success"></i>
-            Acara Hari Ini ({{ now()->format('d F Y') }})
-        </h5>
-    </div>
-    <div class="card-body">
-        @if(count($todayEvents) > 0)
-            @foreach($todayEvents as $event)
-                <div class="alert alert-info mb-2">
-                    <strong>{{ $event->roomInfo->nama_ruangan }}:</strong> 
-                    <span>{{ date('H:i', strtotime($event->jam_mulai)) }} - {{ date('H:i', strtotime($event->jam_selesai)) }}</span>
-                </div>
-            @endforeach
-        @else
-            <p class="text-muted mb-0">Tidak ada acara yang dijadwalkan hari ini.</p>
-        @endif
-    </div>
-</div>
-
-<div class="card mt-4">
-    <div class="card-header bg-white">
+<div class="card mt-4 shadow-sm">
+    <div class="card-header bg-white py-3 border-bottom">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
-            <h5 class="mb-2 mb-md-0">
+            <h5 class="mb-2 mb-md-0 fw-bold">
                 <i class="bi bi-question-circle me-2 text-info"></i>
                 Panduan Penggunaan
             </h5>
-            <small class="text-muted">Cara menggunakan sistem reservasi</small>
+            <small class="text-muted">Langkah-langkah menggunakan sistem</small>
         </div>
     </div>
     <div class="card-body">
-        <div class="row g-4">
+        <div class="row g-4 justify-content-center">
             <div class="col-lg-2 col-md-4 col-6">
-                <div class="text-center">
-                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
-                         style="width: 50px; height: 50px;">
-                        <span class="fw-bold">1</span>
+                <div class="text-center p-3 bg-light rounded h-100">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 60px; height: 60px;">
+                        <span class="fw-bold fs-5">1</span>
                     </div>
-                    <h6 class="fw-bold">Login</h6>
-                    <p class="text-muted small">Masuk ke akun Anda atau daftar jika belum punya</p>
+                    <h6 class="fw-bold mb-2">Login</h6>
+                    <p class="text-muted small mb-0">Masuk ke akun Anda</p>
                 </div>
             </div>
             
             <div class="col-lg-2 col-md-4 col-6">
-                <div class="text-center">
-                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
-                         style="width: 50px; height: 50px;">
-                        <span class="fw-bold">2</span>
+                <div class="text-center p-3 bg-light rounded h-100">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 60px; height: 60px;">
+                        <span class="fw-bold fs-5">2</span>
                     </div>
-                    <h6 class="fw-bold">Pilih Tanggal</h6>
-                    <p class="text-muted small">Lihat kalender dan pilih tanggal yang tersedia</p>
+                    <h6 class="fw-bold mb-2">Pilih Tanggal</h6>
+                    <p class="text-muted small mb-0">Cari tanggal tersedia</p>
                 </div>
             </div>
             
             <div class="col-lg-2 col-md-4 col-6">
-                <div class="text-center">
-                    <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
-                         style="width: 50px; height: 50px;">
-                        <span class="fw-bold">3</span>
+                <div class="text-center p-3 bg-light rounded h-100">
+                    <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 60px; height: 60px;">
+                        <span class="fw-bold fs-5">3</span>
                     </div>
-                    <h6 class="fw-bold">Isi Form</h6>
-                    <p class="text-muted small">Lengkapi informasi reservasi Anda</p>
+                    <h6 class="fw-bold mb-2">Isi Form</h6>
+                    <p class="text-muted small mb-0">Lengkapi data reservasi</p>
                 </div>
             </div>
             
             <div class="col-lg-2 col-md-4 col-6">
-                <div class="text-center">
-                    <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
-                         style="width: 50px; height: 50px;">
-                        <span class="fw-bold">4</span>
+                <div class="text-center p-3 bg-light rounded h-100">
+                    <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 60px; height: 60px;">
+                        <span class="fw-bold fs-5">4</span>
                     </div>
-                    <h6 class="fw-bold">Konfirmasi</h6>
-                    <p class="text-muted small">Tunggu konfirmasi dan gunakan ruangan</p>
+                    <h6 class="fw-bold mb-2">Konfirmasi</h6>
+                    <p class="text-muted small mb-0">Tunggu konfirmasi</p>
                 </div>
             </div>
             
             <div class="col-lg-2 col-md-4 col-6">
-                <div class="text-center">
-                    <div class="bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
-                         style="width: 50px; height: 50px;">
-                        <span class="fw-bold">5</span>
+                <div class="text-center p-3 bg-light rounded h-100">
+                    <div class="bg-purple text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 60px; height: 60px;">
+                        <span class="fw-bold fs-5">5</span>
                     </div>
-                    <h6 class="fw-bold">Check Out</h6>
-                    <p class="text-muted small">Lakukan check out setelah selesai menggunakan ruangan</p>
+                    <h6 class="fw-bold mb-2">Check Out</h6>
+                    <p class="text-muted small mb-0">Setelah selesai</p>
                 </div>
             </div>
             
             <div class="col-lg-2 col-md-4 col-6">
-                <div class="text-center">
-                    <div class="bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
-                         style="width: 50px; height: 50px;">
-                        <span class="fw-bold">6</span>
+                <div class="text-center p-3 bg-light rounded h-100">
+                    <div class="bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 60px; height: 60px;">
+                        <span class="fw-bold fs-5">6</span>
                     </div>
-                    <h6 class="fw-bold">Isi Survey</h6>
-                    <p class="text-muted small">Berikan penilaian dan feedback untuk meningkatkan layanan</p>
+                    <h6 class="fw-bold mb-2">Survey</h6>
+                    <p class="text-muted small mb-0">Berikan penilaian</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="card mt-4">
-    <div class="card-header bg-white">
+<div class="card mt-4 shadow-sm">
+    <div class="card-header bg-white py-3 border-bottom">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
-            <h5 class="mb-2 mb-md-0">
+            <h5 class="mb-2 mb-md-0 fw-bold">
                 <i class="bi bi-calendar3 me-2 text-primary"></i>
                 Kalender Ketersediaan
             </h5>
-            <div class="d-flex flex-wrap align-items-center mt-2 mt-md-0">
-                <span class="badge bg-danger me-2 mb-1">
+            <div class="d-flex flex-wrap align-items-center gap-2 mt-2 mt-md-0">
+                <span class="badge bg-danger">
                     <i class="bi bi-x-circle me-1"></i>Penuh
                 </span>
-                <span class="badge bg-secondary me-2 mb-1">
-                    <i class="bi bi-x-circle me-1"></i>Not Available
+                <span class="badge bg-secondary">
+                    <i class="bi bi-x-circle me-1"></i>Tidak Tersedia
                 </span>
-                <span class="badge bg-warning me-2 mb-1">
-                    <i class="bi bi-check-circle me-1"></i>Ada Reservasi
+                <span class="badge bg-warning">
+                    <i class="bi bi-check-circle me-1"></i>Terisi
                 </span>
-                <span class="badge bg-success me-2 mb-1">
+                <span class="badge bg-success">
                     <i class="bi bi-check-circle me-1"></i>Tersedia
                 </span>
-                <small class="text-muted">Klik tanggal untuk detail jadwal</small>
             </div>
         </div>
     </div>
     
     <div class="card-body p-0">
-        <div class="overflow-auto">
-            <div id="calendar" class="p-2" style="min-width: 300px;"></div>
+        <div class="overflow-auto p-2">
+            <div id="calendar" style="min-width: 300px;"></div>
         </div>
     </div>
 </div>
@@ -317,7 +344,7 @@
 
         manualBlockedDates.forEach(function(date) {
             events.push({
-                title: 'Not Available',
+                title: 'Tidak Tersedia',
                 start: date,
                 allDay: true,
                 display: 'background',
@@ -353,7 +380,7 @@
             height: 'auto',
             events: events,
             contentHeight: 'auto',
-            aspectRatio: window.innerWidth < 768 ? 1.2 : 1.35,
+            aspectRatio: window.innerWidth < 768 ? 1 : 1.5,
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
@@ -375,7 +402,7 @@
         calendar.render();
 
         window.addEventListener('resize', function() {
-            calendar.setOption('aspectRatio', window.innerWidth < 768 ? 1.2 : 1.35);
+            calendar.setOption('aspectRatio', window.innerWidth < 768 ? 1 : 1.5);
             calendar.setOption('dayMaxEvents', window.innerWidth < 768 ? 2 : 3);
         });
 
@@ -390,57 +417,111 @@
 @section('styles')
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
 <style>
-    .bg-custom-dark {
-        background-color: #1e293b !important;
+    :root {
+        --primary: #0d6efd;
+        --secondary: #6c757d;
+        --success: #198754;
+        --info: #0dcaf0;
+        --warning: #ffc107;
+        --danger: #dc3545;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --purple: #6f42c1;
     }
     
-    /* Warna Kalender yang Lebih Kontras */
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #0F172A 0%, #1e293b 100%) !important;
+        border: none !important;
+    }
+    
+    .bg-purple {
+        background-color: var(--purple) !important;
+    }
+    
+    .icon-wrapper {
+        transition: all 0.3s ease;
+    }
+    
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .card-header {
+        border-radius: 12px 12px 0 0 !important;
+    }
+    
+    /* Warna Kalender */
     .fc-event-booked {
-        background-color: rgba(255, 215, 0, 1) !important; 
+        background-color: rgba(255, 193, 7, 0.7) !important; 
+        border: none;
     }
     
     .fc-event-full {
-        background-color: rgba(220, 53, 69, 0.6) !important;
+        background-color: rgba(220, 53, 69, 0.7) !important;
+        border: none;
     }
     
     .fc-event-not-available {
-        background-color: rgba(108, 117, 125, 0.6) !important;
+        background-color: rgba(108, 117, 125, 0.7) !important;
+        border: none;
     }
     
     .fc-event-available {
-        background-color: rgba(40, 167, 69, 0.4) !important;
+        background-color: rgba(25, 135, 84, 0.7) !important;
+        border: none;
     }
     
     .fc-day-today {
         background-color: rgba(13, 110, 253, 0.15) !important;
-        border: 2px solid #0d6efd !important;
+        border: 2px solid var(--primary) !important;
+    }
+    
+    .fc-daygrid-day-frame {
+        transition: background-color 0.2s ease;
+        border-radius: 6px;
+        margin: 2px;
     }
     
     .fc-daygrid-day-frame:hover {
         background-color: #e9ecef;
         cursor: pointer;
-        transition: background-color 0.2s ease;
     }
     
-    /* Styling untuk statistik */
-    .border {
-        border: 1px solid #dee2e6 !important;
-        transition: all 0.2s ease;
+    .fc .fc-button {
+        border-radius: 8px !important;
+        padding: 6px 12px;
     }
     
-    .border:hover {
-        border-color: #0d6efd !important;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    .fc .fc-toolbar-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    
+    /* Statistik */
+    .stat-card {
+        transition: all 0.3s ease;
+        border-radius: 10px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border-color: var(--primary);
     }
     
     /* Responsif */
     @media (max-width: 767px) {
         .card-body {
-            padding: 1rem;
-        }
-        
-        .fc-header-toolbar {
-            padding: 0 10px;
+            padding: 1.25rem;
         }
         
         .fc-toolbar-title {
@@ -448,60 +529,89 @@
         }
         
         .fc-button {
-            padding: 0.2rem 0.4rem;
+            padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
         }
         
-        .col-6 .text-center p,
-        .col-lg-2 .text-center p {
-            font-size: 0.75rem;
+        .fc .fc-toolbar.fc-header-toolbar {
+            flex-direction: column;
+            gap: 10px;
         }
         
-        @media (max-width: 991px) {
-            .col-lg-2 {
-                margin-bottom: 1rem;
-            }
+        .fc-header-toolbar .fc-toolbar-chunk {
+            display: flex;
+            justify-content: center;
+            width: 100%;
         }
     }
     
-    /* Animasi hover untuk card */
-    .card {
+    /* Panduan */
+    .guide-step {
         transition: all 0.3s ease;
     }
     
-    .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    .guide-step:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.08);
     }
     
-    /* Styling untuk badge */
+    /* Event List */
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+        padding: 0.75rem 0;
+        transition: background-color 0.2s ease;
+    }
+    
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+    
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    /* Button Styles */
+    .btn-lg {
+        border-radius: 50px;
+        padding: 0.75rem 1.5rem;
+    }
+    
+    .btn-outline-light:hover {
+        color: var(--primary) !important;
+        background-color: white;
+    }
+    
+    /* Badge Styles */
     .badge {
-        font-size: 0.75rem;
-        padding: 0.5em 0.75em;
+        border-radius: 50px;
+        padding: 0.5em 0.9em;
+        font-weight: 500;
     }
     
-    /* Responsive text untuk mobile */
-    @media (max-width: 575px) {
-        .display-4 {
-            font-size: 2rem;
-        }
-        
-        .h5 {
-            font-size: 1.1rem;
-        }
-        
-        .small {
-            font-size: 0.75rem;
-        }
+    /* Calendar Header */
+    .fc .fc-col-header-cell-cushion {
+        font-weight: 600;
+        color: var(--dark);
     }
     
-    /* Tampilan informasi acara hari ini */
+    /* Calendar Day Number */
+    .fc .fc-daygrid-day-number {
+        font-weight: 500;
+    }
+    
+    /* Calendar Event Contrast */
     .fc-event-booked .fc-daygrid-day-number,
     .fc-event-full .fc-daygrid-day-number,
     .fc-event-not-available .fc-daygrid-day-number,
     .fc-event-available .fc-daygrid-day-number {
-        font-weight: bold;
         color: #000 !important;
+        font-weight: 600;
+    }
+    
+    /* Calendar Scroll */
+    #calendar {
+        min-height: 400px;
     }
 </style>
 @endsection

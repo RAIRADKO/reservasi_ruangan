@@ -295,7 +295,7 @@
 @section('styles')
 <style>
     .bg-gradient-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #0F172A 0%, #1e293b 100%);
     }
 
     .schedule-timeline-wrapper {
