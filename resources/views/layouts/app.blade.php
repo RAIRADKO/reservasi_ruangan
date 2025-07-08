@@ -120,6 +120,87 @@
                 padding: 0.25rem 0.5rem;
                 font-size: 1.25rem;
             }
+            
+            /* Mobile menu styling */
+            .navbar-collapse {
+                background-color: #0F172A;
+                border-radius: 0.5rem;
+                margin-top: 1rem;
+                padding: 1rem;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            
+            .navbar-nav .nav-link {
+                padding: 0.75rem 1rem;
+                margin-bottom: 0.5rem;
+                border-radius: 0.5rem;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                transition: all 0.3s ease;
+            }
+            
+            .navbar-nav .nav-link:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 255, 255, 0.2);
+            }
+            
+            .navbar-nav .nav-link.active {
+                background-color: rgba(255, 255, 255, 0.15);
+                border-color: rgba(255, 255, 255, 0.3);
+            }
+            
+            /* Mobile user menu */
+            .mobile-user-menu {
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                padding-top: 1rem;
+                margin-top: 1rem;
+            }
+            
+            .mobile-user-info {
+                display: flex;
+                align-items: center;
+                padding: 0.75rem 1rem;
+                margin-bottom: 0.5rem;
+                background-color: rgba(255, 255, 255, 0.05);
+                border-radius: 0.5rem;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .mobile-user-info i {
+                font-size: 1.5rem;
+                margin-right: 0.75rem;
+            }
+            
+            .mobile-user-info .user-details {
+                flex: 1;
+            }
+            
+            .mobile-user-info .user-name {
+                font-weight: 600;
+                color: #ffffff;
+                margin-bottom: 0.25rem;
+            }
+            
+            .mobile-user-info .user-email {
+                font-size: 0.85rem;
+                color: #94a3b8;
+                margin: 0;
+            }
+            
+            .mobile-logout-btn {
+                width: 100%;
+                padding: 0.75rem;
+                background-color: transparent;
+                border: 1px solid rgba(220, 38, 127, 0.3);
+                color: #f87171;
+                border-radius: 0.5rem;
+                transition: all 0.3s ease;
+            }
+            
+            .mobile-logout-btn:hover {
+                background-color: rgba(220, 38, 127, 0.1);
+                border-color: rgba(220, 38, 127, 0.5);
+                color: #fca5a5;
+            }
         }
         
         @media (max-width: 767.98px) {
@@ -376,15 +457,17 @@
                         {{-- Menu untuk user yang sudah login --}}
                         <li class="nav-item me-lg-2">
                             <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
-                                <i class="bi bi-house-door me-1"></i>Home
+                                <i class="bi bi-house-door me-2"></i>Home
                             </a>
                         </li>
                         <li class="nav-item me-lg-3">
                             <a class="nav-link {{ request()->routeIs('user.reservations') ? 'active' : '' }}" href="{{ route('user.reservations') }}">
-                                <i class="bi bi-calendar-check me-1"></i>Reservasi Saya
+                                <i class="bi bi-calendar-check me-2"></i>Reservasi Saya
                             </a>
                         </li>
-                        <li class="nav-item dropdown">
+                        
+                        {{-- Desktop: Dropdown menu --}}
+                        <li class="nav-item dropdown d-none d-lg-block">
                             <a class="nav-link dropdown-toggle d-flex align-items-center py-2" 
                                href="#" 
                                id="userDropdown" 
@@ -410,6 +493,28 @@
                                     </form>
                                 </li>
                             </ul>
+                        </li>
+                        
+                        {{-- Mobile: User info dan logout --}}
+                        <li class="nav-item d-lg-none">
+                            <div class="mobile-user-menu">
+                                <div class="mobile-user-info">
+                                    <i class="bi bi-person-circle"></i>
+                                    <div class="user-details">
+                                        <div class="user-name">{{ Auth::user()->name }}</div>
+                                        <div class="user-email">{{ Auth::user()->email }}</div>
+                                    </div>
+                                </div>
+                                <a class="nav-link mb-2" href="{{ route('user.profile') }}">
+                                    <i class="bi bi-person me-2"></i>Profil
+                                </a>
+                                <form action="{{ route('logout') }}" method="POST" class="mb-0">
+                                    @csrf
+                                    <button type="submit" class="mobile-logout-btn">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </div>
                         </li>
                     @else
                         {{-- Menu untuk guest (belum login) --}}
