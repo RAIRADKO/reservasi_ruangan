@@ -18,7 +18,7 @@ class RoomInfoSeeder extends Seeder
             'deskripsi' => 'Ruang rapat utama yang terletak di lantai 2 dengan fasilitas modern untuk menunjang kebutuhan rapat Anda.',
             'kapasitas' => 25,
             'fasilitas' => 'Proyektor, Papan Tulis, Sound System, AC, Meja Rapat, Kursi',
-            'foto' => null, // Biarkan null atau isi dengan path jika ada gambar default
+            'foto' => null,
         ]);
     }
 }
