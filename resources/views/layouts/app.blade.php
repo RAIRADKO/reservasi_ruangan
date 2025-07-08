@@ -587,7 +587,7 @@
                     </div>
                     <div class="col-md-6 text-md-end">
                         <p class="footer-developer">
-                            Developed by <a href="#">Rahmat Irfan Adie Purwatmoko</a>
+                            Developed by <a href="https://www.linkedin.com/in/rahmatirfan/">Rahmat Irfan Adie Purwatmoko</a>
                         </p>
                     </div>
                 </div>
