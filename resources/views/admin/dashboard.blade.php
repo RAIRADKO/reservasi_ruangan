@@ -40,7 +40,7 @@
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h5 class="card-title fw-bold fs-4 mb-1">{{-- $completedCount ?? 0 --}}</h5>
+                            <h5 class="card-title fw-bold fs-4 mb-1">{{ $completedCount ?? 0 }}</h5>
                             <p class="card-text mb-0">Reservasi Selesai</p>
                         </div>
                         <div class="bg-white bg-opacity-25 rounded-circle p-3">

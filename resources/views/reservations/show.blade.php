@@ -39,9 +39,9 @@
                     <div class="col-12 col-md-6 mb-3">
                         <h6 class="text-muted h6"><i class="bi bi-person-fill me-2"></i>Informasi Pemohon</h6>
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">Nama: <strong>{{ $reservation->nama }}</strong></li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">Kontak: <strong>{{ $reservation->kontak }}</strong></li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">Instansi: <strong>{{ $reservation->dinas->name ?? 'N/A' }}</strong></li>
+                            <li class="list-group-item d-flex justify-content-between align-items px-0">Nama: <strong>{{ $reservation->nama }}</strong></li>
+                            <li class="list-group-item d-flex justify-content-between align-items px-0">Kontak: <strong>{{ $reservation->kontak }}</strong></li>
+                            <li class="list-group-item d-flex justify-content-between align-items px-0">Instansi: <strong>{{ $reservation->dinas->name ?? 'N/A' }}</strong></li>
                         </ul>
                     </div>
                     <div class="col-12 col-md-6 mb-3">
@@ -71,7 +71,6 @@
                     <p class="text-muted fst-italic">Tidak ada fasilitas tambahan yang dipilih.</p>
                 @endif
 
-                {{-- Check Out Button - Moved to bottom of details --}}
                 @auth
                     @if(Auth::id() == $reservation->user_id)
                         @php
