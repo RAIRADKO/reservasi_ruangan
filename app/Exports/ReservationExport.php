@@ -37,9 +37,12 @@ class ReservationExport implements FromCollection, WithHeadings, WithMapping, Sh
             'Instansi/Dinas',
             'Ruangan',
             'Keperluan',
+            'Fasilitas yang Digunakan',
             'Status',
             'Alasan Penolakan',
             'Tanggal Pengajuan',
+            'Waktu Dibatalkan',
+            'Waktu Check Out',
         ];
     }
 
@@ -50,7 +53,16 @@ class ReservationExport implements FromCollection, WithHeadings, WithMapping, Sh
      */
     public function map($reservation): array
     {
-        // Memetakan setiap baris data reservasi ke kolom yang sesuai
+        $waktu_disetujui = '-';
+        if ($reservation->status === 'approved') {
+            $waktu_disetujui = $reservation->updated_at->format('d-m-Y H:i:s');
+        }
+
+        $waktu_dibatalkan = '-';
+        if ($reservation->status === 'canceled') {
+            $waktu_dibatalkan = $reservation->updated_at->format('d-m-Y H:i:s');
+        }
+
         return [
             $reservation->id,
             $reservation->tanggal->format('d-m-Y'),
@@ -58,12 +70,15 @@ class ReservationExport implements FromCollection, WithHeadings, WithMapping, Sh
             date('H:i', strtotime($reservation->jam_selesai)),
             $reservation->nama,
             $reservation->user->nip ?? 'N/A',
-            $reservation->dinas->name ?? 'N/A', // Mengambil nama dari relasi dinas
-            $reservation->roomInfo->nama_ruangan ?? 'N/A', // Mengambil nama dari relasi roomInfo
+            $reservation->dinas->name ?? 'N/A',
+            $reservation->roomInfo->nama_ruangan ?? 'N/A',
             $reservation->keperluan,
-            ucfirst($reservation->status), // Mengubah status menjadi huruf kapital di awal
+            $reservation->fasilitas_terpilih ?? '-',
+            ucfirst($reservation->status),
             $reservation->rejection_reason ?? '-',
             $reservation->created_at->format('d-m-Y H:i:s'),
+            $waktu_dibatalkan,
+            $reservation->checked_out_at ? $reservation->checked_out_at->format('d-m-Y H:i:s') : '-',
         ];
     }
     
@@ -76,7 +91,6 @@ class ReservationExport implements FromCollection, WithHeadings, WithMapping, Sh
     public function styles(Worksheet $sheet)
     {
         return [
-            // Style untuk baris pertama (header)
             1    => [
                 'font' => ['bold' => true, 'size' => 12, 'color' => ['argb' => 'FFFFFFFF']],
                 'fill' => [
