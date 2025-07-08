@@ -62,11 +62,10 @@ class UserController extends Controller
     {
         $request->validate([
             'current_password' => ['required', 'current_password'],
-            'new_password' => ['required', 'confirmed', Password::min(8)],
+            'new_password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
         ], [
             'current_password.current_password' => 'Password saat ini tidak sesuai.',
             'new_password.confirmed' => 'Konfirmasi password baru tidak cocok.',
-            'new_password.min' => 'Password baru minimal harus 8 karakter.',
         ]);
 
         $user = Auth::user();

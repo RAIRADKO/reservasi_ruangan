@@ -49,7 +49,7 @@
                     <div class="mb-3">
                         <label for="password" class="form-label">{{ __('Password') }}</label>
                         <input id="password" type="password" class="form-control form-control-lg @error('password') is-invalid @enderror" name="password" required autocomplete="new-password"> {{-- Larger input --}}
-                        <div class="form-text small">Minimal 8 karakter.</div> {{-- Smaller text --}}
+                        <div class="form-text small">Minimal 8 karakter, dengan kombinasi huruf besar, angka, dan karakter unik.</div> {{-- Smaller text --}}
                         @error('password')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>

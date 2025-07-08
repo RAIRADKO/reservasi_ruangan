@@ -99,13 +99,13 @@
                     <div class="bg-white bg-opacity-10 rounded p-3 mb-4">
                         <h6 class="mb-3 text-white">Mengapa Menggunakan Sistem Ini?</h6>
                         <div class="d-flex flex-wrap justify-content-center gap-2">
-                            <span class="badge bg-white bg-opacity-20 text-white py-2">
+                            <span class="badge bg-gray bg-opacity-20 text-white py-2">
                                 <i class="bi bi-shield-check me-1"></i>Aman
                             </span>
-                            <span class="badge bg-white bg-opacity-20 text-white py-2">
+                            <span class="badge bg-gray bg-opacity-20 text-white py-2">
                                 <i class="bi bi-lightning me-1"></i>Cepat
                             </span>
-                            <span class="badge bg-white bg-opacity-20 text-white py-2">
+                            <span class="badge bg-gray bg-opacity-20 text-white py-2">
                                 <i class="bi bi-phone me-1"></i>Akses Mobile
                             </span>
                         </div>
@@ -431,7 +431,8 @@
     
     .bg-gradient-primary {
         background: linear-gradient(135deg, #0F172A 0%, #1e293b 100%) !important;
-        border: none !important;
+        /* PERUBAHAN: Outline dipertegas dengan warna lebih terang agar kontras */
+        border: 3px solid var(--secondary) !important; 
     }
     
     .bg-purple {
@@ -446,7 +447,8 @@
         border-radius: 12px;
         overflow: hidden;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border: none;
+        /* PERUBAHAN: Lebar outline dipertegas dari 2px menjadi 3px */
+        border: 3px solid #0d6efd !important; 
     }
     
     .card:hover {
