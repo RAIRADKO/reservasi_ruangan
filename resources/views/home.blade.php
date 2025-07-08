@@ -63,7 +63,7 @@
     </div>
 
     <div class="col-lg-5 col-12 mt-4 mt-lg-0">
-        <div class="card h-100 bg-gradient-primary text-white border-0">
+        <div class="card h-100 bg-custom-dark text-white border-0">
             <div class="card-body text-center d-flex flex-column justify-content-center py-4">
                 <div class="mb-3">
                     <i class="bi bi-calendar-check display-4 mb-3"></i>
@@ -330,9 +330,9 @@
 @section('styles')
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
 <style>
-    /* Gradient background untuk card aksi */
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Custom dark background untuk card reservasi */
+    .bg-custom-dark {
+        background-color: #0F172A !important;
     }
     
     /* Responsif untuk kalender */
