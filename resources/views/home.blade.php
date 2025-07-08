@@ -130,6 +130,58 @@
 
 <div class="card mt-4">
     <div class="card-header bg-white">
+        <h5 class="mb-0">
+            <i class="bi bi-people me-2 text-info"></i>
+            Statistik Pengunjung
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row text-center">
+            <div class="col-md-4 col-12 mb-3 mb-md-0">
+                <div class="border rounded p-3">
+                    <h3 class="text-primary">{{ $todayVisitors }}</h3>
+                    <p class="mb-0 text-muted">Hari Ini</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-12 mb-3 mb-md-0">
+                <div class="border rounded p-3">
+                    <h3 class="text-success">{{ $monthlyVisitors }}</h3>
+                    <p class="mb-0 text-muted">Bulan Ini</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-12">
+                <div class="border rounded p-3">
+                    <h3 class="text-info">{{ $totalVisitors }}</h3>
+                    <p class="mb-0 text-muted">Total</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">
+            <i class="bi bi-calendar-event me-2 text-success"></i>
+            Acara Hari Ini ({{ now()->format('d F Y') }})
+        </h5>
+    </div>
+    <div class="card-body">
+        @if(count($todayEvents) > 0)
+            @foreach($todayEvents as $event)
+                <div class="alert alert-info mb-2">
+                    <strong>{{ $event->roomInfo->nama_ruangan }}:</strong> 
+                    <span>{{ date('H:i', strtotime($event->jam_mulai)) }} - {{ date('H:i', strtotime($event->jam_selesai)) }}</span>
+                </div>
+            @endforeach
+        @else
+            <p class="text-muted mb-0">Tidak ada acara yang dijadwalkan hari ini.</p>
+        @endif
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-white">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
             <h5 class="mb-2 mb-md-0">
                 <i class="bi bi-question-circle me-2 text-info"></i>
@@ -233,6 +285,7 @@
             </div>
         </div>
     </div>
+    
     <div class="card-body p-0">
         <div class="overflow-auto">
             <div id="calendar" class="p-2" style="min-width: 300px;"></div>
@@ -250,6 +303,7 @@
         var reservationDates = @json($reservationDates ?? []);
         var manualBlockedDates = @json($manualBlockedDates ?? []);
         var fullDates = @json($fullDates ?? []);
+        var availableDates = @json($availableDates ?? []);
         
         var events = reservationDates.map(function(date) {
             return {
@@ -257,7 +311,7 @@
                 start: date,
                 allDay: true,
                 display: 'background',
-                color: '#fff3cd'
+                className: 'fc-event-booked'
             };
         });
 
@@ -267,7 +321,7 @@
                 start: date,
                 allDay: true,
                 display: 'background',
-                color: '#e9ecef'
+                className: 'fc-event-not-available'
             });
         });
 
@@ -277,7 +331,17 @@
                 start: date,
                 allDay: true,
                 display: 'background',
-                color: '#f8d7da'
+                className: 'fc-event-full'
+            });
+        });
+
+        availableDates.forEach(function(date) {
+            events.push({
+                title: 'Tersedia',
+                start: date,
+                allDay: true,
+                display: 'background',
+                className: 'fc-event-available'
             });
         });
         
@@ -288,7 +352,6 @@
             locale: 'id',
             height: 'auto',
             events: events,
-            // Responsif untuk ukuran layar kecil
             contentHeight: 'auto',
             aspectRatio: window.innerWidth < 768 ? 1.2 : 1.35,
             headerToolbar: {
@@ -305,20 +368,17 @@
                 var url = reservationsDateRoute.replace(':date', info.dateStr);
                 window.location.href = url;
             },
-            // Responsif untuk mobile
             dayMaxEvents: window.innerWidth < 768 ? 2 : 3,
             moreLinkClick: 'popover'
         });
         
         calendar.render();
 
-        // Responsive calendar adjustment
         window.addEventListener('resize', function() {
             calendar.setOption('aspectRatio', window.innerWidth < 768 ? 1.2 : 1.35);
             calendar.setOption('dayMaxEvents', window.innerWidth < 768 ? 2 : 3);
         });
 
-        // Initialize tooltips
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
           return new bootstrap.Tooltip(tooltipTriggerEl)
@@ -330,42 +390,36 @@
 @section('styles')
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
 <style>
-    /* Custom dark background untuk card reservasi */
     .bg-custom-dark {
-        background-color: #0F172A !important;
+        background-color: #1e293b !important;
     }
     
-    /* Responsif untuk kalender */
-    .fc .fc-toolbar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
+    /* Warna Kalender yang Lebih Kontras */
+    .fc-event-booked {
+        background-color: rgba(255, 215, 0, 1) !important; 
     }
     
-    .fc-toolbar-chunk {
-        margin-bottom: 5px;
+    .fc-event-full {
+        background-color: rgba(220, 53, 69, 0.6) !important;
     }
     
-    @media (min-width: 768px) {
-        .fc .fc-toolbar {
-            flex-direction: row;
-            align-items: center;
-            gap: 0;
-        }
-        
-        .fc-toolbar-chunk {
-            margin-bottom: 0;
-        }
+    .fc-event-not-available {
+        background-color: rgba(108, 117, 125, 0.6) !important;
+    }
+    
+    .fc-event-available {
+        background-color: rgba(40, 167, 69, 0.4) !important;
+    }
+    
+    .fc-day-today {
+        background-color: rgba(13, 110, 253, 0.15) !important;
+        border: 2px solid #0d6efd !important;
     }
     
     .fc-daygrid-day-frame:hover {
         background-color: #e9ecef;
         cursor: pointer;
-        transition: background-color: 0.2s ease;
-    }
-    
-    .fc-day-today {
-        background-color: rgba(13, 110, 253, 0.1) !important;
+        transition: background-color 0.2s ease;
     }
     
     /* Styling untuk statistik */
@@ -379,7 +433,7 @@
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     }
     
-    /* Padding tambahan untuk mobile */
+    /* Responsif */
     @media (max-width: 767px) {
         .card-body {
             padding: 1rem;
@@ -398,13 +452,11 @@
             font-size: 0.875rem;
         }
         
-        /* Adjust panduan penggunaan untuk mobile */
         .col-6 .text-center p,
         .col-lg-2 .text-center p {
             font-size: 0.75rem;
         }
         
-        /* Responsive grid untuk panduan penggunaan */
         @media (max-width: 991px) {
             .col-lg-2 {
                 margin-bottom: 1rem;
@@ -422,7 +474,7 @@
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     }
     
-    /* Styling untuk badge dengan ikon */
+    /* Styling untuk badge */
     .badge {
         font-size: 0.75rem;
         padding: 0.5em 0.75em;
@@ -441,6 +493,15 @@
         .small {
             font-size: 0.75rem;
         }
+    }
+    
+    /* Tampilan informasi acara hari ini */
+    .fc-event-booked .fc-daygrid-day-number,
+    .fc-event-full .fc-daygrid-day-number,
+    .fc-event-not-available .fc-daygrid-day-number,
+    .fc-event-available .fc-daygrid-day-number {
+        font-weight: bold;
+        color: #000 !important;
     }
 </style>
 @endsection

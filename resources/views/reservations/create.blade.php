@@ -75,6 +75,7 @@
                     @enderror
                 </div>
 
+                <!-- FACILITIES CHECKLIST RESTORED -->
                 <div id="fasilitas-wrapper" class="mb-3" style="display: none;">
                     <label class="form-label">Fasilitas Ruangan</label>
                     <div class="alert alert-light border">
@@ -175,8 +176,93 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // ... [existing JS code remains the same] ...
+    const roomSelect = document.getElementById('room_info_id');
+    const fasilitasWrapper = document.getElementById('fasilitas-wrapper');
+    const fasilitasChecklist = document.getElementById('fasilitas-checklist');
+
+    // Function to handle room selection change
+    roomSelect.addEventListener('change', function() {
+        // Clear previous checklist
+        fasilitasChecklist.innerHTML = '';
+        
+        // Get selected option
+        const selectedOption = this.options[this.selectedIndex];
+        const fasilitasData = selectedOption.getAttribute('data-fasilitas');
+
+        if (fasilitasData && fasilitasData.trim() !== '') {
+            const fasilitasArray = fasilitasData.split(',').map(item => item.trim());
+            
+            if (fasilitasArray.length > 0 && fasilitasArray[0] !== '') {
+                fasilitasArray.forEach(fasilitas => {
+                    const checkboxDiv = document.createElement('div');
+                    checkboxDiv.classList.add('form-check');
+                    
+                    const checkboxInput = document.createElement('input');
+                    checkboxInput.classList.add('form-check-input');
+                    checkboxInput.type = 'checkbox';
+                    checkboxInput.name = 'fasilitas[]';
+                    checkboxInput.value = fasilitas;
+                    checkboxInput.id = 'fasilitas-' + fasilitas.replace(/\s+/g, '-').toLowerCase();
+                    
+                    const checkboxLabel = document.createElement('label');
+                    checkboxLabel.classList.add('form-check-label');
+                    checkboxLabel.htmlFor = checkboxInput.id;
+                    checkboxLabel.textContent = fasilitas;
+                    
+                    checkboxDiv.appendChild(checkboxInput);
+                    checkboxDiv.appendChild(checkboxLabel);
+                    fasilitasChecklist.appendChild(checkboxDiv);
+                });
+
+                fasilitasWrapper.style.display = 'block';
+            } else {
+                // Show message when room has no facilities
+                fasilitasChecklist.innerHTML = '<div class="text-muted small">Ruangan ini tidak memiliki fasilitas khusus</div>';
+                fasilitasWrapper.style.display = 'block';
+            }
+        } else {
+            // Hide section when room has no facilities data
+            fasilitasWrapper.style.display = 'none';
+        }
+    });
     
+    // Trigger change event on page load if a room is already selected
+    if (roomSelect.value) {
+        roomSelect.dispatchEvent(new Event('change'));
+    }
+
+    // Keep the rest of the existing script
+    const blockedDates = @json($blockedDates ?? []);
+    const tanggalInput = document.getElementById('tanggal');
+    const submitButton = document.getElementById('submitButton');
+    const dateWarning = document.getElementById('date-warning');
+    const checkAvailabilityButton = document.getElementById('checkAvailabilityButton');
+    const availabilityResult = document.getElementById('availability-result');
+    const availabilityMessage = document.getElementById('availability-message');
+    const existingReservationsList = document.getElementById('existing-reservations');
+    const reservationList = document.getElementById('reservation-list');
+    const jamMulai = document.getElementById('jam_mulai');
+    const jamSelesai = document.getElementById('jam_selesai');
+
+    function checkDate() {
+        const selectedDate = tanggalInput.value;
+        if (blockedDates.includes(selectedDate)) {
+            tanggalInput.classList.add('is-invalid');
+            dateWarning.textContent = 'Tanggal yang dipilih tidak tersedia untuk reservasi. Silakan pilih tanggal lain.';
+            dateWarning.style.display = 'block';
+            submitButton.disabled = true;
+        } else {
+            tanggalInput.classList.remove('is-invalid');
+            dateWarning.style.display = 'none';
+            submitButton.disabled = false;
+        }
+    }
+    
+    tanggalInput.addEventListener('change', checkDate);
+    if (tanggalInput.value) {
+        checkDate();
+    }
+
     // Add time validation
     function validateTimes() {
         const startTime = jamMulai.value;
@@ -194,7 +280,47 @@ document.addEventListener('DOMContentLoaded', function() {
     jamMulai.addEventListener('change', validateTimes);
     jamSelesai.addEventListener('change', validateTimes);
     
-    // Update availability result styling
+    checkAvailabilityButton.addEventListener('click', function() {
+        const roomId = roomSelect.value;
+        const tanggal = tanggalInput.value;
+        const jam_mulai = jamMulai.value;
+        const jam_selesai = jamSelesai.value;
+
+        if (!roomId || !tanggal || !jam_mulai || !jam_selesai) {
+            showAvailabilityResult(false, 'Mohon lengkapi semua field terlebih dahulu.');
+            return;
+        }
+
+        checkAvailabilityButton.disabled = true;
+        checkAvailabilityButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Mengecek...';
+
+        fetch('{{ route("reservations.check-availability") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                room_info_id: roomId,
+                tanggal: tanggal,
+                jam_mulai: jam_mulai,
+                jam_selesai: jam_selesai
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            showAvailabilityResult(data.available, data.message, data.existing_reservations);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAvailabilityResult(false, 'Terjadi kesalahan saat mengecek ketersediaan.');
+        })
+        .finally(() => {
+            checkAvailabilityButton.disabled = false;
+            checkAvailabilityButton.innerHTML = '<i class="bi bi-search"></i> Cek Ketersediaan';
+        });
+    });
+
     function showAvailabilityResult(available, message, existingReservationsData = null) {
         availabilityResult.style.display = 'block';
         const alertIcon = document.getElementById('alert-icon');
@@ -222,6 +348,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
+
+    [roomSelect, tanggalInput, jamMulai, jamSelesai].forEach(element => {
+        element.addEventListener('change', function() {
+            availabilityResult.style.display = 'none';
+        });
+    });
 });
 </script>
 @endsection

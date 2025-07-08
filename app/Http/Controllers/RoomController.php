@@ -94,7 +94,12 @@ class RoomController extends Controller
         // Ensure reservationDates doesn't contain dates that are already manually blocked or full
         $reservationDates = array_diff($reservationDates, $manualBlockedDates, $fullDates);
 
-        return view('home', compact('room', 'rooms', 'reservationDates', 'manualBlockedDates', 'fullDates'));
+        $todayVisitors = Reservation::where('status', Reservation::STATUS_APPROVED)->whereDate('tanggal', today())->count();
+        $monthlyVisitors = Reservation::where('status', Reservation::STATUS_APPROVED)->whereMonth('tanggal', today()->month)->count();
+        $totalVisitors = Reservation::where('status', Reservation::STATUS_APPROVED)->count();
+        $todayEvents = Reservation::with('roomInfo')->where('status', Reservation::STATUS_APPROVED)->whereDate('tanggal', today())->get();
+
+        return view('home', compact('room', 'rooms', 'reservationDates', 'manualBlockedDates', 'fullDates', 'todayVisitors', 'monthlyVisitors', 'totalVisitors', 'todayEvents'));
     }
     
     public function showReservationsByDate($date)
