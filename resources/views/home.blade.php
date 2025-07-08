@@ -9,7 +9,7 @@
             <div class="card-header bg-white py-3">
                 <h5 class="mb-0">
                     <i class="bi bi-info-circle me-2 text-primary"></i>
-                    Tentang Sistem Elektronik Reservasi Ruangan
+                    Tentang CommandBook
                 </h5>
             </div>
             <div class="card-body">
@@ -24,7 +24,7 @@
                     </div>
                     
                     <div class="col-md-7 col-12">
-                        <h4 class="card-title fw-bold text-primary">Sistem Elektronik Reservasi Ruangan</h4>
+                        <h4 class="card-title fw-bold text-primary">CommandBook</h4>
                         <p class="card-text text-muted mb-3">
                             Aplikasi digital untuk memudahkan reservasi ruangan rapat di lingkungan 
                             Pemerintah Kabupaten Purworejo dengan sistem yang terintegrasi dan efisien.
@@ -75,16 +75,7 @@
                         Halo, <strong>{{ Auth::user()->name }}</strong>!<br>
                         Siap untuk melakukan reservasi ruangan?
                     </p>
-                    
-                    <div class="bg-white bg-opacity-10 rounded p-3 mb-3">
-                        <h6 class="mb-2">Ruangan Tersedia</h6>
-                        <div class="d-flex align-items-center justify-content-center">
-                            <i class="bi bi-door-open-fill me-2"></i>
-                            <span>{{ $room->nama_ruangan }}</span>
-                        </div>
-                        <small class="opacity-75">Kapasitas: {{ $room->kapasitas }} orang</small>
-                    </div>
-                    
+                                        
                     <div class="d-grid">
                         <a href="{{ route('reservations.create') }}" class="btn btn-light btn-lg py-2">
                             <i class="bi bi-plus-circle-fill me-2"></i>

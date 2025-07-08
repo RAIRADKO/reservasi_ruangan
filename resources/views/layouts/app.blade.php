@@ -363,7 +363,7 @@
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ route('home') }}">
                 <img src="{{ asset('img/Lambang_Kabupaten_Purworejo.png') }}" alt="Logo Kabupaten Purworejo" class="navbar-logo me-3">
-                <span>Sistem Elektronik Reservasi Ruangan</span>
+                <span>CommandBook</span>
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -473,7 +473,7 @@
                     <div class="d-flex align-items-center mb-3">
                         <img src="{{ asset('img/Lambang_Kabupaten_Purworejo.png') }}" alt="Logo Kabupaten Purworejo" class="footer-logo me-3">
                         <div>
-                            <h5 class="footer-title">Sistem Elektronik Reservasi Ruangan</h5>
+                            <h5 class="footer-title">CoommandBook</h5>
                             <p class="footer-subtitle">Pemerintah Kabupaten Purworejo</p>
                         </div>
                     </div>
@@ -524,7 +524,7 @@
                 <div class="row align-items-center">
                     <div class="col-md-6">
                         <p class="footer-bottom-text">
-                            © 2025 Sistem Elektronik Reservasi Ruangan - Kabupaten Purworejo. All rights reserved.
+                            © 2025 CommandBook - Kabupaten Purworejo. All rights reserved.
                         </p>
                     </div>
                     <div class="col-md-6 text-md-end">
