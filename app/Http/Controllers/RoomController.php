@@ -15,24 +15,86 @@ class RoomController extends Controller
     {
         $rooms = RoomInfo::all();
         $room = RoomInfo::firstOrFail(); // Keep for backward compatibility
-        
-        // Mengambil tanggal yang penuh karena reservasi (untuk semua ruangan)
-        $reservationDates = Reservation::where('status', Reservation::STATUS_APPROVED)
-            ->distinct()
-            ->pluck('tanggal')
-            ->map(function ($date) {
-                return $date->format('Y-m-d');
-            });
-            
+        $totalRooms = $rooms->count();
+
+        // Get operating hours
+        $operatingStart = Carbon::parse(config('room.operating_hours.start', '08:00'));
+        $operatingEnd = Carbon::parse(config('room.operating_hours.end', '16:00'));
+
+        // Get all approved reservations
+        $allReservations = Reservation::where('status', Reservation::STATUS_APPROVED)
+            ->orderBy('tanggal')
+            ->orderBy('room_info_id')
+            ->orderBy('jam_mulai')
+            ->get();
+
+        $reservationsByDate = $allReservations->groupBy(function ($reservation) {
+            return $reservation->tanggal->format('Y-m-d');
+        });
+
+        $fullDates = [];
+        $reservationDates = [];
+
+        foreach ($reservationsByDate as $date => $reservationsOnDate) {
+            $roomsBookedSolid = 0;
+            $reservationsByRoom = $reservationsOnDate->groupBy('room_info_id');
+
+            if ($totalRooms > 0 && count($reservationsByRoom) === $totalRooms) {
+                foreach ($reservationsByRoom as $roomId => $roomReservations) {
+                    $mergedTimes = [];
+                    
+                    // Merge overlapping/adjacent intervals
+                    foreach ($roomReservations as $res) {
+                        $start = Carbon::parse($res->jam_mulai);
+                        $end = Carbon::parse($res->jam_selesai);
+                        
+                        if (empty($mergedTimes)) {
+                            $mergedTimes[] = ['start' => $start, 'end' => $end];
+                            continue;
+                        }
+                        
+                        $merged = false;
+                        foreach ($mergedTimes as $key => $mergedTime) {
+                            if ($start <= $mergedTime['end'] && $end >= $mergedTime['start']) {
+                                $mergedTimes[$key]['start'] = min($start, $mergedTime['start']);
+                                $mergedTimes[$key]['end'] = max($end, $mergedTime['end']);
+                                $merged = true;
+                                break;
+                            }
+                        }
+                        if (!$merged) {
+                            $mergedTimes[] = ['start' => $start, 'end' => $end];
+                        }
+                    }
+
+                    // Check if the single merged interval covers the whole day
+                    if (count($mergedTimes) === 1) {
+                        $bookedStart = $mergedTimes[0]['start'];
+                        $bookedEnd = $mergedTimes[0]['end'];
+                        
+                        if ($bookedStart <= $operatingStart && $bookedEnd >= $operatingEnd) {
+                            $roomsBookedSolid++;
+                        }
+                    }
+                }
+            }
+
+            if ($totalRooms > 0 && $roomsBookedSolid === $totalRooms) {
+                $fullDates[] = $date;
+            } else {
+                $reservationDates[] = $date;
+            }
+        }
+
         // Mengambil tanggal yang diblokir manual oleh admin
         $manualBlockedDates = BlockedDate::pluck('date')->map(function ($date) {
             return $date->format('Y-m-d');
-        });
-        
-        // Menggabungkan keduanya dan memastikan tidak ada duplikat
-        $bookedDates = $reservationDates->merge($manualBlockedDates)->unique()->values()->all();
-            
-        return view('home', compact('room', 'rooms', 'bookedDates'));
+        })->values()->all();
+
+        // Ensure reservationDates doesn't contain dates that are already manually blocked or full
+        $reservationDates = array_diff($reservationDates, $manualBlockedDates, $fullDates);
+
+        return view('home', compact('room', 'rooms', 'reservationDates', 'manualBlockedDates', 'fullDates'));
     }
     
     public function showReservationsByDate($date)

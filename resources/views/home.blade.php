@@ -229,6 +229,12 @@
                 <span class="badge bg-danger me-2 mb-1">
                     <i class="bi bi-x-circle me-1"></i>Penuh
                 </span>
+                <span class="badge bg-secondary me-2 mb-1">
+                    <i class="bi bi-x-circle me-1"></i>Not Available
+                </span>
+                <span class="badge bg-warning me-2 mb-1">
+                    <i class="bi bi-check-circle me-1"></i>Ada Reservasi
+                </span>
                 <span class="badge bg-success me-2 mb-1">
                     <i class="bi bi-check-circle me-1"></i>Tersedia
                 </span>
@@ -250,16 +256,38 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
-        var bookedDates = @json($bookedDates);
+        var reservationDates = @json($reservationDates ?? []);
+        var manualBlockedDates = @json($manualBlockedDates ?? []);
+        var fullDates = @json($fullDates ?? []);
         
-        var events = bookedDates.map(function(date) {
+        var events = reservationDates.map(function(date) {
             return {
+                title: 'Ada Reservasi',
+                start: date,
+                allDay: true,
+                display: 'background',
+                color: '#fff3cd'
+            };
+        });
+
+        manualBlockedDates.forEach(function(date) {
+            events.push({
+                title: 'Not Available',
+                start: date,
+                allDay: true,
+                display: 'background',
+                color: '#e9ecef'
+            });
+        });
+
+        fullDates.forEach(function(date) {
+            events.push({
                 title: 'Penuh',
                 start: date,
                 allDay: true,
                 display: 'background',
                 color: '#f8d7da'
-            };
+            });
         });
         
         var reservationsDateRoute = "{{ route('reservations.date', ['date' => ':date']) }}";
@@ -342,7 +370,7 @@
     .fc-daygrid-day-frame:hover {
         background-color: #e9ecef;
         cursor: pointer;
-        transition: background-color 0.2s ease;
+        transition: background-color: 0.2s ease;
     }
     
     .fc-day-today {
