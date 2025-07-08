@@ -9,18 +9,20 @@ class Reservation extends Model
 {
     protected $fillable = [
         'user_id',
-        'room_info_id', // Ditambahkan
-        'dinas_id', // Ditambahkan
+        'room_info_id',
+        'dinas_id',
         'nama',
         'kontak',
         'tanggal',
         'jam_mulai',
         'jam_selesai',
         'keperluan',
-        'fasilitas_terpilih', // Ditambahkan
+        'fasilitas_terpilih',
         'status',
         'rejection_reason',
-        'checked_out_at', // Add this
+        'checked_out_at',
+        'satisfaction_rating', // Ditambahkan
+        'feedback', // Ditambahkan
     ];
 
     protected $casts = [
@@ -50,23 +52,20 @@ class Reservation extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Relasi ke model RoomInfo
     public function roomInfo(): BelongsTo
     {
         return $this->belongsTo(RoomInfo::class);
     }
     
-    // Relasi ke model Dinas
     public function dinas(): BelongsTo
     {
         return $this->belongsTo(Dinas::class);
     }
     
-    // Memperbarui method hasConflict untuk memeriksa berdasarkan ruangan
     public static function hasConflict($tanggal, $jam_mulai, $jam_selesai, $room_info_id, $excludeId = null)
     {
         $query = self::where('tanggal', $tanggal)
-            ->where('room_info_id', $room_info_id) // Ditambahkan untuk memeriksa ruangan spesifik
+            ->where('room_info_id', $room_info_id)
             ->where('status', self::STATUS_APPROVED)
             ->where(function ($q) use ($jam_mulai, $jam_selesai) {
                 $q->where(function ($q) use ($jam_mulai, $jam_selesai) {
@@ -97,9 +96,6 @@ class Reservation extends Model
         return $this->asDateTime($value)->setTimezone('Asia/Jakarta');
     }
 
-    /**
-     * Accessor untuk mendapatkan fasilitas terpilih sebagai array.
-     */
     public function getFasilitasTerpilihArrayAttribute()
     {
         if ($this->fasilitas_terpilih) {

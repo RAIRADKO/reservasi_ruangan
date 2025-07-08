@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use App\Mail\ReservationCanceledAdminNotification;
 use Illuminate\Support\Facades\Mail;
-use Carbon\Carbon; // Pastikan Carbon diimpor
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
@@ -44,12 +44,10 @@ class UserController extends Controller
 
         $wasApproved = $reservation->status === Reservation::STATUS_APPROVED;
 
-        // Mengubah metode update menjadi lebih eksplisit
         $reservation->status = Reservation::STATUS_CANCELED;
         $reservation->save();
         
         if ($wasApproved) {
-            // Jika reservasi yang dibatalkan sudah disetujui, kirim email ke admin
             $adminEmail = config('mail.admin_address');
             if ($adminEmail) {
                 Mail::to($adminEmail)->send(new ReservationCanceledAdminNotification($reservation));
@@ -60,15 +58,8 @@ class UserController extends Controller
         return redirect()->route('user.reservations')->with('success', 'Reservasi berhasil dibatalkan');
     }
 
-    /**
-     * Update the user's password.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function updatePassword(Request $request)
     {
-        # Validasi input
         $request->validate([
             'current_password' => ['required', 'current_password'],
             'new_password' => ['required', 'confirmed', Password::min(8)],
@@ -78,7 +69,6 @@ class UserController extends Controller
             'new_password.min' => 'Password baru minimal harus 8 karakter.',
         ]);
 
-        # Update password pengguna
         $user = Auth::user();
         $user->password = Hash::make($request->new_password);
         $user->save();
@@ -86,23 +76,14 @@ class UserController extends Controller
         return back()->with('password_success', 'Password Anda berhasil diperbarui.');
     }
 
-    /**
-     * Show the checkout and survey page for a reservation.
-     *
-     * @param \App\Models\Reservation $reservation
-     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
-     */
     public function showCheckoutForm(Reservation $reservation)
     {
-        // Authorization: Ensure the user owns the reservation
         if (Auth::id() !== $reservation->user_id) {
             abort(403, 'Akses ditolak.');
         }
 
-        // PERBAIKAN: Gunakan toDateString() untuk memformat tanggal dengan benar.
         $endTime = Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai);
 
-        // Logic Check: Ensure reservation is 'approved' and its time has passed
         if ($reservation->status !== Reservation::STATUS_APPROVED || $endTime->isFuture()) {
              return redirect()->route('user.reservations')->with('error', 'Reservasi ini belum dapat di-checkout.');
         }
@@ -110,33 +91,29 @@ class UserController extends Controller
         return view('user.checkout', compact('reservation'));
     }
 
-    /**
-     * Process the final checkout after the survey.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Reservation $reservation
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function completeCheckout(Request $request, Reservation $reservation)
     {
-        // Authorization
         if (Auth::id() !== $reservation->user_id) {
             abort(403, 'Akses ditolak.');
         }
 
-        // PERBAIKAN: Gunakan toDateString() untuk memformat tanggal dengan benar.
+        $request->validate([
+            'satisfaction_rating' => 'required|integer|between:1,5',
+            'feedback' => 'nullable|string|max:1000',
+        ]);
+
         $endTime = Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai);
 
-        // Logic Check
         if ($reservation->status !== Reservation::STATUS_APPROVED || $endTime->isFuture()) {
              return redirect()->route('user.reservations')->with('error', 'Reservasi ini belum dapat di-checkout.');
         }
 
-        // Update the reservation status
         $reservation->status = Reservation::STATUS_COMPLETED;
         $reservation->checked_out_at = now();
+        $reservation->satisfaction_rating = $request->satisfaction_rating;
+        $reservation->feedback = $request->feedback;
         $reservation->save();
 
-        return redirect()->route('user.reservations')->with('success', 'Check-out berhasil! Terima kasih telah menggunakan ruangan.');
+        return redirect()->route('user.reservations')->with('success', 'Check-out berhasil! Terima kasih atas masukan Anda.');
     }
 }

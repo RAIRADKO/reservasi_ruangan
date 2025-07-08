@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Check Out Reservasi')
+@section('title', 'Check Out & Beri Masukan')
 
 @section('content')
 <div class="row justify-content-center">
@@ -8,68 +8,63 @@
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white py-3">
                 <h5 class="mb-0 fw-bold">
-                    <i class="bi bi-qr-code-scan me-2 text-primary"></i>
-                    Langkah Terakhir: Survei & Check Out
+                    <i class="bi bi-check2-square me-2 text-primary"></i>
+                    Check Out & Beri Masukan
                 </h5>
             </div>
             <div class="card-body p-4">
                 <div class="alert alert-info" role="alert">
                     <h6 class="alert-heading">Selesaikan Reservasi Anda</h6>
-                    <p>Terima kasih telah menggunakan ruangan. Untuk menyelesaikan proses reservasi, Anda diwajibkan untuk mengisi survei singkat sebagai masukan bagi kami.</p>
+                    <p>Terima kasih telah menggunakan ruangan. Mohon berikan masukan Anda untuk membantu kami meningkatkan kualitas layanan.</p>
                 </div>
 
-                <div class="text-center my-4">
-                    <h6 class="text-muted mb-3">Langkah 1: Isi Survei Kepuasan</h6>
-                    <p>Silakan isi survei kepuasan melalui salah satu metode di bawah ini.</p>
+                <form method="POST" action="{{ route('user.reservations.complete', $reservation->id) }}">
+                    @csrf
                     
-                    {{-- Tampilkan QR Code jika ada --}}
-                    @if($reservation->roomInfo->qr_code_path)
-                        <div class="mb-3">
-                             <img src="{{ $reservation->roomInfo->qr_code_url }}" alt="QR Code Survei untuk {{ $reservation->roomInfo->nama_ruangan }}" style="width: 200px; height: 200px;" />
-                             <p class="mt-2 text-muted small">Pindai QR Code di atas menggunakan kamera Anda.</p>
-                        </div>
-                    @endif
+                    {{-- Form Kepuasan --}}
+                    <div class="my-4">
+                        <h6 class="text-muted mb-3">Bagaimana tingkat kepuasan Anda terhadap fasilitas dan layanan?</h6>
+                        <div class="d-flex justify-content-center flex-wrap gap-2 satisfaction-rating">
+                            <input type="radio" class="btn-check" name="satisfaction_rating" id="rating-1" value="1" required>
+                            <label class="btn btn-outline-danger" for="rating-1" data-bs-toggle="tooltip" title="Sangat Buruk">😠</label>
 
-                    {{-- Tambahkan pemisah "ATAU" jika keduanya ada --}}
-                    @if($reservation->roomInfo->qr_code_path && $reservation->roomInfo->survey_link)
-                        <div class="d-flex align-items-center my-3">
-                            <hr class="flex-grow-1">
-                            <span class="mx-3 text-muted">ATAU</span>
-                            <hr class="flex-grow-1">
-                        </div>
-                    @endif
+                            <input type="radio" class="btn-check" name="satisfaction_rating" id="rating-2" value="2">
+                            <label class="btn btn-outline-warning" for="rating-2" data-bs-toggle="tooltip" title="Buruk">😟</label>
 
-                    {{-- Tampilkan Tombol Link Survei jika ada --}}
-                    @if($reservation->roomInfo->survey_link)
-                        <div class="d-grid gap-2 col-10 mx-auto">
-                            <a href="{{ $reservation->roomInfo->survey_link }}" target="_blank" class="btn btn-primary">
-                                <i class="bi bi-link-45deg me-2"></i> Buka Tautan Formulir Survei
-                            </a>
+                            <input type="radio" class="btn-check" name="satisfaction_rating" id="rating-3" value="3">
+                            <label class="btn btn-outline-secondary" for="rating-3" data-bs-toggle="tooltip" title="Cukup">😐</label>
+
+                            <input type="radio" class="btn-check" name="satisfaction_rating" id="rating-4" value="4">
+                            <label class="btn btn-outline-info" for="rating-4" data-bs-toggle="tooltip" title="Baik">😊</label>
+                            
+                            <input type="radio" class="btn-check" name="satisfaction_rating" id="rating-5" value="5">
+                            <label class="btn btn-outline-success" for="rating-5" data-bs-toggle="tooltip" title="Sangat Baik">😍</label>
                         </div>
-                    @endif
+                        @error('satisfaction_rating')
+                            <div class="text-danger text-center mt-2 small">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- Form Masukan --}}
+                    <div class="mb-4">
+                        <label for="feedback" class="form-label text-muted">Saran dan Masukan (Opsional)</label>
+                        <textarea class="form-control" id="feedback" name="feedback" rows="4" placeholder="Sampaikan saran atau masukan Anda di sini..."></textarea>
+                        @error('feedback')
+                            <div class="text-danger mt-1 small">{{ $message }}</div>
+                        @enderror
+                    </div>
                     
-                    {{-- Tampilkan pesan jika tidak ada metode survei --}}
-                    @if(!$reservation->roomInfo->qr_code_path && !$reservation->roomInfo->survey_link)
-                        <div class="alert alert-warning mt-3">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            Metode survei belum diatur untuk ruangan ini. Anda dapat langsung melanjutkan proses check out.
-                        </div>
-                    @endif
-                </div>
+                    <hr>
 
-                <hr>
-
-                <div class="text-center my-4">
-                     <h6 class="text-muted mb-3">Langkah 2: Konfirmasi Check Out</h6>
-                    <p>Setelah Anda selesai mengisi survei, klik tombol di bawah ini untuk mengonfirmasi check-out dan menyelesaikan reservasi Anda secara resmi.</p>
-                    
-                    <form method="POST" action="{{ route('user.reservations.complete', $reservation->id) }}">
-                        @csrf
+                    <div class="text-center my-4">
+                        <h6 class="text-muted mb-3">Konfirmasi Check Out</h6>
+                        <p>Dengan menekan tombol di bawah, Anda mengonfirmasi telah selesai menggunakan ruangan.</p>
+                        
                         <button type="submit" class="btn btn-success btn-lg">
-                            <i class="bi bi-check2-circle-fill me-2"></i> Saya Sudah Mengisi Survei, Lanjutkan Check Out
+                            <i class="bi bi-check2-circle-fill me-2"></i> Konfirmasi Check Out
                         </button>
-                    </form>
-                </div>
+                    </div>
+                </form>
 
                 <div class="card mt-4 bg-light border-0">
                     <div class="card-body">
@@ -91,4 +86,37 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('styles')
+<style>
+.satisfaction-rating .btn {
+    font-size: 1.5rem;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+.satisfaction-rating .btn:hover {
+    transform: scale(1.1);
+}
+.btn-check:checked + .btn {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 0.25rem var(--bs-btn-border-color);
+}
+</style>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
 @endsection

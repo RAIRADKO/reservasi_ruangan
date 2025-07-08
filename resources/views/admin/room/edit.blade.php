@@ -55,26 +55,6 @@
                         </div>
                     @endif
                 </div>
-                <div class="mb-4">
-                    <label for="qr_code" class="form-label">Gambar QR Code Survei</label>
-                    <input class="form-control @error('qr_code') is-invalid @enderror" 
-                           type="file" id="qr_code" name="qr_code">
-                    <div class="form-text">Kosongkan jika tidak ingin mengubah QR Code.</div>
-                    @error('qr_code')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                    @if($room->qr_code_path)
-                        <div class="mt-3">
-                            <img src="{{ $room->qr_code_url }}" alt="QR Code" class="img-fluid rounded bg-light p-2" style="max-height: 150px;">
-                            <div class="text-muted mt-1 small">QR Code saat ini</div>
-                        </div>
-                    @endif
-                </div>
-                <div class="mb-4">
-                    <label for="survey_link" class="form-label">Tautan Survei</label>
-                    <input type="url" class="form-control @error('survey_link') is-invalid @enderror" 
-                        id="survey_link" name="survey_link" value="{{ old('survey_link', $room->survey_link) }}" placeholder="https://contoh.com/survey-ruangan">
-                    <div class="form-text">Masukkan URL lengkap untuk formulir survei (opsional).</div>
-                    @error('survey_link')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                     <button type="submit" class="btn btn-primary px-4 py-2">
                         <i class="bi bi-save-fill me-1"></i> Simpan Perubahan
