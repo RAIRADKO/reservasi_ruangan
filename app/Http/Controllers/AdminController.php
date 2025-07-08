@@ -98,7 +98,6 @@ class AdminController extends Controller
         return back()->with('success', 'Reservasi berhasil dihapus.');
     }
 
-    // == START: Room Management CRUD ==
     public function roomIndex()
     {
         $rooms = RoomInfo::paginate(10);
@@ -173,7 +172,7 @@ class AdminController extends Controller
 
     public function editRoom()
     {
-        $room = RoomInfo::firstOrFail(); // Menggunakan firstOrFail untuk memastikan data ada
+        $room = RoomInfo::firstOrFail(); 
         return view('admin.room.edit', compact('room'));
     }
 
@@ -192,7 +191,6 @@ class AdminController extends Controller
         $data = $request->only(['nama_ruangan', 'deskripsi', 'kapasitas', 'fasilitas']);
         
         if ($request->hasFile('foto')) {
-            // Hapus foto lama jika ada
             if ($room->foto) {
                 Storage::delete('public/' . $room->foto);
             }
@@ -245,7 +243,6 @@ class AdminController extends Controller
         return response()->json(['message' => 'Blokir tanggal berhasil dibuka.']);
     }
 
-    // == START: METODE BARU UNTUK MANAJEMEN DINAS ==
     public function dinasIndex()
     {
         $dinas = Dinas::withCount('reservations')->orderBy('name')->paginate(10);
@@ -286,7 +283,6 @@ class AdminController extends Controller
 
     public function dinasDestroy(Dinas $dina)
     {
-        // Mencegah penghapusan jika ada reservasi terkait
         if ($dina->reservations()->exists()) {
             return redirect()->route('admin.dinas.index')->with('error', 'Instansi/Dinas tidak dapat dihapus karena sudah digunakan dalam data reservasi.');
         }
@@ -294,9 +290,7 @@ class AdminController extends Controller
         $dina->delete();
         return redirect()->route('admin.dinas.index')->with('success', 'Instansi/Dinas berhasil dihapus.');
     }
-    // == END: METODE BARU UNTUK MANAJEMEN DINAS ==
 
-    // == METODE BARU UNTUK MANAJEMEN USER ==
     public function usersIndex()
     {
         $users = User::paginate(10);

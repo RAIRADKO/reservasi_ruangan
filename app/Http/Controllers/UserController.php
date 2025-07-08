@@ -91,6 +91,13 @@ class UserController extends Controller
         return view('user.checkout', compact('reservation'));
     }
 
+    /**
+     * Process the final checkout after the survey.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\Reservation $reservation
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function completeCheckout(Request $request, Reservation $reservation)
     {
         if (Auth::id() !== $reservation->user_id) {
@@ -99,7 +106,10 @@ class UserController extends Controller
 
         $request->validate([
             'satisfaction_rating' => 'required|integer|between:1,5',
-            'feedback' => 'nullable|string|max:1000',
+            'feedback' => 'required|string|max:1000',
+        ], [
+            'feedback.required' => 'Kolom saran dan masukan wajib diisi.',
+            'satisfaction_rating.required' => 'Mohon berikan penilaian kepuasan Anda.'
         ]);
 
         $endTime = Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai);

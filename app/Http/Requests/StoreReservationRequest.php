@@ -16,8 +16,8 @@ class StoreReservationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'room_info_id' => 'required|exists:room_infos,id', // Aturan validasi untuk room_info_id
-            'dinas_id' => 'required|exists:dinas,id', // Aturan validasi untuk dinas_id
+            'room_info_id' => 'required|exists:room_infos,id', 
+            'dinas_id' => 'required|exists:dinas,id', 
             'nama' => 'required|string|max:100',
             'kontak' => 'required|string|max:100',
             'tanggal' => 'required|date|after_or_equal:today',
@@ -35,7 +35,7 @@ class StoreReservationRequest extends FormRequest
             $tanggal = $this->input('tanggal');
             $jamMulai = $this->input('jam_mulai');
             $jamSelesai = $this->input('jam_selesai');
-            $roomInfoId = $this->input('room_info_id'); // Ambil room_info_id
+            $roomInfoId = $this->input('room_info_id'); 
 
             if (BlockedDate::where('date', $tanggal)->exists()) {
                 $validator->errors()->add('blocked', 'Tanggal yang dipilih tidak tersedia untuk reservasi. Silakan pilih tanggal lain.');

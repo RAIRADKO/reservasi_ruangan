@@ -16,9 +16,9 @@ class ReservationController extends Controller
 {
     public function create()
     {
-        $rooms = RoomInfo::all(); // Mengambil semua ruangan
+        $rooms = RoomInfo::all(); 
         $blockedDates = BlockedDate::pluck('date')->map->format('Y-m-d')->toArray();
-        $dinas = Dinas::orderBy('name')->get(); // Mengambil semua data dinas
+        $dinas = Dinas::orderBy('name')->get(); 
         return view('reservations.create', compact('rooms', 'blockedDates', 'dinas'));
     }
 

@@ -14,7 +14,7 @@ class RoomController extends Controller
     public function index()
     {
         $rooms = RoomInfo::all();
-        $room = RoomInfo::firstOrFail(); // Keep for backward compatibility
+        $room = RoomInfo::firstOrFail(); 
         $totalRooms = $rooms->count();
 
         // Get operating hours

@@ -43,6 +43,8 @@ class ReservationExport implements FromCollection, WithHeadings, WithMapping, Sh
             'Tanggal Pengajuan',
             'Waktu Dibatalkan',
             'Waktu Check Out',
+            'Tingkat Kepuasan (1-5)', 
+            'Masukan/Feedback',       
         ];
     }
 
@@ -53,15 +55,7 @@ class ReservationExport implements FromCollection, WithHeadings, WithMapping, Sh
      */
     public function map($reservation): array
     {
-        $waktu_disetujui = '-';
-        if ($reservation->status === 'approved') {
-            $waktu_disetujui = $reservation->updated_at->format('d-m-Y H:i:s');
-        }
-
-        $waktu_dibatalkan = '-';
-        if ($reservation->status === 'canceled') {
-            $waktu_dibatalkan = $reservation->updated_at->format('d-m-Y H:i:s');
-        }
+        // ... (logika yang sudah ada)
 
         return [
             $reservation->id,
@@ -77,8 +71,10 @@ class ReservationExport implements FromCollection, WithHeadings, WithMapping, Sh
             ucfirst($reservation->status),
             $reservation->rejection_reason ?? '-',
             $reservation->created_at->format('d-m-Y H:i:s'),
-            $waktu_dibatalkan,
+            $reservation->status === 'canceled' ? $reservation->updated_at->format('d-m-Y H:i:s') : '-',
             $reservation->checked_out_at ? $reservation->checked_out_at->format('d-m-Y H:i:s') : '-',
+            $reservation->satisfaction_rating ?? '-', 
+            $reservation->feedback ?? '-',
         ];
     }
     
@@ -96,7 +92,7 @@ class ReservationExport implements FromCollection, WithHeadings, WithMapping, Sh
                 'fill' => [
                     'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                     'startColor' => [
-                        'argb' => 'FF4F81BD', // Warna biru
+                        'argb' => 'FF4F81BD', 
                     ],
                 ],
             ],
