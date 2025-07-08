@@ -8,7 +8,7 @@
         <div class="card shadow-sm">
             <div class="card-body p-3 p-md-4">
                 <div class="text-center mb-3 mb-md-4">
-                    <h4 class="card-title mb-1">Login</h4>
+                    <h4 class="card-title mb-1"> Login</h4>
                     <p class="text-muted small mb-0">Masuk dengan NIP Anda</p>
                 </div>
                 
