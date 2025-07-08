@@ -18,7 +18,8 @@ class RoomInfo extends Model
         'kapasitas',
         'fasilitas',
         'foto',
-        'qr_code_path', // Tambahkan ini
+        'qr_code_path',
+        'survey_link',
     ];
 
     // Menambahkan relasi ke model Reservation

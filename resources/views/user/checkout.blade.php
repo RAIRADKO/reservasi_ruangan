@@ -19,11 +19,42 @@
                 </div>
 
                 <div class="text-center my-4">
-                    <h6 class="text-muted mb-3">Langkah 1: Pindai QR Code Survei</h6>
-                    <p>Silakan pindai QR Code yang telah disediakan di dalam ruangan menggunakan kamera ponsel Anda untuk mengisi survei kepuasan.</p>
-                    {{-- Menampilkan QR Code dinamis berdasarkan ruangan --}}
-                    <img src="{{ $reservation->roomInfo->qr_code_url }}" alt="QR Code Survei untuk {{ $reservation->roomInfo->nama_ruangan }}" style="width: 200px; height: 200px;" />
-                    <p class="mt-2 text-muted small">Pindai QR Code untuk ruangan <strong>{{ $reservation->roomInfo->nama_ruangan }}</strong> yang terletak di dekat pintu keluar.</p>
+                    <h6 class="text-muted mb-3">Langkah 1: Isi Survei Kepuasan</h6>
+                    <p>Silakan isi survei kepuasan melalui salah satu metode di bawah ini.</p>
+                    
+                    {{-- Tampilkan QR Code jika ada --}}
+                    @if($reservation->roomInfo->qr_code_path)
+                        <div class="mb-3">
+                             <img src="{{ $reservation->roomInfo->qr_code_url }}" alt="QR Code Survei untuk {{ $reservation->roomInfo->nama_ruangan }}" style="width: 200px; height: 200px;" />
+                             <p class="mt-2 text-muted small">Pindai QR Code di atas menggunakan kamera Anda.</p>
+                        </div>
+                    @endif
+
+                    {{-- Tambahkan pemisah "ATAU" jika keduanya ada --}}
+                    @if($reservation->roomInfo->qr_code_path && $reservation->roomInfo->survey_link)
+                        <div class="d-flex align-items-center my-3">
+                            <hr class="flex-grow-1">
+                            <span class="mx-3 text-muted">ATAU</span>
+                            <hr class="flex-grow-1">
+                        </div>
+                    @endif
+
+                    {{-- Tampilkan Tombol Link Survei jika ada --}}
+                    @if($reservation->roomInfo->survey_link)
+                        <div class="d-grid gap-2 col-10 mx-auto">
+                            <a href="{{ $reservation->roomInfo->survey_link }}" target="_blank" class="btn btn-primary">
+                                <i class="bi bi-link-45deg me-2"></i> Buka Tautan Formulir Survei
+                            </a>
+                        </div>
+                    @endif
+                    
+                    {{-- Tampilkan pesan jika tidak ada metode survei --}}
+                    @if(!$reservation->roomInfo->qr_code_path && !$reservation->roomInfo->survey_link)
+                        <div class="alert alert-warning mt-3">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            Metode survei belum diatur untuk ruangan ini. Anda dapat langsung melanjutkan proses check out.
+                        </div>
+                    @endif
                 </div>
 
                 <hr>
