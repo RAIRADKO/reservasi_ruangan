@@ -148,44 +148,7 @@
                 border-color: rgba(255, 255, 255, 0.3);
             }
             
-            /* Mobile user menu */
-            .mobile-user-menu {
-                border-top: 1px solid rgba(255, 255, 255, 0.1);
-                padding-top: 1rem;
-                margin-top: 1rem;
-            }
-            
-            .mobile-user-info {
-                display: flex;
-                align-items: center;
-                padding: 0.75rem 1rem;
-                margin-bottom: 0.5rem;
-                background-color: rgba(255, 255, 255, 0.05);
-                border-radius: 0.5rem;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-            }
-            
-            .mobile-user-info i {
-                font-size: 1.5rem;
-                margin-right: 0.75rem;
-            }
-            
-            .mobile-user-info .user-details {
-                flex: 1;
-            }
-            
-            .mobile-user-info .user-name {
-                font-weight: 600;
-                color: #ffffff;
-                margin-bottom: 0.25rem;
-            }
-            
-            .mobile-user-info .user-email {
-                font-size: 0.85rem;
-                color: #94a3b8;
-                margin: 0;
-            }
-            
+            /* Mobile logout button */
             .mobile-logout-btn {
                 width: 100%;
                 padding: 0.75rem;
@@ -194,6 +157,7 @@
                 color: #f87171;
                 border-radius: 0.5rem;
                 transition: all 0.3s ease;
+                margin-top: 0.5rem;
             }
             
             .mobile-logout-btn:hover {
@@ -275,7 +239,7 @@
         
         .navbar-custom .nav-link:hover {
             color: #94a3b8 !important;
-            background-color: transparent; /* Override hover background */
+            background-color: rgba(255, 255, 255, 0.1) !important;
         }
         
         .navbar-custom .navbar-toggler {
@@ -455,66 +419,55 @@
                 <ul class="navbar-nav ms-auto align-items-lg-center">
                     @auth
                         {{-- Menu untuk user yang sudah login --}}
-                        <li class="nav-item me-lg-2">
+                        
+                        {{-- Desktop Menu --}}
+                        <li class="nav-item me-lg-2 d-none d-lg-block">
                             <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
                                 <i class="bi bi-house-door me-2"></i>Home
                             </a>
                         </li>
-                        <li class="nav-item me-lg-3">
+                        <li class="nav-item me-lg-2 d-none d-lg-block">
                             <a class="nav-link {{ request()->routeIs('user.reservations') ? 'active' : '' }}" href="{{ route('user.reservations') }}">
                                 <i class="bi bi-calendar-check me-2"></i>Reservasi Saya
                             </a>
                         </li>
-                        
-                        {{-- Desktop: Dropdown menu --}}
-                        <li class="nav-item dropdown d-none d-lg-block">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center py-2" 
-                               href="#" 
-                               id="userDropdown" 
-                               role="button" 
-                               data-bs-toggle="dropdown" 
-                               aria-expanded="false">
-                                <i class="bi bi-person-circle me-2 fs-5"></i>
-                                <span class="d-none d-lg-inline">{{ Auth::user()->name }}</span>
+                        <li class="nav-item me-lg-2 d-none d-lg-block">
+                            <a class="nav-link {{ request()->routeIs('user.profile') ? 'active' : '' }}" href="{{ route('user.profile') }}">
+                                <i class="bi bi-person me-2"></i>{{ Auth::user()->name }}
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('user.profile') }}">
-                                        <i class="bi bi-person me-2"></i>Profil
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider my-2"></li>
-                                <li>
-                                    <form action="{{ route('logout') }}" method="POST" class="mb-0">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item d-flex align-items-center text-danger">
-                                            <i class="bi bi-box-arrow-right me-2"></i>Logout
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
+                        </li>
+                        <li class="nav-item d-none d-lg-block">
+                            <form action="{{ route('logout') }}" method="POST" class="mb-0">
+                                @csrf
+                                <button type="submit" class="nav-link btn btn-link text-decoration-none border-0 p-0" style="color: #ffffff !important;">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                </button>
+                            </form>
                         </li>
                         
-                        {{-- Mobile: User info dan logout --}}
+                        {{-- Mobile Menu --}}
                         <li class="nav-item d-lg-none">
-                            <div class="mobile-user-menu">
-                                <div class="mobile-user-info">
-                                    <i class="bi bi-person-circle"></i>
-                                    <div class="user-details">
-                                        <div class="user-name">{{ Auth::user()->name }}</div>
-                                        <div class="user-email">{{ Auth::user()->email }}</div>
-                                    </div>
-                                </div>
-                                <a class="nav-link mb-2" href="{{ route('user.profile') }}">
-                                    <i class="bi bi-person me-2"></i>Profil
-                                </a>
-                                <form action="{{ route('logout') }}" method="POST" class="mb-0">
-                                    @csrf
-                                    <button type="submit" class="mobile-logout-btn">
-                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
-                                    </button>
-                                </form>
-                            </div>
+                            <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
+                                <i class="bi bi-house-door me-2"></i>Home
+                            </a>
+                        </li>
+                        <li class="nav-item d-lg-none">
+                            <a class="nav-link {{ request()->routeIs('user.reservations') ? 'active' : '' }}" href="{{ route('user.reservations') }}">
+                                <i class="bi bi-calendar-check me-2"></i>Reservasi Saya
+                            </a>
+                        </li>
+                        <li class="nav-item d-lg-none">
+                            <a class="nav-link {{ request()->routeIs('user.profile') ? 'active' : '' }}" href="{{ route('user.profile') }}">
+                                <i class="bi bi-person me-2"></i>{{ Auth::user()->name }}
+                            </a>
+                        </li>
+                        <li class="nav-item d-lg-none">
+                            <form action="{{ route('logout') }}" method="POST" class="mb-0">
+                                @csrf
+                                <button type="submit" class="mobile-logout-btn">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                </button>
+                            </form>
                         </li>
                     @else
                         {{-- Menu untuk guest (belum login) --}}
@@ -642,22 +595,47 @@
         </div>
     </footer>
 
-
     {{-- Bootstrap JavaScript --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
-    {{-- Enhanced dropdown functionality --}}
+    {{-- Enhanced navbar toggle functionality --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Bootstrap dropdowns
-            const dropdownElements = document.querySelectorAll('.dropdown-toggle');
-            dropdownElements.forEach(el => {
-                el.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const dropdown = new bootstrap.Dropdown(this);
-                    dropdown.toggle();
+            // Initialize navbar toggle
+            const navbarToggler = document.querySelector('.navbar-toggler');
+            const navbarCollapse = document.querySelector('.navbar-collapse');
+            
+            if (navbarToggler && navbarCollapse) {
+                navbarToggler.addEventListener('click', function() {
+                    // Toggle the collapse manually if Bootstrap isn't working
+                    if (navbarCollapse.classList.contains('show')) {
+                        navbarCollapse.classList.remove('show');
+                        navbarToggler.setAttribute('aria-expanded', 'false');
+                    } else {
+                        navbarCollapse.classList.add('show');
+                        navbarToggler.setAttribute('aria-expanded', 'true');
+                    }
                 });
-            });
+                
+                // Close navbar when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!navbarToggler.contains(event.target) && !navbarCollapse.contains(event.target)) {
+                        navbarCollapse.classList.remove('show');
+                        navbarToggler.setAttribute('aria-expanded', 'false');
+                    }
+                });
+                
+                // Close navbar when clicking on nav links (mobile)
+                const navLinks = navbarCollapse.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        if (window.innerWidth < 992) { // Only on mobile
+                            navbarCollapse.classList.remove('show');
+                            navbarToggler.setAttribute('aria-expanded', 'false');
+                        }
+                    });
+                });
+            }
 
             // Auto-close alerts after 5 seconds
             const alerts = document.querySelectorAll('.alert-dismissible');
