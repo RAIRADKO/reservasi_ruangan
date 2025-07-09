@@ -219,22 +219,44 @@
                                         
                                         // Hitung lebar minimum untuk menampilkan teks
                                         $minWidthForText = $duration * 100 > 8 ? '' : 'no-text';
+                                        $shortLabel = $namaAwal . ' ' . date('H:i', strtotime($reservation->jam_mulai));
                                     @endphp
                                     <div class="reservation-block {{ $colorClass }} shadow-sm mb-3 rounded-3 position-relative {{ $minWidthForText }}" 
                                          style="left: {{ $startPosition * 100 }}%; 
                                                 width: {{ $duration * 100 }}%;
                                                 height: 60px;"
                                          data-bs-toggle="tooltip" 
-                                         title="{{ $reservation->nama }} - {{ $reservation->keperluan }} | {{ date('H:i', strtotime($reservation->jam_mulai)) }}-{{ date('H:i', strtotime($reservation->jam_selesai)) }}">
-                                        <div class="d-flex justify-content-between align-items-center h-100 px-3 text-white">
-                                            <div class="reservation-info">
-                                                <div class="fw-bold reservation-title">{{ $reservation->nama }}</div>
-                                                <small class="opacity-75 d-none d-md-block reservation-desc">{{ Str::limit($reservation->keperluan, 20) }}</small>
+                                         data-short-label="{{ $shortLabel }}"
+                                         title="{{ $reservation->nama }} - {{ $reservation->keperluan }} | {{ $reservation->roomInfo->nama_ruangan ?? 'N/A' }} | {{ date('H:i', strtotime($reservation->jam_mulai)) }}-{{ date('H:i', strtotime($reservation->jam_selesai)) }}">>
+                                        <div class="d-flex flex-column justify-content-center h-100 px-3 text-white position-relative">
+                                            @php
+                                                $namaWords = explode(' ', $reservation->nama);
+                                                $namaAwal = $namaWords[0] ?? '';
+                                                $ruanganNama = $reservation->roomInfo->nama_ruangan ?? 'N/A';
+                                                $jamMulai = date('H:i', strtotime($reservation->jam_mulai));
+                                                $jamSelesai = date('H:i', strtotime($reservation->jam_selesai));
+                                            @endphp
+                                            
+                                            <!-- Label Utama -->
+                                            <div class="reservation-main-info text-center">
+                                                <div class="fw-bold reservation-title mb-1" style="font-size: 0.9rem; line-height: 1.2;">
+                                                    {{ $namaAwal }}
+                                                </div>
+                                                <div class="reservation-details d-flex justify-content-center align-items-center flex-wrap">
+                                                    <small class="opacity-90 me-2 d-none d-lg-inline-block reservation-room" style="font-size: 0.75rem;">
+                                                        <i class="bi bi-door-closed-fill me-1"></i>{{ Str::limit($ruanganNama, 8) }}
+                                                    </small>
+                                                    <small class="fw-bold reservation-time opacity-95" style="font-size: 0.75rem;">
+                                                        <i class="bi bi-clock-fill me-1"></i>{{ $jamMulai }}-{{ $jamSelesai }}
+                                                    </small>
+                                                </div>
                                             </div>
-                                            <div class="text-end">
-                                                <small class="fw-bold reservation-time">
-                                                    {{ date('H:i', strtotime($reservation->jam_mulai)) }}-{{ date('H:i', strtotime($reservation->jam_selesai)) }}
-                                                </small>
+                                            
+                                            <!-- Badge Status untuk reservasi lebar -->
+                                            <div class="reservation-badge position-absolute top-0 end-0 mt-1 me-1">
+                                                <span class="badge bg-light bg-opacity-20 text-white" style="font-size: 0.6rem;">
+                                                    <i class="bi bi-person-fill"></i>
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -458,9 +480,7 @@
     }
 
     /* Tampilan untuk reservasi sempit */
-    .reservation-block.no-text .reservation-title,
-    .reservation-block.no-text .reservation-desc,
-    .reservation-block.no-text .reservation-time {
+    .reservation-block.no-text .reservation-main-info {
         display: none;
     }
 
@@ -472,6 +492,48 @@
             rgba(255,255,255,0.3) 5px,
             rgba(255,255,255,0.3) 10px
         ) !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .reservation-block.no-text::before {
+        content: attr(data-short-label);
+        font-size: 0.7rem;
+        font-weight: bold;
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+
+    /* Perbaikan layout label */
+    .reservation-main-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .reservation-details {
+        gap: 0.25rem;
+    }
+
+    .reservation-badge {
+        z-index: 10;
+    }
+
+    /* Hover effects untuk label */
+    .reservation-block:hover .reservation-title {
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .reservation-block:hover .reservation-badge {
+        transform: scale(1.1);
+        transition: transform 0.2s ease;
+    }
+
+    /* Responsive label adjustments */
+    @media (max-width: 1200px) {
+        .reservation-room {
+            display: none !important;
+        }
     }
 
     @media (max-width: 768px) {
@@ -514,14 +576,22 @@
         
         /* Responsif untuk reservasi timeline */
         .reservation-block .reservation-title {
-            font-size: 0.8rem;
+            font-size: 0.8rem !important;
         }
         
         .reservation-block .reservation-time {
-            font-size: 0.7rem;
+            font-size: 0.65rem !important;
         }
         
-        .reservation-block .reservation-desc {
+        .reservation-block .reservation-room {
+            display: none !important;
+        }
+
+        .reservation-details {
+            justify-content: center !important;
+        }
+
+        .reservation-badge {
             display: none;
         }
     }
