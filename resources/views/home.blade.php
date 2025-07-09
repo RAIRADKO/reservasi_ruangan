@@ -2,6 +2,230 @@
 
 @section('title', 'Selamat Datang di Sistem Reservasi Ruangan')
 
+@section('styles')
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+<style>
+    :root {
+        --primary: #0d6efd;
+        --secondary: #6c757d;
+        --success: #198754;
+        --info: #0dcaf0;
+        --warning: #ffc107;
+        --danger: #dc3545;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --purple: #6f42c1;
+    }
+
+    .slideshow-card {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .slideshow-card .carousel,
+    .slideshow-card .carousel-inner,
+    .slideshow-card .carousel-item,
+    .slideshow-card .carousel-item img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
+    }
+
+    .slideshow-card .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.7);
+        z-index: 2;
+    }
+
+    .slideshow-card .card-body {
+        position: relative;
+        z-index: 3;
+    }
+    
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #0F172A 0%, #1e293b 100%) !important;
+        border: 3px solid var(--secondary) !important; 
+    }
+    
+    .bg-purple {
+        background-color: var(--purple) !important;
+    }
+    
+    .icon-wrapper {
+        transition: all 0.3s ease;
+    }
+    
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 3px solid #0d6efd !important; 
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .card-header {
+        border-radius: 12px 12px 0 0 !important;
+    }
+    
+    .fc-event-booked {
+        background-color: rgba(255, 193, 7, 0.7) !important; 
+        border: none;
+    }
+    
+    .fc-event-full {
+        background-color: rgba(220, 53, 69, 0.7) !important;
+        border: none;
+    }
+    
+    .fc-event-not-available {
+        background-color: rgba(108, 117, 125, 0.7) !important;
+        border: none;
+    }
+    
+    .fc-event-available {
+        background-color: rgba(25, 135, 84, 0.7) !important;
+        border: none;
+    }
+    
+    .fc-day-today {
+        background-color: rgba(13, 110, 253, 0.15) !important;
+        border: 2px solid var(--primary) !important;
+    }
+    
+    .fc-daygrid-day-frame {
+        transition: background-color 0.2s ease;
+        border-radius: 6px;
+        margin: 2px;
+    }
+    
+    .fc-daygrid-day-frame:hover {
+        background-color: #e9ecef;
+        cursor: pointer;
+    }
+    
+    .fc .fc-button {
+        border-radius: 8px !important;
+        padding: 6px 12px;
+    }
+    
+    .fc .fc-toolbar-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    
+    .stat-card {
+        transition: all 0.3s ease;
+        border-radius: 10px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border-color: var(--primary);
+    }
+    
+    @media (max-width: 767px) {
+        .card-body {
+            padding: 1.25rem;
+        }
+        
+        .fc-toolbar-title {
+            font-size: 1.1rem;
+        }
+        
+        .fc-button {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .fc .fc-toolbar.fc-header-toolbar {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .fc-header-toolbar .fc-toolbar-chunk {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+    }
+    
+    .guide-step {
+        transition: all 0.3s ease;
+    }
+    
+    .guide-step:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.08);
+    }
+    
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+        padding: 0.75rem 0;
+        transition: background-color 0.2s ease;
+    }
+    
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+    
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .btn-lg {
+        border-radius: 50px;
+        padding: 0.75rem 1.5rem;
+    }
+    
+    .btn-outline-light:hover {
+        color: var(--primary) !important;
+        background-color: white;
+    }
+    
+    .badge {
+        border-radius: 50px;
+        padding: 0.5em 0.9em;
+        font-weight: 500;
+    }
+    
+    .fc .fc-col-header-cell-cushion {
+        font-weight: 600;
+        color: var(--dark);
+    }
+    
+    .fc .fc-daygrid-day-number {
+        font-weight: 500;
+    }
+    
+    .fc-event-booked .fc-daygrid-day-number,
+    .fc-event-full .fc-daygrid-day-number,
+    .fc-event-not-available .fc-daygrid-day-number,
+    .fc-event-available .fc-daygrid-day-number {
+        color: #000 !important;
+        font-weight: 600;
+    }
+    
+    #calendar {
+        min-height: 400px;
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="row g-4">
     <div class="col-lg-7 col-12">
@@ -65,7 +289,19 @@
     </div>
 
     <div class="col-lg-5 col-12 mt-4 mt-lg-0">
-        <div class="card h-100 border-0 shadow-sm bg-gradient-primary">
+        <div class="card h-100 border-0 shadow-sm slideshow-card">
+            <div id="roomSlideshow" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    @foreach($rooms as $index => $roomPhoto)
+                        @if($roomPhoto->foto_url)
+                            <div class="carousel-item {{ $index == 0 ? 'active' : '' }}" data-bs-interval="3000">
+                                <img src="{{ $roomPhoto->foto_url }}" alt="Foto Ruangan {{ $index + 1 }}">
+                            </div>
+                        @endif
+                    @endforeach
+                </div>
+            </div>
+            <div class="overlay"></div>
             <div class="card-body text-center d-flex flex-column justify-content-center py-4 px-3">
                 <div class="mb-4">
                     <i class="bi bi-calendar-check text-white display-5"></i>
@@ -412,208 +648,4 @@
         })
     });
 </script>
-@endsection
-
-@section('styles')
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
-<style>
-    :root {
-        --primary: #0d6efd;
-        --secondary: #6c757d;
-        --success: #198754;
-        --info: #0dcaf0;
-        --warning: #ffc107;
-        --danger: #dc3545;
-        --light: #f8f9fa;
-        --dark: #212529;
-        --purple: #6f42c1;
-    }
-    
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #0F172A 0%, #1e293b 100%) !important;
-        /* PERUBAHAN: Outline dipertegas dengan warna lebih terang agar kontras */
-        border: 3px solid var(--secondary) !important; 
-    }
-    
-    .bg-purple {
-        background-color: var(--purple) !important;
-    }
-    
-    .icon-wrapper {
-        transition: all 0.3s ease;
-    }
-    
-    .card {
-        border-radius: 12px;
-        overflow: hidden;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        /* PERUBAHAN: Lebar outline dipertegas dari 2px menjadi 3px */
-        border: 3px solid #0d6efd !important; 
-    }
-    
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-    
-    .card-header {
-        border-radius: 12px 12px 0 0 !important;
-    }
-    
-    /* Warna Kalender */
-    .fc-event-booked {
-        background-color: rgba(255, 193, 7, 0.7) !important; 
-        border: none;
-    }
-    
-    .fc-event-full {
-        background-color: rgba(220, 53, 69, 0.7) !important;
-        border: none;
-    }
-    
-    .fc-event-not-available {
-        background-color: rgba(108, 117, 125, 0.7) !important;
-        border: none;
-    }
-    
-    .fc-event-available {
-        background-color: rgba(25, 135, 84, 0.7) !important;
-        border: none;
-    }
-    
-    .fc-day-today {
-        background-color: rgba(13, 110, 253, 0.15) !important;
-        border: 2px solid var(--primary) !important;
-    }
-    
-    .fc-daygrid-day-frame {
-        transition: background-color 0.2s ease;
-        border-radius: 6px;
-        margin: 2px;
-    }
-    
-    .fc-daygrid-day-frame:hover {
-        background-color: #e9ecef;
-        cursor: pointer;
-    }
-    
-    .fc .fc-button {
-        border-radius: 8px !important;
-        padding: 6px 12px;
-    }
-    
-    .fc .fc-toolbar-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-    }
-    
-    /* Statistik */
-    .stat-card {
-        transition: all 0.3s ease;
-        border-radius: 10px;
-        border: 1px solid #dee2e6;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        border-color: var(--primary);
-    }
-    
-    /* Responsif */
-    @media (max-width: 767px) {
-        .card-body {
-            padding: 1.25rem;
-        }
-        
-        .fc-toolbar-title {
-            font-size: 1.1rem;
-        }
-        
-        .fc-button {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
-        }
-        
-        .fc .fc-toolbar.fc-header-toolbar {
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .fc-header-toolbar .fc-toolbar-chunk {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-        }
-    }
-    
-    /* Panduan */
-    .guide-step {
-        transition: all 0.3s ease;
-    }
-    
-    .guide-step:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0,0,0,0.08);
-    }
-    
-    /* Event List */
-    .list-group-item {
-        border-left: none;
-        border-right: none;
-        padding: 0.75rem 0;
-        transition: background-color 0.2s ease;
-    }
-    
-    .list-group-item:last-child {
-        border-bottom: none;
-    }
-    
-    .list-group-item:hover {
-        background-color: #f8f9fa;
-    }
-    
-    /* Button Styles */
-    .btn-lg {
-        border-radius: 50px;
-        padding: 0.75rem 1.5rem;
-    }
-    
-    .btn-outline-light:hover {
-        color: var(--primary) !important;
-        background-color: white;
-    }
-    
-    /* Badge Styles */
-    .badge {
-        border-radius: 50px;
-        padding: 0.5em 0.9em;
-        font-weight: 500;
-    }
-    
-    /* Calendar Header */
-    .fc .fc-col-header-cell-cushion {
-        font-weight: 600;
-        color: var(--dark);
-    }
-    
-    /* Calendar Day Number */
-    .fc .fc-daygrid-day-number {
-        font-weight: 500;
-    }
-    
-    /* Calendar Event Contrast */
-    .fc-event-booked .fc-daygrid-day-number,
-    .fc-event-full .fc-daygrid-day-number,
-    .fc-event-not-available .fc-daygrid-day-number,
-    .fc-event-available .fc-daygrid-day-number {
-        color: #000 !important;
-        font-weight: 600;
-    }
-    
-    /* Calendar Scroll */
-    #calendar {
-        min-height: 400px;
-    }
-</style>
 @endsection
