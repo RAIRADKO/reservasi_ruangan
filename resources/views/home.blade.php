@@ -150,7 +150,7 @@
                     <div class="col-md-4 col-12">
                         <div class="border rounded p-3 bg-light h-100">
                             <div class="text-success mb-2">
-                                <i class="bi bi-calendar-month display-6"></i>
+                                <i class="bi bi-calendar display-6"></i>
                             </div>
                             <h3 class="text-success fw-bold">{{ $monthlyVisitors }}</h3>
                             <p class="mb-0">Bulan Ini</p>
