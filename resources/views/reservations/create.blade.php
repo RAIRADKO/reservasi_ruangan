@@ -1,5 +1,37 @@
 @extends('layouts.app')
 
+@section('title', 'Form Reservasi Ruangan')
+
+@section('styles')
+<style>
+    /* Custom styling for facility checkboxes */
+    .fasilitas-checklist {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem; /* Space between buttons */
+    }
+
+    .fasilitas-item .btn {
+        border-radius: 50px; /* Pill-shaped buttons */
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+    }
+    
+    .fasilitas-item .btn .icon-unchecked,
+    .fasilitas-item .btn-check:checked ~ .btn .icon-checked {
+        display: inline-block;
+    }
+
+    .fasilitas-item .btn .icon-checked,
+    .fasilitas-item .btn-check:checked ~ .btn .icon-unchecked {
+        display: none;
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="card border-0 shadow">
     <div class="card-header bg-primary text-white">
@@ -9,7 +41,6 @@
         <form method="POST" action="{{ route('reservations.store') }}" class="needs-validation" novalidate>
             @csrf
 
-            <!-- Personal Information Section -->
             <div class="mb-4">
                 <h5 class="text-primary mb-3"><i class="bi bi-person-badge me-2"></i>Informasi Pemohon</h5>
                 <div class="row">
@@ -54,7 +85,6 @@
                 </div>
             </div>
             
-            <!-- Room Selection Section -->
             <div class="mb-4">
                 <h5 class="text-primary mb-3"><i class="bi bi-door-closed me-2"></i>Detail Ruangan</h5>
                 <div class="mb-3">
@@ -75,12 +105,12 @@
                     @enderror
                 </div>
 
-                <!-- FACILITIES CHECKLIST RESTORED -->
                 <div id="fasilitas-wrapper" class="mb-3" style="display: none;">
-                    <label class="form-label">Fasilitas Ruangan</label>
-                    <div class="alert alert-light border">
-                        <p class="mb-2 small text-muted">Centang fasilitas yang akan digunakan:</p>
-                        <div id="fasilitas-checklist" class="d-flex flex-wrap gap-3"></div>
+                    <label class="form-label">Fasilitas Ruangan (pilih yang akan digunakan)</label>
+                    <div class="p-3 bg-light border rounded">
+                        <div id="fasilitas-checklist" class="fasilitas-checklist">
+                            {{-- Checkboxes will be inserted here by JS --}}
+                        </div>
                     </div>
                     @error('fasilitas')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -88,7 +118,6 @@
                 </div>
             </div>
 
-            <!-- Time Selection Section -->
             <div class="mb-4">
                 <h5 class="text-primary mb-3"><i class="bi bi-clock me-2"></i>Waktu Reservasi</h5>
                 <div class="row g-3">
@@ -134,7 +163,6 @@
                 </div>
             </div>
 
-            <!-- Availability Check -->
             <div id="availability-result" class="mb-4" style="display: none;">
                 <div class="alert p-3" role="alert">
                     <div class="d-flex align-items-center">
@@ -149,7 +177,6 @@
                 </div>
             </div>
 
-            <!-- Purpose Section -->
             <div class="mb-4">
                 <h5 class="text-primary mb-3"><i class="bi bi-card-text me-2"></i>Detail Acara</h5>
                 <div class="mb-3">
@@ -159,7 +186,6 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
             <div class="d-flex flex-column flex-md-row gap-3 pt-2">
                 <button type="button" id="checkAvailabilityButton" class="btn btn-outline-primary flex-grow-1">
                     <i class="bi bi-search me-2"></i> Cek Ketersediaan
@@ -180,58 +206,64 @@ document.addEventListener('DOMContentLoaded', function() {
     const fasilitasWrapper = document.getElementById('fasilitas-wrapper');
     const fasilitasChecklist = document.getElementById('fasilitas-checklist');
 
-    // Function to handle room selection change
-    roomSelect.addEventListener('change', function() {
-        // Clear previous checklist
-        fasilitasChecklist.innerHTML = '';
+    function updateFasilitas() {
+        fasilitasChecklist.innerHTML = ''; 
+
+        const selectedOption = roomSelect.options[roomSelect.selectedIndex];
         
-        // Get selected option
-        const selectedOption = this.options[this.selectedIndex];
+        if (!selectedOption || !selectedOption.value) {
+            fasilitasWrapper.style.display = 'none';
+            return;
+        }
+
         const fasilitasData = selectedOption.getAttribute('data-fasilitas');
 
         if (fasilitasData && fasilitasData.trim() !== '') {
-            const fasilitasArray = fasilitasData.split(',').map(item => item.trim());
-            
-            if (fasilitasArray.length > 0 && fasilitasArray[0] !== '') {
-                fasilitasArray.forEach(fasilitas => {
-                    const checkboxDiv = document.createElement('div');
-                    checkboxDiv.classList.add('form-check');
-                    
-                    const checkboxInput = document.createElement('input');
-                    checkboxInput.classList.add('form-check-input');
-                    checkboxInput.type = 'checkbox';
-                    checkboxInput.name = 'fasilitas[]';
-                    checkboxInput.value = fasilitas;
-                    checkboxInput.id = 'fasilitas-' + fasilitas.replace(/\s+/g, '-').toLowerCase();
-                    
-                    const checkboxLabel = document.createElement('label');
-                    checkboxLabel.classList.add('form-check-label');
-                    checkboxLabel.htmlFor = checkboxInput.id;
-                    checkboxLabel.textContent = fasilitas;
-                    
-                    checkboxDiv.appendChild(checkboxInput);
-                    checkboxDiv.appendChild(checkboxLabel);
-                    fasilitasChecklist.appendChild(checkboxDiv);
-                });
+            const fasilitasArray = fasilitasData.split(',').map(item => item.trim()).filter(item => item);
 
+            if (fasilitasArray.length > 0) {
+                fasilitasArray.forEach(fasilitas => {
+                    const uniqueId = 'fasilitas-' + fasilitas.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+                    
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'fasilitas-item';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.className = 'btn-check';
+                    input.name = 'fasilitas[]';
+                    input.id = uniqueId;
+                    input.value = fasilitas;
+                    input.autocomplete = 'off';
+
+                    const label = document.createElement('label');
+                    label.className = 'btn btn-outline-primary';
+                    label.htmlFor = uniqueId;
+                    label.innerHTML = `
+                        <i class="bi bi-square icon-unchecked me-2"></i>
+                        <i class="bi bi-check-square-fill icon-checked me-2"></i>
+                        <span>${fasilitas}</span>
+                    `;
+                    
+                    itemDiv.appendChild(input);
+                    itemDiv.appendChild(label);
+                    fasilitasChecklist.appendChild(itemDiv);
+                });
                 fasilitasWrapper.style.display = 'block';
             } else {
-                // Show message when room has no facilities
-                fasilitasChecklist.innerHTML = '<div class="text-muted small">Ruangan ini tidak memiliki fasilitas khusus</div>';
+                fasilitasChecklist.innerHTML = '<div class="text-muted small">Ruangan ini tidak memiliki fasilitas khusus.</div>';
                 fasilitasWrapper.style.display = 'block';
             }
         } else {
-            // Hide section when room has no facilities data
-            fasilitasWrapper.style.display = 'none';
+            fasilitasChecklist.innerHTML = '<div class="text-muted small">Ruangan ini tidak memiliki fasilitas khusus.</div>';
+            fasilitasWrapper.style.display = 'block';
         }
-    });
-    
-    // Trigger change event on page load if a room is already selected
-    if (roomSelect.value) {
-        roomSelect.dispatchEvent(new Event('change'));
     }
 
-    // Keep the rest of the existing script
+    roomSelect.addEventListener('change', updateFasilitas);
+    updateFasilitas();
+
+    // The rest of your script
     const blockedDates = @json($blockedDates ?? []);
     const tanggalInput = document.getElementById('tanggal');
     const submitButton = document.getElementById('submitButton');
@@ -263,7 +295,6 @@ document.addEventListener('DOMContentLoaded', function() {
         checkDate();
     }
 
-    // Add time validation
     function validateTimes() {
         const startTime = jamMulai.value;
         const endTime = jamSelesai.value;
@@ -339,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 reservationList.innerHTML = '';
                 existingReservationsData.forEach(reservation => {
                     const li = document.createElement('li');
-                    li.innerHTML = `<strong>${reservation.jam_mulai} - ${reservation.jam_selesai}</strong> (${reservation.nama_pemesan})`;
+                    li.innerHTML = `<strong>${reservation.jam_mulai} - ${reservation.jam_selesai}</strong>`;
                     reservationList.appendChild(li);
                 });
                 existingReservationsList.style.display = 'block';
