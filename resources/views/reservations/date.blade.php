@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="container">
-    <!-- Header Section -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center bg-gradient-primary text-white p-3 p-md-4 rounded-3 shadow-sm">
@@ -29,7 +28,6 @@
         </div>
     </div>
 
-    <!-- Room Filter -->
     @if(isset($rooms) && $rooms->count() > 1)
     <div class="row mb-4">
         <div class="col-12">
@@ -60,7 +58,6 @@
     </div>
     @endif
 
-    <!-- Room Status Summary -->
     @if(!isset($room) && $reservations->isNotEmpty())
     <div class="row mb-4">
         <div class="col-12">
@@ -164,7 +161,6 @@
             </div>
         </div>
     @else
-        <!-- Visual Schedule -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
@@ -188,7 +184,6 @@
                                     $colors = ['bg-primary', 'bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-secondary'];
                                 @endphp
 
-                                <!-- Time markers -->
                                 <div class="time-markers mb-3">
                                     @for($hour = $startHour; $hour <= $endHour; $hour++)
                                         <div class="time-marker" 
@@ -198,7 +193,6 @@
                                     @endfor
                                 </div>
 
-                                <!-- Hour lines -->
                                 <div class="hour-lines position-absolute top-0 start-0 w-100 h-100">
                                     @for($hour = $startHour; $hour <= $endHour; $hour++)
                                         <div class="hour-line position-absolute top-0 bottom-0" 
@@ -206,7 +200,6 @@
                                     @endfor
                                 </div>
 
-                                <!-- Reservations timeline -->
                                 <div class="reservations-timeline position-relative">
                                     @foreach($reservations as $index => $reservation)
                                     @php
@@ -217,46 +210,35 @@
                                         $duration = $startTime->diffInMinutes($endTime) / (($endHour - $startHour) * 60);
                                         $colorClass = $colors[$index % count($colors)];
                                         
-                                        // Hitung lebar minimum untuk menampilkan teks
-                                        $minWidthForText = $duration * 100 > 8 ? '' : 'no-text';
-                                        $shortLabel = $namaAwal . ' ' . date('H:i', strtotime($reservation->jam_mulai));
+                                        $ruanganNama = $reservation->roomInfo->nama_ruangan ?? 'N/A';
+                                        $jamMulai = date('H:i', strtotime($reservation->jam_mulai));
+                                        $jamSelesai = date('H:i', strtotime($reservation->jam_selesai));
+                                        
+                                        // **IMPROVEMENT: Enhanced Tooltip Title**
+                                        $tooltipTitle = "Pemesan: {$reservation->nama}\nKeperluan: {$reservation->keperluan}\nRuangan: {$ruanganNama}\nWaktu: {$jamMulai} - {$jamSelesai}";
                                     @endphp
-                                    <div class="reservation-block {{ $colorClass }} shadow-sm mb-3 rounded-3 position-relative {{ $minWidthForText }}" 
+                                    
+                                    <div class="reservation-block {{ $colorClass }} shadow-sm mb-3 rounded-3 position-relative p-2" 
                                          style="left: {{ $startPosition * 100 }}%; 
                                                 width: {{ $duration * 100 }}%;
-                                                height: 60px;"
+                                                min-height: 60px;"
                                          data-bs-toggle="tooltip" 
-                                         data-short-label="{{ $shortLabel }}"
-                                         title="{{ $reservation->nama }} - {{ $reservation->keperluan }} | {{ $reservation->roomInfo->nama_ruangan ?? 'N/A' }} | {{ date('H:i', strtotime($reservation->jam_mulai)) }}-{{ date('H:i', strtotime($reservation->jam_selesai)) }}">>
-                                        <div class="d-flex flex-column justify-content-center h-100 px-3 text-white position-relative">
-                                            @php
-                                                $namaWords = explode(' ', $reservation->nama);
-                                                $namaAwal = $namaWords[0] ?? '';
-                                                $ruanganNama = $reservation->roomInfo->nama_ruangan ?? 'N/A';
-                                                $jamMulai = date('H:i', strtotime($reservation->jam_mulai));
-                                                $jamSelesai = date('H:i', strtotime($reservation->jam_selesai));
-                                            @endphp
-                                            
-                                            <!-- Label Utama -->
-                                            <div class="reservation-main-info text-center">
-                                                <div class="fw-bold reservation-title mb-1" style="font-size: 0.9rem; line-height: 1.2;">
-                                                    {{ $namaAwal }}
-                                                </div>
-                                                <div class="reservation-details d-flex justify-content-center align-items-center flex-wrap">
-                                                    <small class="opacity-90 me-2 d-none d-lg-inline-block reservation-room" style="font-size: 0.75rem;">
-                                                        <i class="bi bi-door-closed-fill me-1"></i>{{ Str::limit($ruanganNama, 8) }}
-                                                    </small>
-                                                    <small class="fw-bold reservation-time opacity-95" style="font-size: 0.75rem;">
-                                                        <i class="bi bi-clock-fill me-1"></i>{{ $jamMulai }}-{{ $jamSelesai }}
-                                                    </small>
-                                                </div>
+                                         data-bs-title="{{ $tooltipTitle }}">
+                                         
+                                        <div class="reservation-content text-white">
+                                            <div class="reservation-title fw-bold">
+                                                <i class="bi bi-person-fill me-1"></i>
+                                                {{ $reservation->nama }}
                                             </div>
-                                            
-                                            <!-- Badge Status untuk reservasi lebar -->
-                                            <div class="reservation-badge position-absolute top-0 end-0 mt-1 me-1">
-                                                <span class="badge bg-light bg-opacity-20 text-white" style="font-size: 0.6rem;">
-                                                    <i class="bi bi-person-fill"></i>
-                                                </span>
+                                            <div class="reservation-details mt-1">
+                                                <small class="reservation-room d-block opacity-90">
+                                                    <i class="bi bi-door-closed-fill me-1"></i>
+                                                    {{ Str::limit($ruanganNama, 15) }}
+                                                </small>
+                                                <small class="reservation-time d-block opacity-90">
+                                                    <i class="bi bi-clock-fill me-1"></i>
+                                                    {{ $jamMulai }} - {{ $jamSelesai }}
+                                                </small>
                                             </div>
                                         </div>
                                     </div>
@@ -269,7 +251,6 @@
             </div>
         </div>
 
-        <!-- Detailed Table -->
         <div class="row">
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
@@ -399,15 +380,43 @@
         position: relative;
     }
 
+    /* **IMPROVEMENT: Updated Reservation Block Styles** */
     .reservation-block {
         position: absolute;
         transition: all 0.3s ease;
         cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow: hidden; /* Prevent content overflow */
+        line-height: 1.3;
     }
 
     .reservation-block:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+        z-index: 10;
+    }
+    
+    .reservation-content {
+        padding: 0.2rem;
+    }
+    
+    .reservation-title {
+        font-size: 0.8rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    
+    .reservation-details {
+        font-size: 0.7rem;
+    }
+    
+    .reservation-details small {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
     }
 
     .avatar-circle {
@@ -479,63 +488,6 @@
         background-color: rgba(0, 0, 0, 0.1);
     }
 
-    /* Tampilan untuk reservasi sempit */
-    .reservation-block.no-text .reservation-main-info {
-        display: none;
-    }
-
-    .reservation-block.no-text {
-        background-image: repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 5px,
-            rgba(255,255,255,0.3) 5px,
-            rgba(255,255,255,0.3) 10px
-        ) !important;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .reservation-block.no-text::before {
-        content: attr(data-short-label);
-        font-size: 0.7rem;
-        font-weight: bold;
-        color: white;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-    }
-
-    /* Perbaikan layout label */
-    .reservation-main-info {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .reservation-details {
-        gap: 0.25rem;
-    }
-
-    .reservation-badge {
-        z-index: 10;
-    }
-
-    /* Hover effects untuk label */
-    .reservation-block:hover .reservation-title {
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    }
-
-    .reservation-block:hover .reservation-badge {
-        transform: scale(1.1);
-        transition: transform 0.2s ease;
-    }
-
-    /* Responsive label adjustments */
-    @media (max-width: 1200px) {
-        .reservation-room {
-            display: none !important;
-        }
-    }
-
     @media (max-width: 768px) {
         .schedule-timeline {
             padding: 15px;
@@ -543,11 +495,21 @@
         }
 
         .reservation-block {
-            height: 50px !important;
+            min-height: 50px !important;
+            padding: 0.2rem !important;
         }
 
-        .reservation-block .fw-bold {
-            font-size: 0.8rem;
+        .reservation-title {
+            font-size: 0.75rem;
+        }
+        
+        .reservation-details {
+            font-size: 0.65rem;
+        }
+
+        /* Sembunyikan ruangan jika terlalu sempit di mobile */
+        .reservation-room {
+            display: none !important;
         }
 
         .time-marker {
@@ -573,27 +535,6 @@
         .bg-gradient-primary h1 {
             font-size: 1.5rem !important;
         }
-        
-        /* Responsif untuk reservasi timeline */
-        .reservation-block .reservation-title {
-            font-size: 0.8rem !important;
-        }
-        
-        .reservation-block .reservation-time {
-            font-size: 0.65rem !important;
-        }
-        
-        .reservation-block .reservation-room {
-            display: none !important;
-        }
-
-        .reservation-details {
-            justify-content: center !important;
-        }
-
-        .reservation-badge {
-            display: none;
-        }
     }
     
     @media (max-width: 576px) {
@@ -615,7 +556,15 @@
         }
         
         .reservation-block {
-            height: 40px !important;
+            min-height: 45px !important;
+        }
+        
+        .reservation-title {
+            font-size: 0.7rem;
+        }
+        
+        .reservation-details {
+            font-size: 0.6rem;
         }
     }
 </style>
@@ -633,9 +582,15 @@
     
     // Initialize tooltips
     document.addEventListener('DOMContentLoaded', function() {
+        // **IMPROVEMENT: Use data-bs-title for tooltip content**
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                // Mengizinkan HTML di dalam tooltip jika diperlukan
+                html: true,
+                // Menggunakan newline \n sebagai pemisah baris
+                title: tooltipTriggerEl.getAttribute('data-bs-title').replace(/\n/g, '<br />')
+            })
         })
     });
 </script>
