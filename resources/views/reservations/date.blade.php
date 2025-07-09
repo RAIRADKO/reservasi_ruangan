@@ -76,42 +76,65 @@
                         @php
                             $roomReservations = $reservations->groupBy('room_info_id');
                             $allRooms = $rooms ?? collect();
+                            $workHoursStart = '08:00:00';
+                            $workHoursEnd = '16:00:00';
                         @endphp
                         
                         @foreach($allRooms as $roomItem)
+                        @php
+                            $reservationsForRoom = $roomReservations->get($roomItem->id, collect());
+                            
+                            // Hitung status ruangan
+                            $status = 'available';
+                            $statusText = 'Tersedia';
+                            $icon = 'bi-door-open-fill';
+                            $color = 'success';
+                            
+                            if ($reservationsForRoom->isNotEmpty()) {
+                                $minStart = $reservationsForRoom->min('jam_mulai');
+                                $maxEnd = $reservationsForRoom->max('jam_selesai');
+                                
+                                if ($minStart <= $workHoursStart && $maxEnd >= $workHoursEnd) {
+                                    $status = 'full';
+                                    $statusText = 'Penuh';
+                                    $icon = 'bi-door-closed-fill';
+                                    $color = 'danger';
+                                } else {
+                                    $status = 'partial';
+                                    $statusText = 'Sebagian';
+                                    $icon = 'bi-door-closed';
+                                    $color = 'warning';
+                                }
+                            }
+                        @endphp
                         <div class="col-12 col-md-6 col-lg-4 mb-3">
                             <div class="room-status-card p-3 rounded-3 h-100 
-                                {{ $roomReservations->has($roomItem->id) ? 'bg-danger bg-opacity-10 border-danger' : 'bg-success bg-opacity-10 border-success' }}">
+                                bg-{{ $color }}-subtle border-{{ $color }}">
                                 <div class="d-flex align-items-center justify-content-between">
                                     <div>
                                         <h6 class="mb-1 fw-bold">{{ $roomItem->nama_ruangan }}</h6>
-                                        @if($roomReservations->has($roomItem->id))
-                                            <small class="text-danger fw-bold">
-                                                <i class="bi bi-exclamation-circle me-1"></i>
-                                                {{ $roomReservations[$roomItem->id]->count() }} Reservasi
-                                            </small>
-                                        @else
-                                            <small class="text-success fw-bold">
-                                                <i class="bi bi-check-circle me-1"></i>
-                                                Tersedia
-                                            </small>
-                                        @endif
+                                        <small class="text-{{ $color }} fw-bold">
+                                            <i class="bi {{ $icon }} me-1"></i>
+                                            @if($status === 'full')
+                                                Penuh ({{ $reservationsForRoom->count() }} Reservasi)
+                                            @elseif($status === 'partial')
+                                                Sebagian Terpakai ({{ $reservationsForRoom->count() }} Reservasi)
+                                            @else
+                                                Tersedia Penuh
+                                            @endif
+                                        </small>
                                     </div>
                                     <div class="status-icon">
-                                        @if($roomReservations->has($roomItem->id))
-                                            <i class="bi bi-door-closed-fill text-danger fs-4"></i>
-                                        @else
-                                            <i class="bi bi-door-open-fill text-success fs-4"></i>
-                                        @endif
+                                        <i class="bi {{ $icon }} text-{{ $color }} fs-4"></i>
                                     </div>
                                 </div>
                                 
-                                @if($roomReservations->has($roomItem->id))
+                                @if($reservationsForRoom->isNotEmpty())
                                 <div class="mt-2">
-                                    <small class="text-muted">Waktu terreservasi:</small>
+                                    <small class="text-muted">Waktu reservasi:</small>
                                     <div class="reserved-times mt-1">
-                                        @foreach($roomReservations[$roomItem->id] as $res)
-                                        <span class="badge bg-danger bg-opacity-75 me-1 mb-1">
+                                        @foreach($reservationsForRoom as $res)
+                                        <span class="badge bg-{{ $color }} bg-opacity-75 me-1 mb-1">
                                             {{ date('H:i', strtotime($res->jam_mulai)) }}-{{ date('H:i', strtotime($res->jam_selesai)) }}
                                         </span>
                                         @endforeach
@@ -148,7 +171,12 @@
                     <div class="card-header bg-white border-bottom-0 py-3">
                         <h4 class="mb-0 fw-bold h5">
                             <i class="bi bi-bar-chart-line me-2 text-primary"></i>
-                            Jadwal Visual
+                            Jadwal Visual Ruangan
+                            @if(isset($room))
+                                <span class="badge bg-primary bg-opacity-10 text-primary ms-2">
+                                    {{ $room->nama_ruangan }}
+                                </span>
+                            @endif
                         </h4>
                     </div>
                     <div class="card-body">
@@ -170,8 +198,16 @@
                                     @endfor
                                 </div>
 
+                                <!-- Hour lines -->
+                                <div class="hour-lines position-absolute top-0 start-0 w-100 h-100">
+                                    @for($hour = $startHour; $hour <= $endHour; $hour++)
+                                        <div class="hour-line position-absolute top-0 bottom-0" 
+                                             style="left: {{ (($hour - $startHour) / ($endHour - $startHour)) * 100 }}%;"></div>
+                                    @endfor
+                                </div>
+
                                 <!-- Reservations timeline -->
-                                <div class="reservations-timeline">
+                                <div class="reservations-timeline position-relative">
                                     @foreach($reservations as $index => $reservation)
                                     @php
                                         $startTime = \Carbon\Carbon::parse($reservation->jam_mulai);
@@ -180,18 +216,23 @@
                                         $startPosition = (($startTime->hour - $startHour) * 60 + $startTime->minute) / (($endHour - $startHour) * 60);
                                         $duration = $startTime->diffInMinutes($endTime) / (($endHour - $startHour) * 60);
                                         $colorClass = $colors[$index % count($colors)];
+                                        
+                                        // Hitung lebar minimum untuk menampilkan teks
+                                        $minWidthForText = $duration * 100 > 8 ? '' : 'no-text';
                                     @endphp
-                                    <div class="reservation-block {{ $colorClass }} shadow-sm mb-3 rounded-3 position-relative" 
+                                    <div class="reservation-block {{ $colorClass }} shadow-sm mb-3 rounded-3 position-relative {{ $minWidthForText }}" 
                                          style="left: {{ $startPosition * 100 }}%; 
                                                 width: {{ $duration * 100 }}%;
-                                                height: 60px;">
+                                                height: 60px;"
+                                         data-bs-toggle="tooltip" 
+                                         title="{{ $reservation->nama }} - {{ $reservation->keperluan }} | {{ date('H:i', strtotime($reservation->jam_mulai)) }}-{{ date('H:i', strtotime($reservation->jam_selesai)) }}">
                                         <div class="d-flex justify-content-between align-items-center h-100 px-3 text-white">
-                                            <div>
-                                                <div class="fw-bold">{{ $reservation->nama }}</div>
-                                                <small class="opacity-75 d-none d-md-block">{{ Str::limit($reservation->keperluan, 20) }}</small>
+                                            <div class="reservation-info">
+                                                <div class="fw-bold reservation-title">{{ $reservation->nama }}</div>
+                                                <small class="opacity-75 d-none d-md-block reservation-desc">{{ Str::limit($reservation->keperluan, 20) }}</small>
                                             </div>
                                             <div class="text-end">
-                                                <small class="fw-bold">
+                                                <small class="fw-bold reservation-time">
                                                     {{ date('H:i', strtotime($reservation->jam_mulai)) }}-{{ date('H:i', strtotime($reservation->jam_selesai)) }}
                                                 </small>
                                             </div>
@@ -406,6 +447,33 @@
         background: #555;
     }
 
+    /* Garis vertikal setiap jam */
+    .hour-lines {
+        pointer-events: none;
+    }
+
+    .hour-line {
+        width: 1px;
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    /* Tampilan untuk reservasi sempit */
+    .reservation-block.no-text .reservation-title,
+    .reservation-block.no-text .reservation-desc,
+    .reservation-block.no-text .reservation-time {
+        display: none;
+    }
+
+    .reservation-block.no-text {
+        background-image: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 5px,
+            rgba(255,255,255,0.3) 5px,
+            rgba(255,255,255,0.3) 10px
+        ) !important;
+    }
+
     @media (max-width: 768px) {
         .schedule-timeline {
             padding: 15px;
@@ -443,6 +511,19 @@
         .bg-gradient-primary h1 {
             font-size: 1.5rem !important;
         }
+        
+        /* Responsif untuk reservasi timeline */
+        .reservation-block .reservation-title {
+            font-size: 0.8rem;
+        }
+        
+        .reservation-block .reservation-time {
+            font-size: 0.7rem;
+        }
+        
+        .reservation-block .reservation-desc {
+            display: none;
+        }
     }
     
     @media (max-width: 576px) {
@@ -462,6 +543,10 @@
         .room-status-card {
             padding: 15px !important;
         }
+        
+        .reservation-block {
+            height: 40px !important;
+        }
     }
 </style>
 @endsection
@@ -475,5 +560,13 @@
             window.location.href = url;
         }
     }
+    
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    });
 </script>
 @endsection
