@@ -15,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\AuthenticateAdmin::class,
         ]);
+            $middleware->alias([
+            'admin' => \App\Http\Middleware\AuthenticateAdmin::class,
+            'visitor' => \App\Http\Middleware\LogVisitor::class, // Tambahkan ini
+        ]);
     })    
     ->withExceptions(function (Exceptions $exceptions): void {
         //

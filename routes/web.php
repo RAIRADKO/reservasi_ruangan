@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 // Halaman Utama (Publik)
 // ==========================
 
-Route::get('/', [RoomController::class, 'index'])->name('home');
+Route::get('/', [RoomController::class, 'index'])->name('home')->middleware('visitor');
 Route::get('/reservations/date/{date}', [RoomController::class, 'showReservationsByDate'])->name('reservations.date');
 Route::get('/reservations/date/{date}/room/{room}', [RoomController::class, 'showReservationsByDateAndRoom'])->name('reservations.date.room');
 

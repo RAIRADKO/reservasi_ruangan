@@ -7,7 +7,7 @@ use App\Models\RoomInfo;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\BlockedDate;
-
+use App\Models\Visitor;
 
 class RoomController extends Controller
 {
@@ -17,11 +17,11 @@ class RoomController extends Controller
         $room = RoomInfo::firstOrFail(); 
         $totalRooms = $rooms->count();
 
-        // Get operating hours
+        // Jam operasional dari config
         $operatingStart = Carbon::parse(config('room.operating_hours.start', '08:00'));
         $operatingEnd = Carbon::parse(config('room.operating_hours.end', '16:00'));
 
-        // Get all approved reservations
+        // Ambil semua reservasi yang disetujui
         $allReservations = Reservation::where('status', Reservation::STATUS_APPROVED)
             ->orderBy('tanggal')
             ->orderBy('room_info_id')
@@ -42,17 +42,16 @@ class RoomController extends Controller
             if ($totalRooms > 0 && count($reservationsByRoom) === $totalRooms) {
                 foreach ($reservationsByRoom as $roomId => $roomReservations) {
                     $mergedTimes = [];
-                    
-                    // Merge overlapping/adjacent intervals
+
                     foreach ($roomReservations as $res) {
                         $start = Carbon::parse($res->jam_mulai);
                         $end = Carbon::parse($res->jam_selesai);
-                        
+
                         if (empty($mergedTimes)) {
                             $mergedTimes[] = ['start' => $start, 'end' => $end];
                             continue;
                         }
-                        
+
                         $merged = false;
                         foreach ($mergedTimes as $key => $mergedTime) {
                             if ($start <= $mergedTime['end'] && $end >= $mergedTime['start']) {
@@ -67,11 +66,10 @@ class RoomController extends Controller
                         }
                     }
 
-                    // Check if the single merged interval covers the whole day
                     if (count($mergedTimes) === 1) {
                         $bookedStart = $mergedTimes[0]['start'];
                         $bookedEnd = $mergedTimes[0]['end'];
-                        
+
                         if ($bookedStart <= $operatingStart && $bookedEnd >= $operatingEnd) {
                             $roomsBookedSolid++;
                         }
@@ -86,22 +84,31 @@ class RoomController extends Controller
             }
         }
 
-        // Mengambil tanggal yang diblokir manual oleh admin
+        // Tanggal diblokir manual
         $manualBlockedDates = BlockedDate::pluck('date')->map(function ($date) {
             return $date->format('Y-m-d');
         })->values()->all();
 
-        // Ensure reservationDates doesn't contain dates that are already manually blocked or full
         $reservationDates = array_diff($reservationDates, $manualBlockedDates, $fullDates);
 
-        $todayVisitors = Reservation::where('status', Reservation::STATUS_APPROVED)->whereDate('tanggal', today())->count();
-        $monthlyVisitors = Reservation::where('status', Reservation::STATUS_APPROVED)->whereMonth('tanggal', today()->month)->count();
-        $totalVisitors = Reservation::where('status', Reservation::STATUS_APPROVED)->count();
-        $todayEvents = Reservation::with('roomInfo')->where('status', Reservation::STATUS_APPROVED)->whereDate('tanggal', today())->get();
+        // Statistik pengunjung dari tabel Visitor
+        $todayVisitors = Visitor::whereDate('visit_date', today())->count();
+        $monthlyVisitors = Visitor::whereMonth('visit_date', today()->month)
+                                  ->whereYear('visit_date', today()->year)
+                                  ->count();
+        $totalVisitors = Visitor::count();
 
-        return view('home', compact('room', 'rooms', 'reservationDates', 'manualBlockedDates', 'fullDates', 'todayVisitors', 'monthlyVisitors', 'totalVisitors', 'todayEvents'));
+        $todayEvents = Reservation::with('roomInfo')
+            ->where('status', Reservation::STATUS_APPROVED)
+            ->whereDate('tanggal', today())
+            ->get();
+
+        return view('home', compact(
+            'room', 'rooms', 'reservationDates', 'manualBlockedDates', 'fullDates',
+            'todayVisitors', 'monthlyVisitors', 'totalVisitors', 'todayEvents'
+        ));
     }
-    
+
     public function showReservationsByDate($date)
     {
         try {
@@ -109,22 +116,18 @@ class RoomController extends Controller
         } catch (\Exception $e) {
             abort(404, 'Format tanggal tidak valid');
         }
-        
+
         $reservations = Reservation::with(['user', 'roomInfo'])
             ->where('tanggal', $date)
             ->where('status', Reservation::STATUS_APPROVED)
             ->orderBy('jam_mulai')
             ->get();
-            
-        // Load all rooms for status summary
+
         $rooms = RoomInfo::all();
-        
+
         return view('reservations.date', compact('reservations', 'date', 'rooms'));
     }
 
-    /**
-     * Show reservations by date and room
-     */
     public function showReservationsByDateAndRoom($date, $roomId = null)
     {
         try {
@@ -132,21 +135,21 @@ class RoomController extends Controller
         } catch (\Exception $e) {
             abort(404, 'Format tanggal tidak valid');
         }
-        
+
         $query = Reservation::with(['user', 'roomInfo'])
             ->where('tanggal', $date)
             ->where('status', Reservation::STATUS_APPROVED);
-            
+
         if ($roomId) {
             $query->where('room_info_id', $roomId);
             $room = RoomInfo::findOrFail($roomId);
         } else {
             $room = null;
         }
-        
+
         $reservations = $query->orderBy('jam_mulai')->get();
         $rooms = RoomInfo::all();
-            
+
         return view('reservations.date', compact('reservations', 'date', 'room', 'rooms'));
     }
 }
