@@ -57,12 +57,12 @@ class SendCheckoutReminders extends Command
     private function handleAutomaticCheckouts()
     {
         $this->info('Memeriksa reservasi untuk check-out otomatis...');
-        $twentyFourHoursAgo = Carbon::now()->subHours(12);
+        $twelveHoursAgo = Carbon::now()->subHours(12);
         $autoCheckoutReservations = Reservation::with('user', 'roomInfo')
             ->where('status', Reservation::STATUS_APPROVED)
             ->whereNull('checked_out_at')
-            ->where(function ($query) use ($twentyFourHoursAgo) {
-                $query->whereRaw("TIMESTAMP(tanggal, jam_selesai) <= ?", [$twentyFourHoursAgo]);
+            ->where(function ($query) use ($twelveHoursAgo) {
+                $query->whereRaw("TIMESTAMP(tanggal, jam_selesai) <= ?", [$twelveHoursAgo]);
             })
             ->get();
 
@@ -72,7 +72,6 @@ class SendCheckoutReminders extends Command
         }
 
         $this->info("Ditemukan {$autoCheckoutReservations->count()} reservasi yang akan di-check-out otomatis.");
-
         foreach ($autoCheckoutReservations as $reservation) {
             $reservation->update([
                 'status' => Reservation::STATUS_COMPLETED,
