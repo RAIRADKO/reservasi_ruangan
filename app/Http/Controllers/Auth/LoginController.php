@@ -8,25 +8,14 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    /**
-     * Menampilkan form login.
-     *
-     * @return \Illuminate\View\View
-     */
+
     public function showLoginForm()
     {
         return view('auth.login');
     }
-
-    /**
-     * Menangani permintaan login.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function login(Request $request)
     {
-        // 1. Validasi form input untuk NIP (bisa juga username) dan password
+        // 1. Validasi form input
         $request->validate([
             'nip' => ['required', 'string'],
             'password' => ['required'],
@@ -40,19 +29,28 @@ class LoginController extends Controller
             'password' => $request->password,
         ];
 
-        // Kredensial untuk admin (berdasarkan username dari kolom NIP)
+        // 2. Coba autentikasi sebagai user biasa
+        if (Auth::guard('web')->attempt($credentialsUser, $remember)) {
+            $user = Auth::guard('web')->user();
+
+            // 2a. Cek apakah akun user sudah disetujui
+            if ($user->status !== 'approved') {
+                Auth::guard('web')->logout();
+                return back()->withErrors([
+                    'nip' => 'Akun Anda belum disetujui oleh admin.',
+                ])->withInput($request->only('nip', 'remember'));
+            }
+
+            $request->session()->regenerate();
+            return redirect()->intended('/');
+        }
+
+        // 3. Jika gagal, coba autentikasi sebagai admin (berdasarkan username dari kolom NIP)
         $credentialsAdmin = [
             'username' => $request->nip,
             'password' => $request->password,
         ];
 
-        // 2. Coba autentikasi sebagai user biasa
-        if (Auth::guard('web')->attempt($credentialsUser, $remember)) {
-            $request->session()->regenerate();
-            return redirect()->intended('/');
-        }
-
-        // 3. Jika gagal, coba autentikasi sebagai admin
         if (Auth::guard('admin')->attempt($credentialsAdmin, $remember)) {
             $request->session()->regenerate();
             return redirect()->intended(route('admin.dashboard'));
@@ -61,15 +59,8 @@ class LoginController extends Controller
         // 4. Jika keduanya gagal, kembalikan dengan pesan error
         return back()->withErrors([
             'nip' => 'NIP/Username atau password yang Anda masukkan salah.',
-        ])->withInput($request->only('nip')); // Hanya kembalikan input 'nip'
+        ])->withInput($request->only('nip'));
     }
-
-    /**
-     * Melakukan logout pengguna atau admin.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function logout(Request $request)
     {
         // Logout dari guard manapun yang sedang aktif

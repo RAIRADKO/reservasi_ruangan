@@ -37,23 +37,20 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'nip' => ['required', 'string', 'size:18', 'unique:users'],
+            'kontak' => ['required', 'string', 'max:15'],
             'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
         ]);
     }
 
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
-     * @return \App\Models\User
-     */
     protected function create(array $data)
     {
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'nip' => $data['nip'],
+            'kontak' => $data['kontak'],
             'password' => Hash::make($data['password']),
+            'status' => 'pending',
         ]);
     }
 

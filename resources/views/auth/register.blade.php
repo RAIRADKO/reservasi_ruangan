@@ -45,6 +45,16 @@
                             </span>
                         @enderror
                     </div>
+
+                    <div class="form-floating mb-3">
+                        <input id="kontak" type="text" class="form-control @error('kontak') is-invalid @enderror" name="kontak" value="{{ old('kontak') }}" required placeholder="Nomor Kontak">
+                        <label for="kontak"><i class="bi bi-phone me-2"></i>Nomor Kontak</label>
+                        @error('kontak')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
                     
                     <div class="form-floating mb-3">
                         <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password" placeholder="Password">
@@ -113,17 +123,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     passwordInput.addEventListener('input', function() {
         const value = this.value;
-
-        // Cek Panjang Karakter
         updateCriteria(lengthCheck, value.length >= 8);
-        
-        // Cek Huruf Besar
         updateCriteria(uppercaseCheck, /[A-Z]/.test(value));
-
-        // Cek Angka
         updateCriteria(numberCheck, /[0-9]/.test(value));
-        
-        // Cek Simbol
         updateCriteria(symbolCheck, /[^A-Za-z0-9]/.test(value));
     });
 
