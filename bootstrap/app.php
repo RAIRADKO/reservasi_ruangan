@@ -9,17 +9,16 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__.'/../routes/web.php', // Baris ini secara otomatis menerapkan middleware 'web'
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
-    ) 
+    )
     ->withMiddleware(function (Middleware $middleware) {
-        // Daftarkan alias middleware untuk admin di sini
+        // Daftarkan alias middleware di sini
         $middleware->alias([
             'admin' => \App\Http\Middleware\AuthenticateAdmin::class,
-        ]);
-            $middleware->alias([
-            'admin' => \App\Http\Middleware\AuthenticateAdmin::class,
+            'role' => \App\Http\Middleware\CheckRole::class,
             'visitor' => \App\Http\Middleware\LogVisitor::class, // Tambahkan ini
         ]);
-    })    
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create();
+    })
+    ->create();

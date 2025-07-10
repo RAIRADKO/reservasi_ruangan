@@ -82,43 +82,48 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/logout', [AdminLoginController::class, 'logout'])->name('logout');
 });
 
-// ==========================
-// Route Untuk Admin
-// ==========================
+// =================================================================
+// Route Untuk Admin (Dengan Role-Based Access Control)
+// =================================================================
 
-Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
+// Grup untuk semua yang bisa diakses oleh admin dan superadmin
+Route::prefix('admin')->name('admin.')->middleware(['admin', 'role:admin,superadmin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    
+    // Manajemen Reservasi
     Route::get('/reservations', [AdminController::class, 'reservations'])->name('reservations.index');
-    Route::get('/reports', [AdminController::class, 'reports'])->name('reports.index');
-
-    // Route untuk export data reservasi ke Excel
-    Route::get('/reservations/export', [AdminController::class, 'exportReservations'])->name('reservations.export');
-
     Route::put('/reservations/{reservation}/update-status', [AdminController::class, 'updateStatus'])->name('reservations.update-status');
     Route::delete('/reservations/{reservation}', [AdminController::class, 'destroy'])->name('reservations.destroy');
 
-    // == ROUTE BARU UNTUK MANAJEMEN RUANGAN ==
+    // Manajemen Ruangan
     Route::get('rooms', [AdminController::class, 'roomIndex'])->name('room.index');
     Route::get('rooms/create', [AdminController::class, 'roomCreate'])->name('room.create');
     Route::post('rooms', [AdminController::class, 'roomStore'])->name('room.store');
     Route::get('rooms/{room}/edit', [AdminController::class, 'roomEdit'])->name('room.edit');
     Route::put('rooms/{room}', [AdminController::class, 'roomUpdate'])->name('room.update');
     Route::delete('rooms/{room}', [AdminController::class, 'roomDestroy'])->name('room.destroy');
-    
-    // == ROUTE BARU UNTUK MANAJEMEN DINAS ==
+
+    // Manajemen Kalender
+    Route::get('/calendar-management', [AdminController::class, 'showCalendarManagement'])->name('calendar.management');
+    Route::post('/blocked-dates', [AdminController::class, 'storeBlockedDate'])->name('blocked-dates.store');
+    Route::delete('/blocked-dates', [AdminController::class, 'destroyBlockedDate'])->name('blocked-dates.destroy');
+});
+
+// Grup khusus untuk superadmin
+Route::prefix('admin')->name('admin.')->middleware(['admin', 'role:superadmin'])->group(function () {
+    // Manajemen Laporan
+    Route::get('/reports', [AdminController::class, 'reports'])->name('reports.index');
+    Route::get('/reservations/export', [AdminController::class, 'exportReservations'])->name('reservations.export');
+
+    // Manajemen Dinas
     Route::get('dinas', [AdminController::class, 'dinasIndex'])->name('dinas.index');
     Route::get('dinas/create', [AdminController::class, 'dinasCreate'])->name('dinas.create');
     Route::post('dinas', [AdminController::class, 'dinasStore'])->name('dinas.store');
     Route::get('dinas/{dina}/edit', [AdminController::class, 'dinasEdit'])->name('dinas.edit');
     Route::put('dinas/{dina}', [AdminController::class, 'dinasUpdate'])->name('dinas.update');
     Route::delete('dinas/{dina}', [AdminController::class, 'dinasDestroy'])->name('dinas.destroy');
-    
-    // == ROUTE UNTUK MANAJEMEN KALENDER ==
-    Route::get('/calendar-management', [AdminController::class, 'showCalendarManagement'])->name('calendar.management');
-    Route::post('/blocked-dates', [AdminController::class, 'storeBlockedDate'])->name('blocked-dates.store');
-    Route::delete('/blocked-dates', [AdminController::class, 'destroyBlockedDate'])->name('blocked-dates.destroy');
-    
-    // == ROUTE UNTUK MANAJEMEN USER ==
+
+    // Manajemen User
     Route::get('users', [AdminController::class, 'usersIndex'])->name('users.index');
     Route::get('users/create', [AdminController::class, 'usersCreate'])->name('users.create');
     Route::post('users', [AdminController::class, 'usersStore'])->name('users.store');

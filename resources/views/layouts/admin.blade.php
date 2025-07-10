@@ -361,11 +361,17 @@
                     <div class="text-center mb-4 pt-3 d-none d-lg-block">
                         <h4 class="text-white mb-0">
                             <i class="bi bi-shield-check me-2"></i>
-                            Admin Panel
+                            {{-- Tampilkan nama peran secara dinamis --}}
+                            @if(Auth::guard('admin')->user()->role == 'superadmin')
+                                Super Admin Panel
+                            @else
+                                Admin Panel
+                            @endif
                         </h4>
                     </div>
                     
                     <ul class="nav flex-column flex-grow-1">
+                        {{-- Menu yang dapat diakses oleh SEMUA admin --}}
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" 
                             href="{{ route('admin.dashboard') }}">
@@ -373,6 +379,30 @@
                                 Dashboard
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.reservations.*') ? 'active' : '' }}" 
+                            href="{{ route('admin.reservations.index') }}">
+                                <i class="bi bi-journal-text me-2"></i>
+                                Reservasi
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.calendar.*') ? 'active' : '' }}" 
+                            href="{{ route('admin.calendar.management') }}">
+                                <i class="bi bi-calendar3 me-2"></i>
+                                Manajemen Kalender
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.room.*') ? 'active' : '' }}"
+                                href="{{ route('admin.room.index') }}">
+                                <i class="bi bi-door-open-fill me-2"></i>
+                                Manajemen Ruangan
+                            </a>
+                        </li>
+
+                        {{-- Menu KHUSUS untuk Super Admin --}}
+                        @if(Auth::guard('admin')->user()->role == 'superadmin')
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
                                 href="{{ route('admin.users.index') }}">
@@ -388,33 +418,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.calendar.*') ? 'active' : '' }}" 
-                            href="{{ route('admin.calendar.management') }}">
-                                <i class="bi bi-calendar3 me-2"></i>
-                                Manajemen Kalender
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}"
                                 href="{{ route('admin.reports.index') }}">
                                 <i class="bi bi-graph-up me-2"></i>
                                 Laporan
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.reservations.*') ? 'active' : '' }}" 
-                            href="{{ route('admin.reservations.index') }}">
-                                <i class="bi bi-journal-text me-2"></i>
-                                Reservasi
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.room.*') ? 'active' : '' }}"
-                                href="{{ route('admin.room.index') }}">
-                                <i class="bi bi-door-open-fill me-2"></i>
-                                Manajemen Ruangan
-                            </a>
-                        </li>
+                        @endif
                     </ul>
                     
                     <div class="sidebar-footer d-none d-lg-block">
