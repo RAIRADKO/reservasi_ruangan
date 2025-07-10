@@ -387,13 +387,6 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.calendar.*') ? 'active' : '' }}" 
-                            href="{{ route('admin.calendar.management') }}">
-                                <i class="bi bi-calendar3 me-2"></i>
-                                Manajemen Kalender
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.room.*') ? 'active' : '' }}"
                                 href="{{ route('admin.room.index') }}">
                                 <i class="bi bi-door-open-fill me-2"></i>
@@ -403,6 +396,13 @@
 
                         {{-- Menu KHUSUS untuk Super Admin --}}
                         @if(Auth::guard('admin')->user()->role == 'superadmin')
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.calendar.*') ? 'active' : '' }}" 
+                            href="{{ route('admin.calendar.management') }}">
+                                <i class="bi bi-calendar3 me-2"></i>
+                                Manajemen Kalender
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
                                 href="{{ route('admin.users.index') }}">

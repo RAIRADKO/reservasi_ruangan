@@ -102,15 +102,15 @@ Route::prefix('admin')->name('admin.')->middleware(['admin', 'role:admin,superad
     Route::get('rooms/{room}/edit', [AdminController::class, 'roomEdit'])->name('room.edit');
     Route::put('rooms/{room}', [AdminController::class, 'roomUpdate'])->name('room.update');
     Route::delete('rooms/{room}', [AdminController::class, 'roomDestroy'])->name('room.destroy');
-
-    // Manajemen Kalender
-    Route::get('/calendar-management', [AdminController::class, 'showCalendarManagement'])->name('calendar.management');
-    Route::post('/blocked-dates', [AdminController::class, 'storeBlockedDate'])->name('blocked-dates.store');
-    Route::delete('/blocked-dates', [AdminController::class, 'destroyBlockedDate'])->name('blocked-dates.destroy');
 });
 
 // Grup khusus untuk superadmin
 Route::prefix('admin')->name('admin.')->middleware(['admin', 'role:superadmin'])->group(function () {
+    // Manajemen Kalender
+    Route::get('/calendar-management', [AdminController::class, 'showCalendarManagement'])->name('calendar.management');
+    Route::post('/blocked-dates', [AdminController::class, 'storeBlockedDate'])->name('blocked-dates.store');
+    Route::delete('/blocked-dates', [AdminController::class, 'destroyBlockedDate'])->name('blocked-dates.destroy');
+
     // Manajemen Laporan
     Route::get('/reports', [AdminController::class, 'reports'])->name('reports.index');
     Route::get('/reservations/export', [AdminController::class, 'exportReservations'])->name('reservations.export');
