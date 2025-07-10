@@ -43,8 +43,8 @@
                             <select id="room-filter" class="form-select" onchange="filterByRoom()">
                                 <option value="{{ route('reservations.date', ['date' => $date]) }}">Semua Ruangan</option>
                                 @foreach($rooms as $roomOption)
-                                    <option 
-                                        value="{{ route('reservations.date.room', ['date' => $date, 'room' => $roomOption->id]) }}" 
+                                    <option
+                                        value="{{ route('reservations.date.room', ['date' => $date, 'room' => $roomOption->id]) }}"
                                         {{ (isset($room) && $room->id == $roomOption->id) ? 'selected' : '' }}>
                                         {{ $roomOption->nama_ruangan }}
                                     </option>
@@ -76,21 +76,21 @@
                             $workHoursStart = '08:00:00';
                             $workHoursEnd = '16:00:00';
                         @endphp
-                        
+
                         @foreach($allRooms as $roomItem)
                         @php
                             $reservationsForRoom = $roomReservations->get($roomItem->id, collect());
-                            
+
                             // Hitung status ruangan
                             $status = 'available';
                             $statusText = 'Tersedia';
                             $icon = 'bi-door-open-fill';
                             $color = 'success';
-                            
+
                             if ($reservationsForRoom->isNotEmpty()) {
                                 $minStart = $reservationsForRoom->min('jam_mulai');
                                 $maxEnd = $reservationsForRoom->max('jam_selesai');
-                                
+
                                 if ($minStart <= $workHoursStart && $maxEnd >= $workHoursEnd) {
                                     $status = 'full';
                                     $statusText = 'Penuh';
@@ -105,7 +105,7 @@
                             }
                         @endphp
                         <div class="col-12 col-md-6 col-lg-4 mb-3">
-                            <div class="room-status-card p-3 rounded-3 h-100 
+                            <div class="room-status-card p-3 rounded-3 h-100
                                 bg-{{ $color }}-subtle border-{{ $color }}">
                                 <div class="d-flex align-items-center justify-content-between">
                                     <div>
@@ -125,7 +125,7 @@
                                         <i class="bi {{ $icon }} text-{{ $color }} fs-4"></i>
                                     </div>
                                 </div>
-                                
+
                                 @if($reservationsForRoom->isNotEmpty())
                                 <div class="mt-2">
                                     <small class="text-muted">Waktu reservasi:</small>
@@ -186,7 +186,7 @@
 
                                 <div class="time-markers mb-3">
                                     @for($hour = $startHour; $hour <= $endHour; $hour++)
-                                        <div class="time-marker" 
+                                        <div class="time-marker"
                                              style="left: {{ (($hour - $startHour) / ($endHour - $startHour)) * 100 }}%;">
                                             {{ sprintf('%02d:00', $hour) }}
                                         </div>
@@ -195,7 +195,7 @@
 
                                 <div class="hour-lines position-absolute top-0 start-0 w-100 h-100">
                                     @for($hour = $startHour; $hour <= $endHour; $hour++)
-                                        <div class="hour-line position-absolute top-0 bottom-0" 
+                                        <div class="hour-line position-absolute top-0 bottom-0"
                                              style="left: {{ (($hour - $startHour) / ($endHour - $startHour)) * 100 }}%;"></div>
                                     @endfor
                                 </div>
@@ -209,39 +209,46 @@
                                         $startPosition = (($startTime->hour - $startHour) * 60 + $startTime->minute) / (($endHour - $startHour) * 60);
                                         $duration = $startTime->diffInMinutes($endTime) / (($endHour - $startHour) * 60);
                                         $colorClass = $colors[$index % count($colors)];
-                                        
+
                                         $ruanganNama = $reservation->roomInfo->nama_ruangan ?? 'N/A';
                                         $jamMulai = date('H:i', strtotime($reservation->jam_mulai));
                                         $jamSelesai = date('H:i', strtotime($reservation->jam_selesai));
-                                        
-                                        // **IMPROVEMENT: Enhanced Tooltip Title**
-                                        $tooltipTitle = "Pemesan: {$reservation->nama}\nKeperluan: {$reservation->keperluan}\nRuangan: {$ruanganNama}\nWaktu: {$jamMulai} - {$jamSelesai}";
+                                        $instansi = $reservation->dinas->name ?? 'N/A';
                                     @endphp
-                                    
-                                    <div class="reservation-block {{ $colorClass }} shadow-sm mb-3 rounded-3 position-relative p-2" 
-                                         style="left: {{ $startPosition * 100 }}%; 
-                                                width: {{ $duration * 100 }}%;
-                                                min-height: 60px;"
-                                         data-bs-toggle="tooltip" 
-                                         data-bs-title="{{ $tooltipTitle }}">
-                                         
-                                        <div class="reservation-content text-white">
-                                            <div class="reservation-title fw-bold">
-                                                <i class="bi bi-person-fill me-1"></i>
-                                                {{ $reservation->nama }}
-                                            </div>
-                                            <div class="reservation-details mt-1">
-                                                <small class="reservation-room d-block opacity-90">
-                                                    <i class="bi bi-door-closed-fill me-1"></i>
-                                                    {{ Str::limit($ruanganNama, 15) }}
-                                                </small>
-                                                <small class="reservation-time d-block opacity-90">
-                                                    <i class="bi bi-clock-fill me-1"></i>
-                                                    {{ $jamMulai }} - {{ $jamSelesai }}
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </div>
+<div class="reservation-block {{ $colorClass }} shadow-sm mb-3 rounded-3 position-relative p-2"
+ style="left: {{ $startPosition * 100 }}%;
+ width: {{ $duration * 100 }}%;
+ min-height: 60px;"
+ data-bs-toggle="modal"
+ data-bs-target="#reservationModal"
+ data-reservation-id="{{ $reservation->id }}"
+ data-reservation-nama="{{ $reservation->nama }}"
+ data-reservation-instansi="{{ $instansi }}"
+ data-reservation-keperluan="{{ $reservation->keperluan }}"
+ data-reservation-ruangan="{{ $ruanganNama }}"
+ data-reservation-jam-mulai="{{ $jamMulai }}"
+ data-reservation-jam-selesai="{{ $jamSelesai }}"
+ data-reservation-tanggal="{{ \Carbon\Carbon::parse($reservation->tanggal)->isoFormat('dddd, D MMMM Y') }}"
+ data-reservation-durasi="{{ $startTime->diff($endTime)->h }} jam {{ $startTime->diff($endTime)->i }} menit"
+ data-reservation-status="Disetujui">
+
+ <div class="reservation-content text-white">
+ <div class="reservation-title fw-bold">
+ <i class="bi bi-person-fill me-1"></i>
+ {{ $reservation->nama }}
+ </div>
+ <div class="reservation-details mt-1">
+ <small class="reservation-room d-block opacity-90">
+ <i class="bi bi-door-closed-fill me-1"></i>
+ {{ Str::limit($ruanganNama, 15) }}
+ </small>
+ <small class="reservation-time d-block opacity-90">
+ <i class="bi bi-clock-fill me-1"></i>
+ {{ $jamMulai }} - {{ $jamSelesai }}
+ </small>
+ </div>
+ </div>
+ </div>
                                     @endforeach
                                 </div>
                             </div>
@@ -289,7 +296,7 @@
                                             <div class="d-flex align-items-center">
                                                 <span class="badge {{ $colors[$index % count($colors)] }} me-2" style="width: 4px; height: 20px;"></span>
                                                 <strong>
-                                                    {{ date('H:i', strtotime($reservation->jam_mulai)) }} - 
+                                                    {{ date('H:i', strtotime($reservation->jam_mulai)) }} -
                                                     {{ date('H:i', strtotime($reservation->jam_selesai)) }}
                                                 </strong>
                                             </div>
@@ -334,6 +341,31 @@
         </div>
     @endif
 </div>
+
+<div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reservationModalLabel">Detail Reservasi</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Pemesan:</strong> <span id="modalNama"></span></p>
+        <p><strong>Instansi:</strong> <span id="modalInstansi"></span></p>
+        <p><strong>Ruangan:</strong> <span id="modalRuangan"></span></p>
+        <p><strong>Tanggal:</strong> <span id="modalTanggal"></span></p>
+        <p><strong>Waktu:</strong> <span id="modalJamMulai"></span> - <span id="modalJamSelesai"></span></p>
+        <p><strong>Durasi:</strong> <span id="modalDurasi"></span></p>
+        <p><strong>Keperluan:</strong></p>
+        <p id="modalKeperluan"></p>
+        <p><strong>Status:</strong> <span class="badge bg-success" id="modalStatus"></span></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 
 @section('styles')
@@ -346,7 +378,7 @@
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
-    
+
     .schedule-timeline {
         min-height: 200px;
         background: linear-gradient(90deg, #f8f9fa 0%, #ffffff 100%);
@@ -380,7 +412,6 @@
         position: relative;
     }
 
-    /* **IMPROVEMENT: Updated Reservation Block Styles** */
     .reservation-block {
         position: absolute;
         transition: all 0.3s ease;
@@ -397,22 +428,22 @@
         box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
         z-index: 10;
     }
-    
+
     .reservation-content {
         padding: 0.2rem;
     }
-    
+
     .reservation-title {
         font-size: 0.8rem;
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
     }
-    
+
     .reservation-details {
         font-size: 0.7rem;
     }
-    
+
     .reservation-details small {
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -502,7 +533,7 @@
         .reservation-title {
             font-size: 0.75rem;
         }
-        
+
         .reservation-details {
             font-size: 0.65rem;
         }
@@ -516,53 +547,53 @@
             font-size: 0.7rem;
             padding: 1px 4px;
         }
-        
+
         .table th, .table td {
             padding: 0.75rem 0.5rem;
             font-size: 0.875rem;
         }
-        
+
         .avatar-circle {
             width: 30px;
             height: 30px;
             font-size: 0.8rem;
         }
-        
+
         .card-header h4 {
             font-size: 1.1rem;
         }
-        
+
         .bg-gradient-primary h1 {
             font-size: 1.5rem !important;
         }
     }
-    
+
     @media (max-width: 576px) {
         .bg-gradient-primary h1 {
             font-size: 1.3rem !important;
         }
-        
+
         .bg-gradient-primary p {
             font-size: 0.9rem;
         }
-        
+
         .btn {
             padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
         }
-        
+
         .room-status-card {
             padding: 15px !important;
         }
-        
+
         .reservation-block {
             min-height: 45px !important;
         }
-        
+
         .reservation-title {
             font-size: 0.7rem;
         }
-        
+
         .reservation-details {
             font-size: 0.6rem;
         }
@@ -579,19 +610,46 @@
             window.location.href = url;
         }
     }
-    
-    // Initialize tooltips
+
     document.addEventListener('DOMContentLoaded', function() {
-        // **IMPROVEMENT: Use data-bs-title for tooltip content**
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl, {
-                // Mengizinkan HTML di dalam tooltip jika diperlukan
-                html: true,
-                // Menggunakan newline \n sebagai pemisah baris
-                title: tooltipTriggerEl.getAttribute('data-bs-title').replace(/\n/g, '<br />')
-            })
-        })
+        var reservationModal = document.getElementById('reservationModal');
+        reservationModal.addEventListener('show.bs.modal', function (event) {
+            // Button that triggered the modal
+            var button = event.relatedTarget;
+            // Extract info from data-bs-* attributes
+            var nama = button.getAttribute('data-reservation-nama');
+            var instansi = button.getAttribute('data-reservation-instansi');
+            var ruangan = button.getAttribute('data-reservation-ruangan');
+            var tanggal = button.getAttribute('data-reservation-tanggal');
+            var jamMulai = button.getAttribute('data-reservation-jam-mulai');
+            var jamSelesai = button.getAttribute('data-reservation-jam-selesai');
+            var durasi = button.getAttribute('data-reservation-durasi');
+            var keperluan = button.getAttribute('data-reservation-keperluan');
+            var status = button.getAttribute('data-reservation-status');
+
+            // Update the modal's content.
+            var modalTitle = reservationModal.querySelector('.modal-title');
+            var modalNama = reservationModal.querySelector('#modalNama');
+            var modalInstansi = reservationModal.querySelector('#modalInstansi');
+            var modalRuangan = reservationModal.querySelector('#modalRuangan');
+            var modalTanggal = reservationModal.querySelector('#modalTanggal');
+            var modalJamMulai = reservationModal.querySelector('#modalJamMulai');
+            var modalJamSelesai = reservationModal.querySelector('#modalJamSelesai');
+            var modalDurasi = reservationModal.querySelector('#modalDurasi');
+            var modalKeperluan = reservationModal.querySelector('#modalKeperluan');
+            var modalStatus = reservationModal.querySelector('#modalStatus');
+
+            modalTitle.textContent = 'Detail Reservasi: ' + nama;
+            modalNama.textContent = nama;
+            modalInstansi.textContent = instansi;
+            modalRuangan.textContent = ruangan;
+            modalTanggal.textContent = tanggal;
+            modalJamMulai.textContent = jamMulai;
+            modalJamSelesai.textContent = jamSelesai;
+            modalDurasi.textContent = durasi;
+            modalKeperluan.textContent = keperluan;
+            modalStatus.textContent = status;
+        });
     });
 </script>
 @endsection

@@ -109,7 +109,6 @@
                     <label class="form-label">Fasilitas Ruangan (pilih yang akan digunakan)</label>
                     <div class="p-3 bg-light border rounded">
                         <div id="fasilitas-checklist" class="fasilitas-checklist">
-                            {{-- Checkboxes will be inserted here by JS --}}
                         </div>
                     </div>
                     @error('fasilitas')
