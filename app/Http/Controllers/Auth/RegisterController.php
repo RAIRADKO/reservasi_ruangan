@@ -15,25 +15,13 @@ use App\Mail\NewUserRegisteredAdminNotification; // Tambahkan ini
 
 class RegisterController extends Controller
 {
-    // Redirect ke halaman pending setelah registrasi
     protected $redirectTo = '/pending';
 
-    /**
-     * Display the registration view.
-     *
-     * @return \Illuminate\View\View
-     */
     public function showRegistrationForm()
     {
         return view('auth.register');
     }
 
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
     protected function validator(array $data)
     {
         return Validator::make($data, [
@@ -45,12 +33,6 @@ class RegisterController extends Controller
         ]);
     }
 
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
-     * @return \App\Models\User
-     */
     protected function create(array $data)
     {
         return User::create([
@@ -59,30 +41,19 @@ class RegisterController extends Controller
             'nip' => $data['nip'],
             'kontak' => $data['kontak'],
             'password' => Hash::make($data['password']),
-            'status' => 'pending', // Status diubah menjadi pending
+            'status' => 'pending',
         ]);
     }
 
-    /**
-     * Handle a registration request for the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function register(Request $request)
     {
         $this->validator($request->all())->validate();
-
         event(new Registered($user = $this->create($request->all())));
-
-        // Kirim email notifikasi ke admin
         $adminEmail = config('mail.admin_address');
         if ($adminEmail) {
             Mail::to($adminEmail)->send(new NewUserRegisteredAdminNotification($user));
         }
-
         Auth::login($user);
-
         return redirect($this->redirectTo);
     }
 }

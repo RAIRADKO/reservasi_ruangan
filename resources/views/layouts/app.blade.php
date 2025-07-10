@@ -8,21 +8,21 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
     
-    {{-- Bootstrap CSS --}}
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     
-    {{-- Bootstrap Icons --}}
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    {{-- Vite Assets (your custom CSS/JS) --}}
+    
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    {{-- Custom Styles --}}
+    
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8f9fa;
-            padding-top: 80px; /* Padding untuk fixed navbar */
+            padding-top: 80px;
         }
         .card {
             border: none;
@@ -82,7 +82,7 @@
             border-radius: 0.375rem;
         }
         
-        /* Animasi untuk alert */
+            
         .alert-dismissible {
             animation: fadeIn 0.3s ease-in-out;
         }
@@ -92,7 +92,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Efek hover untuk tombol register */
+        
         .btn-register {
             transition: all 0.3s;
         }
@@ -101,7 +101,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         
-        /* Mobile optimizations */
+        
         @media (max-width: 991.98px) {
             .navbar-brand span {
                 display: none;
@@ -121,7 +121,7 @@
                 font-size: 1.25rem;
             }
             
-            /* Mobile menu styling */
+            
             .navbar-collapse {
                 background-color: #0F172A;
                 border-radius: 0.5rem;
@@ -148,7 +148,7 @@
                 border-color: rgba(255, 255, 255, 0.3);
             }
             
-            /* Mobile logout button */
+            
             .mobile-logout-btn {
                 width: 100%;
                 padding: 0.75rem;
@@ -219,17 +219,17 @@
     
     @yield('styles')
     <style>
-        /* Navbar dengan warna #0F172A */
+        
         .navbar-logo {
-            width: 35px;     /* Sesuaikan ukuran yang diinginkan */
-            height: auto;    /* Tetap proporsional */
+            width: 35px;
+            height: auto;
         }
 
         .navbar-custom {
             background-color: #0F172A !important;
             padding: 1rem 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            height: auto; /* Override fixed height for better responsiveness */
+            height: auto;
         }
         
         .navbar-custom .navbar-brand,
@@ -255,7 +255,7 @@
             border-radius: 0.5rem;
         }
 
-        /* Footer dengan desain sesuai gambar */
+        
         .footer-custom {
             background: linear-gradient(135deg, #0F172A 0%, #1e293b 100%);
             color: #ffffff;
@@ -377,7 +377,7 @@
             color: #ffffff;
         }
         
-        /* Responsive */
+        
         @media (max-width: 768px) {
             .footer-custom {
                 padding: 2rem 0 1rem 0;
@@ -418,9 +418,9 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-lg-center">
                     @auth
-                        {{-- Menu untuk user yang sudah login --}}
                         
-                        {{-- Desktop Menu --}}
+                        
+                        
                         <li class="nav-item me-lg-2 d-none d-lg-block">
                             <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
                                 <i class="bi bi-house-door me-2"></i>Home
@@ -445,7 +445,7 @@
                             </form>
                         </li>
                         
-                        {{-- Mobile Menu --}}
+                        
                         <li class="nav-item d-lg-none">
                             <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
                                 <i class="bi bi-house-door me-2"></i>Home
@@ -470,7 +470,7 @@
                             </form>
                         </li>
                     @else
-                        {{-- Menu untuk guest (belum login) --}}
+                        
                         <li class="nav-item me-2">
                             <a class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}" href="{{ route('login') }}">
                                 <i class="bi bi-box-arrow-in-right me-1"></i>Login
@@ -489,7 +489,7 @@
 
     <main class="py-4 flex-grow-1 mt-4">
         <div class="container">
-            {{-- Success Alert --}}
+            
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
                     <i class="bi bi-check-circle-fill me-2 fs-5"></i>
@@ -498,7 +498,7 @@
                 </div>
             @endif
 
-            {{-- Error Alert --}}
+            
             @if(session('error') || $errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <div class="d-flex align-items-center">
@@ -595,10 +595,10 @@
         </div>
     </footer>
 
-    {{-- Bootstrap JavaScript --}}
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
-    {{-- Enhanced navbar toggle functionality --}}
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize navbar toggle

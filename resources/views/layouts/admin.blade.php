@@ -510,7 +510,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Improved sidebar toggle functionality
         class SidebarToggle {
             constructor() {
                 this.sidebar = document.getElementById('sidebar');
@@ -523,7 +522,6 @@
             }
             
             init() {
-                // Toggle button event
                 if (this.toggleButton) {
                     this.toggleButton.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -532,14 +530,12 @@
                     });
                 }
                 
-                // Overlay click event
                 if (this.overlay) {
                     this.overlay.addEventListener('click', () => {
                         this.close();
                     });
                 }
                 
-                // Close sidebar when clicking nav links on mobile
                 const navLinks = document.querySelectorAll('.sidebar .nav-link');
                 navLinks.forEach(link => {
                     link.addEventListener('click', () => {
@@ -549,14 +545,12 @@
                     });
                 });
                 
-                // Handle window resize
                 window.addEventListener('resize', () => {
                     if (window.innerWidth >= 992) {
                         this.close();
                     }
                 });
                 
-                // Handle escape key
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape' && this.isOpen) {
                         this.close();
@@ -593,11 +587,9 @@
             }
         }
         
-        // Initialize sidebar toggle when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
             new SidebarToggle();
             
-            // Auto-dismiss alerts after 5 seconds
             setTimeout(function() {
                 const alerts = document.querySelectorAll('.alert');
                 alerts.forEach(function(alert) {
@@ -608,7 +600,6 @@
                 });
             }, 5000);
             
-            // Initialize tooltips for desktop
             if (window.innerWidth >= 992) {
                 var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
                 var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -616,7 +607,6 @@
                 });
             }
 
-            // Add slide-up animation to cards
             const cards = document.querySelectorAll('.card');
             cards.forEach(function(card, index) {
                 setTimeout(function() {
@@ -625,7 +615,6 @@
             });
         });
 
-        // Universal Delete Modal Handler
         document.addEventListener('DOMContentLoaded', function () {
             const confirmDeleteModal = document.getElementById('confirmDeleteModal');
             if (confirmDeleteModal) {

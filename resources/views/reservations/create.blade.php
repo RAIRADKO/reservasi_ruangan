@@ -4,15 +4,14 @@
 
 @section('styles')
 <style>
-    /* Custom styling for facility checkboxes */
     .fasilitas-checklist {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.75rem; /* Space between buttons */
+        gap: 0.75rem;
     }
 
     .fasilitas-item .btn {
-        border-radius: 50px; /* Pill-shaped buttons */
+        border-radius: 50px;
         font-weight: 500;
         transition: all 0.2s ease-in-out;
         display: flex;
@@ -262,7 +261,6 @@ document.addEventListener('DOMContentLoaded', function() {
     roomSelect.addEventListener('change', updateFasilitas);
     updateFasilitas();
 
-    // The rest of your script
     const blockedDates = @json($blockedDates ?? []);
     const tanggalInput = document.getElementById('tanggal');
     const submitButton = document.getElementById('submitButton');

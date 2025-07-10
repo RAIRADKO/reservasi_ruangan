@@ -17,13 +17,10 @@ class CheckRole
         $admin = Auth::guard('admin')->user();
 
         foreach ($roles as $role) {
-            // Jika pengguna memiliki peran yang diizinkan, lanjutkan.
             if ($admin->role == $role) {
                 return $next($request);
             }
         }
-
-        // Jika tidak, kembalikan ke dashboard dengan pesan error.
         return redirect()->route('admin.dashboard')->with('error', 'Anda tidak memiliki akses ke halaman ini.');
     }
 }

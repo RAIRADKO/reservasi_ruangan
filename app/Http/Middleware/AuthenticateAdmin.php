@@ -9,19 +9,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AuthenticateAdmin
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        // Periksa apakah admin sudah login menggunakan guard 'admin'
         if (!Auth::guard('admin')->check()) {
-            // Arahkan ke halaman login admin, bukan login user
             return redirect()->route('admin.login');
         }
-
         return $next($request);
     }
 }

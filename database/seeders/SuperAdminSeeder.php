@@ -13,7 +13,7 @@ class SuperAdminSeeder extends Seeder
         Admin::updateOrCreate(
             ['username' => 'superadmin'],
             [
-                'password' => Hash::make('adminganteng'), // Ganti dengan password yang aman
+                'password' => Hash::make('adminganteng'), 
                 'role'     => 'superadmin',
             ]
         );

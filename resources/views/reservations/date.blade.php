@@ -81,7 +81,6 @@
                         @php
                             $reservationsForRoom = $roomReservations->get($roomItem->id, collect());
 
-                            // Hitung status ruangan
                             $status = 'available';
                             $statusText = 'Tersedia';
                             $icon = 'bi-door-open-fill';
@@ -205,50 +204,45 @@
                                     @php
                                         $startTime = \Carbon\Carbon::parse($reservation->jam_mulai);
                                         $endTime = \Carbon\Carbon::parse($reservation->jam_selesai);
-
                                         $startPosition = (($startTime->hour - $startHour) * 60 + $startTime->minute) / (($endHour - $startHour) * 60);
                                         $duration = $startTime->diffInMinutes($endTime) / (($endHour - $startHour) * 60);
                                         $colorClass = $colors[$index % count($colors)];
-
                                         $ruanganNama = $reservation->roomInfo->nama_ruangan ?? 'N/A';
                                         $jamMulai = date('H:i', strtotime($reservation->jam_mulai));
                                         $jamSelesai = date('H:i', strtotime($reservation->jam_selesai));
                                         $instansi = $reservation->dinas->name ?? 'N/A';
                                     @endphp
-<div class="reservation-block {{ $colorClass }} shadow-sm mb-3 rounded-3 position-relative p-2"
- style="left: {{ $startPosition * 100 }}%;
- width: {{ $duration * 100 }}%;
- min-height: 60px;"
- data-bs-toggle="modal"
- data-bs-target="#reservationModal"
- data-reservation-id="{{ $reservation->id }}"
- data-reservation-nama="{{ $reservation->nama }}"
- data-reservation-instansi="{{ $instansi }}"
- data-reservation-keperluan="{{ $reservation->keperluan }}"
- data-reservation-ruangan="{{ $ruanganNama }}"
- data-reservation-jam-mulai="{{ $jamMulai }}"
- data-reservation-jam-selesai="{{ $jamSelesai }}"
- data-reservation-tanggal="{{ \Carbon\Carbon::parse($reservation->tanggal)->isoFormat('dddd, D MMMM Y') }}"
- data-reservation-durasi="{{ $startTime->diff($endTime)->h }} jam {{ $startTime->diff($endTime)->i }} menit"
- data-reservation-status="Disetujui">
-
- <div class="reservation-content text-white">
- <div class="reservation-title fw-bold">
- <i class="bi bi-person-fill me-1"></i>
- {{ $reservation->nama }}
- </div>
- <div class="reservation-details mt-1">
- <small class="reservation-room d-block opacity-90">
- <i class="bi bi-door-closed-fill me-1"></i>
- {{ Str::limit($ruanganNama, 15) }}
- </small>
- <small class="reservation-time d-block opacity-90">
- <i class="bi bi-clock-fill me-1"></i>
- {{ $jamMulai }} - {{ $jamSelesai }}
- </small>
- </div>
- </div>
- </div>
+                                    <div class="reservation-block {{ $colorClass }} shadow-sm mb-3 rounded-3 position-relative p-2"
+                                         style="left: {{ $startPosition * 100 }}%; width: {{ $duration * 100 }}%; min-height: 60px;"
+                                         data-bs-toggle="modal"
+                                         data-bs-target="#reservationModal"
+                                         data-reservation-id="{{ $reservation->id }}"
+                                         data-reservation-nama="{{ $reservation->nama }}"
+                                         data-reservation-instansi="{{ $instansi }}"
+                                         data-reservation-keperluan="{{ $reservation->keperluan }}"
+                                         data-reservation-ruangan="{{ $ruanganNama }}"
+                                         data-reservation-jam-mulai="{{ $jamMulai }}"
+                                         data-reservation-jam-selesai="{{ $jamSelesai }}"
+                                         data-reservation-tanggal="{{ \Carbon\Carbon::parse($reservation->tanggal)->isoFormat('dddd, D MMMM Y') }}"
+                                         data-reservation-durasi="{{ $startTime->diff($endTime)->h }} jam {{ $startTime->diff($endTime)->i }} menit"
+                                         data-reservation-status="Disetujui">
+                                        <div class="reservation-content text-white">
+                                            <div class="reservation-title fw-bold">
+                                                <i class="bi bi-person-fill me-1"></i>
+                                                {{ $reservation->nama }}
+                                            </div>
+                                            <div class="reservation-details mt-1">
+                                                <small class="reservation-room d-block opacity-90">
+                                                    <i class="bi bi-door-closed-fill me-1"></i>
+                                                    {{ Str::limit($ruanganNama, 15) }}
+                                                </small>
+                                                <small class="reservation-time d-block opacity-90">
+                                                    <i class="bi bi-clock-fill me-1"></i>
+                                                    {{ $jamMulai }} - {{ $jamSelesai }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
                                     @endforeach
                                 </div>
                             </div>

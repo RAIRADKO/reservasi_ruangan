@@ -6,7 +6,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Admin extends Authenticatable
 {
-    // Tentukan guard untuk model ini
     protected $guard = 'admin';
 
     protected $fillable = [

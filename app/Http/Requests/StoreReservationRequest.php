@@ -42,7 +42,6 @@ class StoreReservationRequest extends FormRequest
                 return;
             }
 
-            // Periksa konflik jadwal untuk ruangan yang spesifik
             if (Reservation::hasConflict($tanggal, $jamMulai, $jamSelesai, $roomInfoId)) {
                 $validator->errors()->add('conflict', 'Ruangan sudah dibooking pada jam tersebut. Silakan pilih jam lain.');
             }

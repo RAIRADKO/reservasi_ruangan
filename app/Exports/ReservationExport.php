@@ -12,21 +12,13 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 
 class ReservationExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
     public function collection()
     {
-        // Mengambil semua data reservasi dengan relasi yang dibutuhkan
         return Reservation::with(['user', 'roomInfo', 'dinas'])->orderBy('tanggal', 'desc')->get();
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
-        // Mendefinisikan judul untuk setiap kolom di file Excel
         return [
             'ID',
             'Tanggal Reservasi',
@@ -48,15 +40,8 @@ class ReservationExport implements FromCollection, WithHeadings, WithMapping, Sh
         ];
     }
 
-    /**
-     * @param mixed $reservation
-     *
-     * @return array
-     */
     public function map($reservation): array
     {
-        // ... (logika yang sudah ada)
-
         return [
             $reservation->id,
             $reservation->tanggal->format('d-m-Y'),
@@ -78,12 +63,6 @@ class ReservationExport implements FromCollection, WithHeadings, WithMapping, Sh
         ];
     }
     
-    /**
-     * Memberikan style pada sheet
-     *
-     * @param Worksheet $sheet
-     * @return array
-     */
     public function styles(Worksheet $sheet)
     {
         return [

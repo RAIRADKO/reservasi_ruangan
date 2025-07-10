@@ -26,9 +26,12 @@
                         @enderror
                     </div>
 
-                    <div class="form-floating mb-3">
+                    <div class="form-floating mb-3 position-relative">
                         <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" id="password" placeholder="Password" required>
                         <label for="password"><i class="bi bi-lock me-2"></i>Password</label>
+                        <button type="button" id="togglePassword" tabindex="-1" class="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2" style="z-index: 2;">
+                            <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                        </button>
                         @error('password')
                             <span class="invalid-feedback d-block" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -64,6 +67,18 @@
 
 @section('scripts')
 <script>
-    // Script untuk toggle password visibility jika diperlukan
+    document.addEventListener('DOMContentLoaded', function() {
+        const passwordInput = document.getElementById('password');
+        const togglePassword = document.getElementById('togglePassword');
+        const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                togglePasswordIcon.classList.toggle('bi-eye');
+                togglePasswordIcon.classList.toggle('bi-eye-slash');
+            });
+        }
+    });
 </script>
 @endsection

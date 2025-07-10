@@ -21,8 +21,8 @@ class Reservation extends Model
         'status',
         'rejection_reason',
         'checked_out_at',
-        'satisfaction_rating', // Ditambahkan
-        'feedback', // Ditambahkan
+        'satisfaction_rating', 
+        'feedback', 
     ];
 
     protected $casts = [

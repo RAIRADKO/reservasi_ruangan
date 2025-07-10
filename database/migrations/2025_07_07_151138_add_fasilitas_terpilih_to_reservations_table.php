@@ -12,8 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('reservations', function (Blueprint $table) {
-            // Menambahkan kolom untuk menyimpan fasilitas yang dipilih oleh pengguna, bisa null.
-            // Disimpan sebagai string yang dipisahkan koma.
             $table->text('fasilitas_terpilih')->nullable()->after('keperluan');
         });
     }

@@ -211,7 +211,7 @@
 @section('styles')
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
 <style>
-    /* Calendar Styling - Improved Version */
+    
     .fc {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
@@ -248,7 +248,7 @@
         box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
     }
     
-    /* Day Grid Styling - Enhanced */
+    
     .fc-daygrid-day {
         transition: all 0.3s ease-in-out;
         border: 1px solid #e9ecef !important;
@@ -287,7 +287,7 @@
         justify-content: center;
     }
     
-    /* Blocked Date Styling - More Visual */
+    
     .fc-day-blocked {
         background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
         color: white !important;
@@ -325,7 +325,7 @@
         box-shadow: 0 6px 15px rgba(220, 53, 69, 0.4);
     }
     
-    /* Today Highlight - More Prominent */
+    
     .fc-day-today {
         background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%) !important;
         border: 2px solid #ffc107 !important;
@@ -353,7 +353,7 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
-    /* Weekend Styling - More Distinct */
+    
     .fc-day-sun, .fc-day-sat {
         background: rgba(108, 117, 125, 0.08) !important;
         position: relative;
@@ -379,7 +379,7 @@
         background: #0d6efd;
     }
     
-    /* Fully Booked Styling */
+    
     .fc-day-fully-booked {
         background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%) !important;
         color: #212529 !important;
@@ -398,7 +398,7 @@
         box-shadow: 0 6px 15px rgba(255, 193, 7, 0.4);
     }
     
-    /* Past Dates - More Distinct */
+    
     .fc-day-past .fc-daygrid-day-number {
         color: #adb5bd !important;
         opacity: 0.7;
@@ -412,7 +412,7 @@
         background: #f8f9fa;
     }
     
-    /* Animation for status changes - Smoother */
+    
     @keyframes statusChange {
         0% { transform: scale(1); box-shadow: 0 0 0 rgba(0,0,0,0); }
         50% { transform: scale(1.03); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
@@ -423,13 +423,13 @@
         animation: statusChange 0.4s ease-in-out;
     }
     
-    /* Event Dot Styling */
+    
     .fc-daygrid-event-dot {
         border-color: #0d6efd !important;
         margin-right: 2px;
     }
     
-    /* Responsive Improvements */
+    
     @media (max-width: 768px) {
         .fc-header-toolbar {
             flex-direction: column !important;
@@ -466,7 +466,7 @@
         }
     }
     
-    /* Day Header Styling */
+    
     .fc-col-header-cell {
         padding: 8px 4px !important;
         background: #f1f3f5 !important;
@@ -477,7 +477,7 @@
         color: #495057;
     }
     
-    /* Current Date Indicator */
+    
     .fc-day-today .fc-daygrid-day-number {
         animation: pulse 2s infinite;
     }
@@ -488,7 +488,7 @@
         100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
     }
     
-    /* Event Styling */
+    
     .fc-event {
         font-size: 0.85rem;
         padding: 2px 4px;

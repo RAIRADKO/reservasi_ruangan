@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('reservations', function (Blueprint $table) {
-            // Menambahkan foreign key ke tabel room_infos
             $table->foreignId('room_info_id')->after('user_id')->constrained()->onDelete('cascade');
         });
     }
@@ -23,7 +22,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('reservations', function (Blueprint $table) {
-            // Menghapus foreign key dan kolom
             $table->dropForeign(['room_info_id']);
             $table->dropColumn('room_info_id');
         });

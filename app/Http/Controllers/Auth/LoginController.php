@@ -19,17 +19,13 @@ class LoginController extends Controller
             'nip' => ['required', 'string'],
             'password' => ['required'],
         ]);
-
         $remember = $request->filled('remember');
-
         $credentialsUser = [
             'nip' => $request->nip,
             'password' => $request->password,
         ];
-
         if (Auth::guard('web')->attempt($credentialsUser, $remember)) {
             $user = Auth::guard('web')->user();
-
             if ($user->status !== 'approved') {
                 $status = $user->status;
                 Auth::guard('web')->logout();
@@ -41,21 +37,17 @@ class LoginController extends Controller
                     'nip' => $errorMessage,
                 ])->withInput($request->only('nip', 'remember'));
             }
-
             $request->session()->regenerate();
             return redirect()->intended('/');
         }
-
         $credentialsAdmin = [
             'username' => $request->nip,
             'password' => $request->password,
         ];
-
         if (Auth::guard('admin')->attempt($credentialsAdmin, $remember)) {
             $request->session()->regenerate();
             return redirect()->intended(route('admin.dashboard'));
         }
-
         return back()->withErrors([
             'nip' => 'NIP/Username atau password yang Anda masukkan salah.',
         ])->withInput($request->only('nip'));
@@ -67,11 +59,8 @@ class LoginController extends Controller
         } else {
             Auth::guard('web')->logout();
         }
-
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
-
         return redirect('/');
     }
 }

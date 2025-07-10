@@ -6,16 +6,15 @@ use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php', // Baris ini secara otomatis menerapkan middleware 'web'
+        web: __DIR__.'/../routes/web.php', 
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Daftarkan alias middleware di sini
         $middleware->alias([
             'admin' => \App\Http\Middleware\AuthenticateAdmin::class,
             'role' => \App\Http\Middleware\CheckRole::class,
-            'visitor' => \App\Http\Middleware\LogVisitor::class, // Tambahkan ini
+            'visitor' => \App\Http\Middleware\LogVisitor::class, 
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

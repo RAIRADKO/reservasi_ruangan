@@ -10,39 +10,28 @@ use Carbon\Carbon;
 
 class SendCheckoutReminders extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'reservations:send-checkout-reminders';
+    protected $description = 'Periksa reservasi yang sudah selesai tapi belum check-out, kirim pengingat, dan lakukan check-out otomatis.';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Periksa reservasi yang sudah selesai tapi belum check-out dan kirim pengingat.';
-
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
-        $this->info('Mulai memeriksa reservasi yang terlambat check out...');
+        $this->info('Mulai memeriksa reservasi...');
+        $this->handleAutomaticCheckouts();
+        $this->handleCheckoutReminders();
+        $this->info('Pemeriksaan reservasi selesai.');
+    }
 
-        // Waktu sekarang dikurangi 15 menit
+    private function handleCheckoutReminders()
+    {
+        $this->info('Memeriksa reservasi yang terlambat check out untuk pengingat...');
         $fifteenMinutesAgo = Carbon::now()->subMinutes(15);
-
-        // Cari reservasi yang:
-        // 1. Statusnya 'approved'
-        // 2. Waktu berakhirnya (tanggal + jam_selesai) sudah lewat dari 15 menit yang lalu
-        // 3. Belum melakukan check-out (checked_out_at masih null)
+        $twentyFourHoursAgo = Carbon::now()->subHours(12);
         $overdueReservations = Reservation::with('user', 'roomInfo')
             ->where('status', Reservation::STATUS_APPROVED)
             ->whereNull('checked_out_at')
-            ->where(function ($query) use ($fifteenMinutesAgo) {
-                $query->whereRaw("TIMESTAMP(tanggal, jam_selesai) <= ?", [$fifteenMinutesAgo]);
+            ->where(function ($query) use ($fifteenMinutesAgo, $twentyFourHoursAgo) {
+                $query->whereRaw("TIMESTAMP(tanggal, jam_selesai) <= ?", [$fifteenMinutesAgo])
+                      ->whereRaw("TIMESTAMP(tanggal, jam_selesai) > ?", [$twentyFourHoursAgo]);
             })
             ->get();
 
@@ -51,7 +40,7 @@ class SendCheckoutReminders extends Command
             return;
         }
 
-        $this->info("Ditemukan {$overdueReservations->count()} reservasi yang terlambat check out. Mengirim email...");
+        $this->info("Ditemukan {$overdueReservations->count()} reservasi yang terlambat. Mengirim email pengingat...");
 
         foreach ($overdueReservations as $reservation) {
             if ($reservation->user && $reservation->user->email) {
@@ -63,7 +52,35 @@ class SendCheckoutReminders extends Command
                 }
             }
         }
+    }
 
-        $this->info('Selesai mengirim semua pengingat.');
+    private function handleAutomaticCheckouts()
+    {
+        $this->info('Memeriksa reservasi untuk check-out otomatis...');
+        $twentyFourHoursAgo = Carbon::now()->subHours(12);
+        $autoCheckoutReservations = Reservation::with('user', 'roomInfo')
+            ->where('status', Reservation::STATUS_APPROVED)
+            ->whereNull('checked_out_at')
+            ->where(function ($query) use ($twentyFourHoursAgo) {
+                $query->whereRaw("TIMESTAMP(tanggal, jam_selesai) <= ?", [$twentyFourHoursAgo]);
+            })
+            ->get();
+
+        if ($autoCheckoutReservations->isEmpty()) {
+            $this->info('Tidak ada reservasi yang perlu di-check-out otomatis.');
+            return;
+        }
+
+        $this->info("Ditemukan {$autoCheckoutReservations->count()} reservasi yang akan di-check-out otomatis.");
+
+        foreach ($autoCheckoutReservations as $reservation) {
+            $reservation->update([
+                'status' => Reservation::STATUS_COMPLETED,
+                'checked_out_at' => now(),
+                'satisfaction_rating' => 5,
+                'feedback' => 'Check-out otomatis oleh sistem setelah 12 jam.'
+            ]);
+            $this->info("Reservasi #{$reservation->id} telah di-check-out secara otomatis.");
+        }
     }
 }

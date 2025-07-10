@@ -56,9 +56,12 @@
                         @enderror
                     </div>
                     
-                    <div class="form-floating mb-3">
+                    <div class="form-floating mb-3 position-relative">
                         <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password" placeholder="Password">
                         <label for="password"><i class="bi bi-lock me-2"></i>Password</label>
+                        <button type="button" id="togglePassword" tabindex="-1" class="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2" style="z-index: 2;">
+                            <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                        </button>
                     </div>
                     
                     {{-- Password Criteria Checklist --}}
@@ -69,9 +72,12 @@
                         <div id="symbol" class="criteria-item invalid"><i class="bi bi-x-circle me-2"></i>Satu simbol unik</div>
                     </div>
                     
-                    <div class="form-floating mb-3">
+                    <div class="form-floating mb-3 position-relative">
                         <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password" placeholder="Konfirmasi Password">
                         <label for="password-confirm"><i class="bi bi-lock-fill me-2"></i>Konfirmasi Password</label>
+                        <button type="button" id="togglePasswordConfirm" tabindex="-1" class="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2" style="z-index: 2;">
+                            <i class="bi bi-eye" id="togglePasswordConfirmIcon"></i>
+                        </button>
                     </div>
 
                     <div class="d-grid mt-4">
@@ -96,10 +102,10 @@
         transition: all 0.3s ease;
     }
     .criteria-item.invalid {
-        color: #dc3545; /* Merah untuk tidak valid */
+        color: #dc3545;
     }
     .criteria-item.valid {
-        color: #198754; /* Hijau untuk valid */
+        color: #198754;
         text-decoration: line-through;
     }
     .criteria-item .bi-x-circle {
@@ -112,10 +118,64 @@
 @endsection
 
 @section('scripts')
-<script>
 document.addEventListener('DOMContentLoaded', function () {
     const passwordInput = document.getElementById('password');
     
+    const lengthCheck = document.getElementById('length');
+    const uppercaseCheck = document.getElementById('uppercase');
+    const numberCheck = document.getElementById('number');
+    const symbolCheck = document.getElementById('symbol');
+
+    passwordInput.addEventListener('input', function() {
+        const value = this.value;
+        updateCriteria(lengthCheck, value.length >= 8);
+        updateCriteria(uppercaseCheck, /[A-Z]/.test(value));
+        updateCriteria(numberCheck, /[0-9]/.test(value));
+        updateCriteria(symbolCheck, /[^A-Za-z0-9]/.test(value));
+    });
+
+    function updateCriteria(element, isValid) {
+        const icon = element.querySelector('i');
+        if (isValid) {
+            element.classList.remove('invalid');
+            element.classList.add('valid');
+            icon.classList.remove('bi-x-circle');
+            icon.classList.add('bi-check-circle-fill');
+        } else {
+            element.classList.remove('valid');
+            element.classList.add('invalid');
+            icon.classList.remove('bi-check-circle-fill');
+            icon.classList.add('bi-x-circle');
+        }
+    }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const passwordInput = document.getElementById('password');
+    const passwordConfirmInput = document.getElementById('password-confirm');
+    const togglePassword = document.getElementById('togglePassword');
+    const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+    const togglePasswordConfirm = document.getElementById('togglePasswordConfirm');
+    const togglePasswordConfirmIcon = document.getElementById('togglePasswordConfirmIcon');
+
+    if (togglePassword && passwordInput) {
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            togglePasswordIcon.classList.toggle('bi-eye');
+            togglePasswordIcon.classList.toggle('bi-eye-slash');
+        });
+    }
+    if (togglePasswordConfirm && passwordConfirmInput) {
+        togglePasswordConfirm.addEventListener('click', function() {
+            const type = passwordConfirmInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordConfirmInput.setAttribute('type', type);
+            togglePasswordConfirmIcon.classList.toggle('bi-eye');
+            togglePasswordConfirmIcon.classList.toggle('bi-eye-slash');
+        });
+    }
+
     const lengthCheck = document.getElementById('length');
     const uppercaseCheck = document.getElementById('uppercase');
     const numberCheck = document.getElementById('number');

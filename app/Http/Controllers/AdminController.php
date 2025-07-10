@@ -22,9 +22,6 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class AdminController extends Controller
 {
-    /**
-     * Menampilkan dashboard admin dengan data statistik utama.
-     */
     public function dashboard()
     {
         $pendingCount = Reservation::where('status', Reservation::STATUS_PENDING)->count();
@@ -40,9 +37,6 @@ class AdminController extends Controller
         return view('admin.dashboard', compact('pendingCount', 'approvedCount', 'completedCount', 'reservations', 'userCount'));
     }
 
-    /**
-     * Menampilkan daftar semua reservasi.
-     */
     public function reservations()
     {
         $reservations = Reservation::with(['user', 'roomInfo', 'dinas'])
@@ -52,18 +46,12 @@ class AdminController extends Controller
         return view('admin.reservations.index', compact('reservations'));
     }
 
-    /**
-     * Menangani permintaan untuk mengekspor data reservasi ke file Excel.
-     */
     public function exportReservations()
     {
         $fileName = 'laporan-riwayat-reservasi-' . date('Y-m-d') . '.xlsx';
         return Excel::download(new ReservationExport(), $fileName);
     }
 
-    /**
-     * Memperbarui status reservasi.
-     */
     public function updateStatus(Request $request, Reservation $reservation)
     {
         $request->validate([
@@ -96,35 +84,23 @@ class AdminController extends Controller
         return back()->with('success', 'Status reservasi berhasil diperbarui.');
     }
 
-    /**
-     * Menghapus data reservasi.
-     */
     public function destroy(Reservation $reservation)
     {
         $reservation->delete();
         return back()->with('success', 'Reservasi berhasil dihapus.');
     }
 
-    /**
-     * Menampilkan daftar ruangan.
-     */
     public function roomIndex()
     {
         $rooms = RoomInfo::paginate(10);
         return view('admin.room.index', compact('rooms'));
     }
 
-    /**
-     * Menampilkan form untuk membuat ruangan baru.
-     */
     public function roomCreate()
     {
         return view('admin.room.create');
     }
 
-    /**
-     * Menyimpan ruangan baru ke database.
-     */
     public function roomStore(Request $request)
     {
         $request->validate([
@@ -147,17 +123,11 @@ class AdminController extends Controller
         return redirect()->route('admin.room.index')->with('success', 'Ruangan baru berhasil ditambahkan.');
     }
     
-    /**
-     * Menampilkan form untuk mengedit informasi ruangan.
-     */
     public function roomEdit(RoomInfo $room)
     {
         return view('admin.room.edit', compact('room'));
     }
 
-    /**
-     * Memperbarui informasi ruangan di database.
-     */
     public function roomUpdate(Request $request, RoomInfo $room)
     {
         $request->validate([
@@ -183,9 +153,6 @@ class AdminController extends Controller
         return redirect()->route('admin.room.index')->with('success', 'Informasi ruangan berhasil diperbarui.');
     }
 
-    /**
-     * Menghapus ruangan dari database.
-     */
     public function roomDestroy(RoomInfo $room)
     {
         if ($room->foto) {
@@ -195,18 +162,12 @@ class AdminController extends Controller
         return redirect()->route('admin.room.index')->with('success', 'Ruangan berhasil dihapus.');
     }
 
-    /**
-     * Menampilkan halaman manajemen kalender.
-     */
     public function showCalendarManagement()
     {
         $blockedDates = BlockedDate::pluck('date')->map(fn ($date) => $date->format('Y-m-d'));
         return view('admin.calendar.management', compact('blockedDates'));
     }
 
-    /**
-     * Menyimpan tanggal yang diblokir.
-     */
     public function storeBlockedDate(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -221,9 +182,6 @@ class AdminController extends Controller
         return response()->json(['message' => 'Tanggal berhasil diblokir.']);
     }
 
-    /**
-     * Menghapus tanggal yang diblokir.
-     */
     public function destroyBlockedDate(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -238,26 +196,17 @@ class AdminController extends Controller
         return response()->json(['message' => 'Blokir tanggal berhasil dibuka.']);
     }
 
-    /**
-     * Menampilkan daftar dinas/instansi.
-     */
     public function dinasIndex()
     {
         $dinas = Dinas::withCount('reservations')->orderBy('name')->paginate(10);
         return view('admin.dinas.index', ['dinas' => $dinas]);
     }
 
-    /**
-     * Menampilkan form untuk membuat dinas baru.
-     */
     public function dinasCreate()
     {
         return view('admin.dinas.create');
     }
 
-    /**
-     * Menyimpan dinas baru ke database.
-     */
     public function dinasStore(Request $request)
     {
         $request->validate(['name' => 'required|string|max:255|unique:dinas,name']);
@@ -265,17 +214,11 @@ class AdminController extends Controller
         return redirect()->route('admin.dinas.index')->with('success', 'Instansi/Dinas berhasil ditambahkan.');
     }
     
-    /**
-     * Menampilkan form untuk mengedit dinas.
-     */
     public function dinasEdit(Dinas $dina)
     {
         return view('admin.dinas.edit', compact('dina'));
     }
 
-    /**
-     * Memperbarui data dinas di database.
-     */
     public function dinasUpdate(Request $request, Dinas $dina)
     {
         $request->validate(['name' => ['required', 'string', 'max:255', Rule::unique('dinas')->ignore($dina->id)]]);
@@ -283,9 +226,6 @@ class AdminController extends Controller
         return redirect()->route('admin.dinas.index')->with('success', 'Informasi Instansi/Dinas berhasil diperbarui.');
     }
 
-    /**
-     * Menghapus dinas dari database.
-     */
     public function dinasDestroy(Dinas $dina)
     {
         if ($dina->reservations()->exists()) {
@@ -295,26 +235,17 @@ class AdminController extends Controller
         return redirect()->route('admin.dinas.index')->with('success', 'Instansi/Dinas berhasil dihapus.');
     }
 
-    /**
-     * Menampilkan daftar pengguna.
-     */
     public function usersIndex()
     {
         $users = User::paginate(10);
         return view('admin.users.index', compact('users'));
     }
 
-    /**
-     * Menampilkan form untuk membuat pengguna baru.
-     */
     public function usersCreate()
     {
         return view('admin.users.create');
     }
 
-    /**
-     * Menyimpan pengguna baru ke database.
-     */
     public function usersStore(Request $request)
     {
         $request->validate([
@@ -334,17 +265,11 @@ class AdminController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Pengguna baru berhasil ditambahkan.');
     }
 
-    /**
-     * Menampilkan form untuk mengedit pengguna.
-     */
     public function usersEdit(User $user)
     {
         return view('admin.users.edit', compact('user'));
     }
 
-    /**
-     * Memperbarui data pengguna di database.
-     */
     public function usersUpdate(Request $request, User $user)
     {
         $request->validate([
@@ -363,18 +288,12 @@ class AdminController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Data pengguna berhasil diperbarui.');
     }
 
-    /**
-     * Menghapus pengguna dari database.
-     */
     public function usersDestroy(User $user)
     {
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil dihapus.');
     }
 
-    /**
-     * Menyetujui registrasi pengguna.
-     */
     public function approveUser(User $user)
     {
         if ($user->status !== 'approved') {
@@ -387,9 +306,6 @@ class AdminController extends Controller
         return back()->with('success', 'Pengguna ' . $user->name . ' telah disetujui.');
     }
 
-    /**
-     * Reject a user registration.
-     */
     public function rejectUser(User $user)
     {
         $user->update(['status' => 'rejected']);
@@ -397,9 +313,6 @@ class AdminController extends Controller
         return back()->with('success', 'Pengguna ' . $user->name . ' telah ditolak.');
     }
 
-    /**
-     * Menampilkan halaman laporan statistik.
-     */
     public function reports()
     {
         $todayVisitors = Reservation::where('status', Reservation::STATUS_APPROVED)
