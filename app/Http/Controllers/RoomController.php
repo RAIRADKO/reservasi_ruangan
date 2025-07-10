@@ -14,8 +14,26 @@ class RoomController extends Controller
     public function index()
     {
         $rooms = RoomInfo::all();
-        $room = RoomInfo::firstOrFail(); 
+        // --- PERBAIKAN: Mengganti firstOrFail() dengan first() ---
+        // Ini mencegah error 404 jika tabel room_infos masih kosong.
+        $room = $rooms->first();
         $totalRooms = $rooms->count();
+
+        // --- PENGAMAN: Menangani kasus jika tidak ada ruangan sama sekali ---
+        // Jika belum ada data ruangan, halaman home akan tetap tampil dengan data kosong.
+        if (!$room) {
+            return view('home', [
+                'room' => null,
+                'rooms' => collect(), // Mengirim collection kosong
+                'reservationDates' => [],
+                'manualBlockedDates' => [],
+                'fullDates' => [],
+                'todayVisitors' => Visitor::whereDate('visit_date', today())->count(),
+                'monthlyVisitors' => Visitor::whereMonth('visit_date', today()->month)->whereYear('visit_date', today()->year)->count(),
+                'totalVisitors' => Visitor::count(),
+                'todayEvents' => collect() // Mengirim collection kosong
+            ]);
+        }
 
         // Jam operasional dari config
         $operatingStart = Carbon::parse(config('room.operating_hours.start', '08:00'));
