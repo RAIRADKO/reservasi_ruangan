@@ -85,6 +85,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/reservations', [AdminController::class, 'reservations'])->name('reservations.index');
+    Route::get('/reports', [AdminController::class, 'reports'])->name('reports.index');
 
     // Route untuk export data reservasi ke Excel
     Route::get('/reservations/export', [AdminController::class, 'exportReservations'])->name('reservations.export');

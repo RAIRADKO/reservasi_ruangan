@@ -395,6 +395,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}"
+                                href="{{ route('admin.reports.index') }}">
+                                <i class="bi bi-graph-up me-2"></i>
+                                Laporan
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.reservations.*') ? 'active' : '' }}" 
                             href="{{ route('admin.reservations.index') }}">
                                 <i class="bi bi-journal-text me-2"></i>
