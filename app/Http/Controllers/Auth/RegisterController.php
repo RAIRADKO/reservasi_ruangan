@@ -10,10 +10,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NewUserRegisteredAdminNotification; // Tambahkan ini
 
 class RegisterController extends Controller
 {
-    protected $redirectTo = '/';
+    // Redirect ke halaman pending setelah registrasi
+    protected $redirectTo = '/pending';
 
     /**
      * Display the registration view.
@@ -42,6 +45,12 @@ class RegisterController extends Controller
         ]);
     }
 
+    /**
+     * Create a new user instance after a valid registration.
+     *
+     * @param  array  $data
+     * @return \App\Models\User
+     */
     protected function create(array $data)
     {
         return User::create([
@@ -50,7 +59,7 @@ class RegisterController extends Controller
             'nip' => $data['nip'],
             'kontak' => $data['kontak'],
             'password' => Hash::make($data['password']),
-            'status' => 'pending',
+            'status' => 'pending', // Status diubah menjadi pending
         ]);
     }
 
@@ -65,6 +74,12 @@ class RegisterController extends Controller
         $this->validator($request->all())->validate();
 
         event(new Registered($user = $this->create($request->all())));
+
+        // Kirim email notifikasi ke admin
+        $adminEmail = config('mail.admin_address');
+        if ($adminEmail) {
+            Mail::to($adminEmail)->send(new NewUserRegisteredAdminNotification($user));
+        }
 
         Auth::login($user);
 

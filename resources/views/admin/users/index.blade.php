@@ -20,6 +20,7 @@
                             <th>Nama</th>
                             <th>NIP</th>
                             <th class="d-none d-md-table-cell">Email</th>
+                            <th class="text-center">Status</th>
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -29,8 +30,25 @@
                             <td>{{ $user->name }}</td>
                             <td class="small">{{ $user->formatted_nip }}</td>
                             <td class="d-none d-md-table-cell small">{{ $user->email }}</td>
+                             <td class="text-center">
+                                <span class="badge bg-{{ $user->status == 'approved' ? 'success' : ($user->status == 'pending' ? 'warning' : 'danger') }}">
+                                    {{ ucfirst($user->status) }}
+                                </span>
+                            </td>
                             <td>
                                 <div class="d-flex flex-column flex-md-row gap-2 justify-content-center">
+                                    @if($user->status === 'pending')
+                                    <form action="{{ route('admin.users.approve', $user) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="btn btn-success btn-sm flex-grow-1 w-100">Approve</button>
+                                    </form>
+                                     <form action="{{ route('admin.users.reject', $user) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="btn btn-secondary btn-sm flex-grow-1 w-100">Reject</button>
+                                    </form>
+                                    @endif
                                     <a href="{{ route('admin.users.edit', $user->id) }}" 
                                        class="btn btn-warning btn-sm flex-grow-1">
                                         <i class="bi bi-pencil-fill me-1 d-none d-md-inline"></i> Edit
@@ -47,7 +65,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="4" class="text-center py-4">
+                            <td colspan="5" class="text-center py-4">
                                 Tidak ada data pengguna.
                             </td>
                         </tr>

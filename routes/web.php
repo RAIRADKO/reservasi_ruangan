@@ -66,6 +66,10 @@ Route::middleware('auth')->group(function () {
     // == PERBAIKAN DI DUA BARIS DI BAWAH INI ==
     Route::get('/reservations/{reservation}/checkout', [UserController::class, 'showCheckoutForm'])->name('user.reservations.checkout');
     Route::post('/reservations/{reservation}/complete', [UserController::class, 'completeCheckout'])->name('user.reservations.complete');
+    
+    Route::get('/pending', function () {
+        return view('auth.pending');
+    })->name('pending');
 });
 
 
@@ -121,4 +125,6 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::get('users/{user}/edit', [AdminController::class, 'usersEdit'])->name('users.edit');
     Route::put('users/{user}', [AdminController::class, 'usersUpdate'])->name('users.update');
     Route::delete('users/{user}', [AdminController::class, 'usersDestroy'])->name('users.destroy');
+    Route::put('users/{user}/approve', [AdminController::class, 'approveUser'])->name('users.approve');
+    Route::put('users/{user}/reject', [AdminController::class, 'rejectUser'])->name('users.reject');
 });

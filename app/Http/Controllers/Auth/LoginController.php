@@ -15,7 +15,6 @@ class LoginController extends Controller
     }
     public function login(Request $request)
     {
-        // 1. Validasi form input
         $request->validate([
             'nip' => ['required', 'string'],
             'password' => ['required'],
@@ -23,21 +22,23 @@ class LoginController extends Controller
 
         $remember = $request->filled('remember');
 
-        // Kredensial untuk user biasa (berdasarkan NIP)
         $credentialsUser = [
             'nip' => $request->nip,
             'password' => $request->password,
         ];
 
-        // 2. Coba autentikasi sebagai user biasa
         if (Auth::guard('web')->attempt($credentialsUser, $remember)) {
             $user = Auth::guard('web')->user();
 
-            // 2a. Cek apakah akun user sudah disetujui
             if ($user->status !== 'approved') {
+                $status = $user->status;
                 Auth::guard('web')->logout();
-                return back()->withErrors([
-                    'nip' => 'Akun Anda belum disetujui oleh admin.',
+                $errorMessage = 'Akun Anda belum disetujui oleh admin.';
+                if ($status === 'rejected') {
+                    $errorMessage = 'Pendaftaran akun Anda ditolak oleh admin.';
+                }
+                 return back()->withErrors([
+                    'nip' => $errorMessage,
                 ])->withInput($request->only('nip', 'remember'));
             }
 
@@ -45,7 +46,6 @@ class LoginController extends Controller
             return redirect()->intended('/');
         }
 
-        // 3. Jika gagal, coba autentikasi sebagai admin (berdasarkan username dari kolom NIP)
         $credentialsAdmin = [
             'username' => $request->nip,
             'password' => $request->password,
@@ -56,14 +56,12 @@ class LoginController extends Controller
             return redirect()->intended(route('admin.dashboard'));
         }
 
-        // 4. Jika keduanya gagal, kembalikan dengan pesan error
         return back()->withErrors([
             'nip' => 'NIP/Username atau password yang Anda masukkan salah.',
         ])->withInput($request->only('nip'));
     }
     public function logout(Request $request)
     {
-        // Logout dari guard manapun yang sedang aktif
         if (Auth::guard('admin')->check()) {
             Auth::guard('admin')->logout();
         } else {

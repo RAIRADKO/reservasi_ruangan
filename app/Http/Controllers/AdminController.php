@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\ReservationExport;
 use App\Mail\ReservationApprovedUserNotification;
 use App\Mail\ReservationRejectedUserNotification;
+use App\Mail\UserApprovedNotification; 
 use App\Models\BlockedDate;
 use App\Models\Dinas;
 use App\Models\Reservation;
@@ -369,6 +370,31 @@ class AdminController extends Controller
     {
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil dihapus.');
+    }
+
+    /**
+     * Menyetujui registrasi pengguna.
+     */
+    public function approveUser(User $user)
+    {
+        if ($user->status !== 'approved') {
+            $user->update(['status' => 'approved']);
+            
+            // Kirim email notifikasi ke pengguna
+            Mail::to($user->email)->send(new UserApprovedNotification($user));
+        }
+
+        return back()->with('success', 'Pengguna ' . $user->name . ' telah disetujui.');
+    }
+
+    /**
+     * Reject a user registration.
+     */
+    public function rejectUser(User $user)
+    {
+        $user->update(['status' => 'rejected']);
+        // Anda bisa menambahkan notifikasi email penolakan ke user di sini jika diperlukan
+        return back()->with('success', 'Pengguna ' . $user->name . ' telah ditolak.');
     }
 
     /**
