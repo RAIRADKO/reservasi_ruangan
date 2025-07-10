@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('reservations', function (Blueprint $table) {
-            // Menambahkan kolom untuk menyimpan alasan penolakan, bisa null.
             $table->text('rejection_reason')->nullable()->after('status');
         });
     }
