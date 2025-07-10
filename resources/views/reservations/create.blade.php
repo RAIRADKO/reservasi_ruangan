@@ -52,18 +52,18 @@
                         </div>
                     </div>
                     
-                    <div class="col-md-6 mb-3">
-                        <label for="kontak" class="form-label">Nomor Kontak</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-phone"></i></span>
-                            <input type="text" class="form-control" id="kontak" name="kontak" value="{{ old('kontak') }}" 
-                                   placeholder="081234567890" required>
-                        </div>
-                        <div class="form-text">Format: 08xxxxxxxxxx</div>
-                        @error('kontak')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                        @enderror
+                <div class="col-md-6 mb-3">
+                    <label for="kontak" class="form-label">Nomor Kontak</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-phone"></i></span>
+                        <input type="text" class="form-control" id="kontak" name="kontak" value="{{ old('kontak', Auth::user()->kontak) }}" placeholder="081234567890" required>
                     </div>
+                    <div class="form-text">Format: 08xxxxxxxxxx</div>
+                    @error('kontak')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+
                 </div>
                 
                 <div class="mb-3">
