@@ -406,6 +406,8 @@
         </div>
     </div>
 
+    {{-- Today's Events - Only show when logged in --}}
+    @auth
     <div class="col-md-6">
         <div class="card h-100 shadow-sm">
             <div class="card-header bg-white py-3 border-bottom">
@@ -442,6 +444,42 @@
             </div>
         </div>
     </div>
+    @else
+    {{-- Additional content for non-logged in users --}}
+    <div class="col-md-6">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-shield-check me-2 text-success"></i>
+                    Keamanan & Privasi
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center py-3">
+                    <i class="bi bi-shield-lock display-4 text-success mb-3"></i>
+                    <h6 class="fw-bold mb-3">Data Anda Aman</h6>
+                    <p class="text-muted mb-4">
+                        Sistem CommandBook menggunakan enkripsi tingkat tinggi untuk melindungi data dan informasi reservasi Anda.
+                    </p>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="bg-light p-3 rounded">
+                                <i class="bi bi-lock text-success mb-2"></i>
+                                <small class="d-block text-muted">SSL Encryption</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-light p-3 rounded">
+                                <i class="bi bi-eye-slash text-success mb-2"></i>
+                                <small class="d-block text-muted">Private Access</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endauth
 </div>
 
 <div class="card mt-4 shadow-sm">
@@ -525,6 +563,8 @@
     </div>
 </div>
 
+{{-- Calendar - Only show when logged in --}}
+@auth
 <div class="card mt-4 shadow-sm">
     <div class="card-header bg-white py-3 border-bottom">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
@@ -555,9 +595,11 @@
         </div>
     </div>
 </div>
+@endauth
 @endsection
 
 @section('scripts')
+@auth
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/id.js"></script>
 <script>
@@ -648,4 +690,5 @@
         })
     });
 </script>
+@endauth
 @endsection
