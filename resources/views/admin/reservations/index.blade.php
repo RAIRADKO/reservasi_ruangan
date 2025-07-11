@@ -75,6 +75,18 @@
                                     <i class="bi bi-x-lg d-md-none"></i>
                                 </button>
                             @endif
+
+                            {{-- Tombol Check Out hanya untuk reservasi oleh admin --}}
+                            @if($reservation->status == 'approved' && $reservation->admin_id)
+                                <form method="POST" action="{{ route('admin.reservations.checkout', $reservation->id) }}" class="d-grid">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="btn btn-sm btn-info">
+                                        <span class="d-none d-md-inline">Check Out</span>
+                                        <i class="bi bi-check-lg d-md-none"></i>
+                                    </button>
+                                </form>
+                            @endif
                             
                             {{-- Tombol Hapus --}}
                             <button type="button" class="btn btn-sm btn-outline-danger" 

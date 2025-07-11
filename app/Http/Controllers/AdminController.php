@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
@@ -180,6 +180,24 @@ class AdminController extends Controller
     {
         $reservation->delete();
         return back()->with('success', 'Reservasi berhasil dihapus.');
+    }
+
+    public function checkout(Reservation $reservation)
+    {
+        if ($reservation->admin_id === null) {
+            return back()->with('error', 'Hanya reservasi yang dibuat oleh admin yang bisa di-checkout dari halaman ini.');
+        }
+
+        if ($reservation->status !== Reservation::STATUS_APPROVED) {
+            return back()->with('error', 'Hanya reservasi yang disetujui yang bisa di-checkout.');
+        }
+
+        $reservation->update([
+            'status' => Reservation::STATUS_COMPLETED,
+            'checked_out_at' => now(),
+        ]);
+
+        return back()->with('success', 'Reservasi berhasil di-checkout.');
     }
 
     public function roomIndex()

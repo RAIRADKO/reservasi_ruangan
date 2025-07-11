@@ -97,6 +97,7 @@ Route::prefix('admin')->name('admin.')->middleware(['admin', 'role:admin,superad
     // Manajemen Reservasi
     Route::get('/reservations', [AdminController::class, 'reservations'])->name('reservations.index');
     Route::put('/reservations/{reservation}/update-status', [AdminController::class, 'updateStatus'])->name('reservations.update-status');
+    Route::patch('/reservations/{reservation}/checkout', [AdminController::class, 'checkout'])->name('reservations.checkout');
     Route::delete('/reservations/{reservation}', [AdminController::class, 'destroy'])->name('reservations.destroy');
 
     // Manajemen Ruangan
