@@ -89,10 +89,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
 // Grup untuk semua yang bisa diakses oleh admin dan superadmin
 Route::prefix('admin')->name('admin.')->middleware(['admin', 'role:admin,superadmin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-    
+
+    // Route baru untuk membuat reservasi oleh admin
+    Route::get('/reservations/create', [AdminController::class, 'showReservationForm'])->name('reservations.create');
+    Route::post('/reservations', [AdminController::class, 'storeReservation'])->name('reservations.store');
+
     // Manajemen Reservasi
     Route::get('/reservations', [AdminController::class, 'reservations'])->name('reservations.index');
     Route::put('/reservations/{reservation}/update-status', [AdminController::class, 'updateStatus'])->name('reservations.update-status');
+    Route::put('/reservations/{reservation}/checkout', [AdminController::class, 'checkoutReservation'])->name('reservations.checkout'); // <-- ROUTE BARU
     Route::delete('/reservations/{reservation}', [AdminController::class, 'destroy'])->name('reservations.destroy');
 
     // Manajemen Ruangan

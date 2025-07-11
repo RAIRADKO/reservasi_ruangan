@@ -17,12 +17,40 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-
 use Illuminate\Validation\Rule;
-
 use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Requests\StoreReservationRequest; // <-- BARIS INI DITAMBAHKAN
 
 class AdminController extends Controller
+
+    public function checkoutReservation(Request $request, Reservation $reservation)
+    {
+        $admin = auth()->guard('admin')->user();
+        
+        // Pengecekan otorisasi: pastikan admin dapat mengelola reservasi ini
+        if ($admin->role !== 'superadmin' && $reservation->roomInfo->instansi_id !== $admin->instansi_id) {
+            return back()->with('error', 'Anda tidak memiliki hak untuk melakukan check-out pada reservasi ini.');
+        }
+
+        // Pengecekan logika: pastikan reservasi dalam status yang bisa di-checkout
+        $endTime = Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai);
+        if ($reservation->status !== Reservation::STATUS_APPROVED || $endTime->isFuture()) {
+            return back()->with('error', 'Reservasi ini belum dapat di-checkout.');
+        }
+        
+        if ($reservation->checked_out_at) {
+            return back()->with('error', 'Reservasi ini sudah di-checkout sebelumnya.');
+        }
+
+        // Lakukan proses checkout
+        $reservation->update([
+            'status' => Reservation::STATUS_COMPLETED,
+            'checked_out_at' => now(),
+            'feedback' => 'Checked out by admin: ' . $admin->username, // Catatan checkout oleh admin
+        ]);
+
+        return back()->with('success', 'Reservasi untuk ' . $reservation->nama . ' berhasil di-checkout.');
+    }
 {
     public function adminIndex()
     {
@@ -476,5 +504,47 @@ class AdminController extends Controller
             'reservationsByRoom',
             'reservationsByDinas'
         ));
+    }
+
+    public function showReservationForm()
+    {
+        $admin = auth()->guard('admin')->user();
+        $roomsQuery = RoomInfo::query();
+
+        // Filter ruangan berdasarkan instansi admin
+        if ($admin->role !== 'superadmin') {
+            $roomsQuery->where('instansi_id', $admin->instansi_id);
+        }
+
+        $rooms = $roomsQuery->get();
+        $blockedDates = BlockedDate::pluck('date')->map->format('Y-m-d')->toArray();
+        $dinas = Dinas::orderBy('name')->get();
+
+        return view('admin.reservations.create', compact('rooms', 'blockedDates', 'dinas', 'admin'));
+    }
+
+    public function storeReservation(StoreReservationRequest $request)
+    {
+        $validatedData = $request->validated();
+        $admin = auth()->guard('admin')->user();
+        
+        $reservationData = [
+            'admin_id' => $admin->id, // Menyimpan ID admin yang membuat reservasi
+            'user_id' => null, // Reservasi oleh admin tidak terikat user biasa
+            'room_info_id' => $validatedData['room_info_id'],
+            'dinas_id' => $validatedData['dinas_id'],
+            'nama' => $validatedData['nama'],
+            'kontak' => $validatedData['kontak'],
+            'tanggal' => $validatedData['tanggal'],
+            'jam_mulai' => $validatedData['jam_mulai'],
+            'jam_selesai' => $validatedData['jam_selesai'],
+            'keperluan' => $validatedData['keperluan'],
+            'status' => Reservation::STATUS_APPROVED, // Otomatis disetujui
+            'fasilitas_terpilih' => isset($validatedData['fasilitas']) ? implode(',', $validatedData['fasilitas']) : null,
+        ];
+
+        Reservation::create($reservationData);
+
+        return redirect()->route('admin.reservations.index')->with('success', 'Reservasi baru berhasil dibuat dan otomatis disetujui.');
     }
 }

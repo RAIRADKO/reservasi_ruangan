@@ -4,10 +4,16 @@
 <div class="container py-2 py-md-3">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 mb-md-4 gap-3">
         <h2 class="mb-0 h4">Manajemen Reservasi</h2>
-        <a href="{{ route('admin.reservations.export') }}" class="btn btn-success btn-sm">
-            <i class="bi bi-file-earmark-excel-fill me-1"></i>
-            Export
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.reservations.create') }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle-fill me-1"></i>
+                Buat Reservasi
+            </a>
+            <a href="{{ route('admin.reservations.export') }}" class="btn btn-success btn-sm">
+                <i class="bi bi-file-earmark-excel-fill me-1"></i>
+                Export
+            </a>
+        </div>
     </div>
     
     <div class="table-responsive">
@@ -46,27 +52,42 @@
                     </td>
                     <td>
                         <div class="d-flex flex-column flex-md-row gap-1 justify-content-center">
-                            {{-- Tombol Approve --}}
-                            <form method="POST" action="{{ route('admin.reservations.update-status', $reservation->id) }}" class="d-grid">
-                                @csrf
-                                @method('PUT')
-                                <input type="hidden" name="status" value="approved">
-                                <button type="submit" class="btn btn-sm btn-success" {{ in_array($reservation->status, ['approved', 'completed', 'rejected', 'cancelled']) ? 'disabled' : '' }}>
-                                    <span class="d-none d-md-inline">Approve</span>
-                                    <i class="bi bi-check-lg d-md-none"></i>
-                                </button>
-                            </form>
+                            @php
+                                $isPast = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai)->isPast();
+                            @endphp
 
-                            {{-- Tombol Reject --}}
-                            <button type="button" class="btn btn-sm btn-danger reject-btn" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#rejectModal"
-                                    data-reservation-id="{{ $reservation->id }}"
-                                    data-reservation-name="{{ $reservation->nama }}"
-                                    {{ in_array($reservation->status, ['rejected', 'completed', 'approved', 'cancelled']) ? 'disabled' : '' }}>
-                                <span class="d-none d-md-inline">Reject</span>
-                                <i class="bi bi-x-lg d-md-none"></i>
-                            </button>
+                            @if($reservation->status == 'approved' && $isPast && is_null($reservation->checked_out_at))
+                                {{-- Tombol Check Out --}}
+                                <button type="button" class="btn btn-sm btn-info checkout-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#checkoutModal"
+                                        data-reservation-id="{{ $reservation->id }}"
+                                        data-reservation-name="{{ $reservation->nama }}">
+                                    <span class="d-none d-md-inline">Check Out</span>
+                                    <i class="bi bi-box-arrow-right d-md-none"></i>
+                                </button>
+                            @elseif($reservation->status == 'pending')
+                                {{-- Tombol Approve --}}
+                                <form method="POST" action="{{ route('admin.reservations.update-status', $reservation->id) }}" class="d-grid">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="status" value="approved">
+                                    <button type="submit" class="btn btn-sm btn-success">
+                                        <span class="d-none d-md-inline">Approve</span>
+                                        <i class="bi bi-check-lg d-md-none"></i>
+                                    </button>
+                                </form>
+
+                                {{-- Tombol Reject --}}
+                                <button type="button" class="btn btn-sm btn-danger reject-btn" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#rejectModal"
+                                        data-reservation-id="{{ $reservation->id }}"
+                                        data-reservation-name="{{ $reservation->nama }}">
+                                    <span class="d-none d-md-inline">Reject</span>
+                                    <i class="bi bi-x-lg d-md-none"></i>
+                                </button>
+                            @endif
                             
                             {{-- Tombol Hapus --}}
                             <button type="button" class="btn btn-sm btn-outline-danger" 
@@ -78,6 +99,59 @@
                                 <i class="bi bi-trash d-md-none"></i>
                             </button>
                         </div>
+{{-- Modal Checkout BARU --}}
+<div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="checkoutModalLabel">Konfirmasi Check Out</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="checkoutForm" method="POST" action="">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <p>Apakah Anda yakin ingin menyelesaikan (check out) reservasi untuk <strong id="checkoutReservationName"></strong>?</p>
+                    <p class="text-muted small">Tindakan ini akan mengubah status reservasi menjadi "Completed".</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-info">Ya, Check Out</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // ... (script untuk reject modal yang sudah ada) ...
+
+  // Script BARU untuk modal checkout
+  const checkoutModal = document.getElementById('checkoutModal');
+  if (checkoutModal) {
+      checkoutModal.addEventListener('show.bs.modal', function (event) {
+          const button = event.relatedTarget;
+          const reservationId = button.getAttribute('data-reservation-id');
+          const reservationName = button.getAttribute('data-reservation-name');
+          
+          const modalReservationName = checkoutModal.querySelector('#checkoutReservationName');
+          const checkoutForm = checkoutModal.querySelector('#checkoutForm');
+          
+          const actionUrl = `{{ url('admin/reservations') }}/${reservationId}/checkout`;
+          
+          modalReservationName.textContent = reservationName;
+          checkoutForm.action = actionUrl;
+      });
+  }
+
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  });
+});
+</script>
+@endsection
                     </td>
                 </tr>
                 @endforeach

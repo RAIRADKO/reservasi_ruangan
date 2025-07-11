@@ -380,10 +380,18 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.reservations.*') ? 'active' : '' }}" 
+                            <a class="nav-link {{ request()->routeIs('admin.reservations.index') || request()->routeIs('admin.reservations.create') ? 'active' : '' }}" 
                             href="{{ route('admin.reservations.index') }}">
                                 <i class="bi bi-journal-text me-2"></i>
-                                Reservasi
+                                Manajemen Reservasi
+                            </a>
+                        </li>
+                        {{-- Tambahkan link di bawah ini --}}
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.reservations.create') ? 'active' : '' }}"
+                                href="{{ route('admin.reservations.create') }}">
+                                <i class="bi bi-calendar-plus me-2"></i>
+                                Buat Reservasi
                             </a>
                         </li>
                         <li class="nav-item">
