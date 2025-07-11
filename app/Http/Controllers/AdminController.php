@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\ReservationExport;
 use App\Mail\ReservationApprovedUserNotification;
 use App\Mail\ReservationRejectedUserNotification;
-use App\Mail\UserApprovedNotification; 
+use App\Mail\UserApprovedNotification;
 use App\Models\BlockedDate;
 use App\Models\Dinas;
 use App\Models\Reservation;
@@ -101,12 +101,21 @@ class AdminController extends Controller
     }
     public function dashboard()
     {
-        $pendingCount = Reservation::where('status', Reservation::STATUS_PENDING)->count();
-        $approvedCount = Reservation::where('status', Reservation::STATUS_APPROVED)->count();
-        $completedCount = Reservation::where('status', Reservation::STATUS_COMPLETED)->count();
+        $admin = auth()->guard('admin')->user();
+        $query = Reservation::query();
+
+        if ($admin->role !== 'superadmin') {
+            $query->whereHas('roomInfo', function ($q) use ($admin) {
+                $q->where('instansi_id', $admin->instansi_id);
+            });
+        }
+
+        $pendingCount = (clone $query)->where('status', Reservation::STATUS_PENDING)->count();
+        $approvedCount = (clone $query)->where('status', Reservation::STATUS_APPROVED)->count();
+        $completedCount = (clone $query)->where('status', Reservation::STATUS_COMPLETED)->count();
         $userCount = User::count();
 
-        $reservations = Reservation::with(['user', 'roomInfo'])
+        $reservations = (clone $query)->with(['user', 'roomInfo'])
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
