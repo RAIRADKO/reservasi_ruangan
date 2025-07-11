@@ -42,6 +42,20 @@
                               id="fasilitas" name="fasilitas" rows="3" required>{{ old('fasilitas', $room->fasilitas) }}</textarea>
                     @error('fasilitas')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
+                @if(auth()->guard('admin')->user()->role === 'superadmin')
+                <div class="mb-3">
+                    <label for="instansi_id" class="form-label">Instansi</label>
+                    <select class="form-select @error('instansi_id') is-invalid @enderror" id="instansi_id" name="instansi_id" required>
+                        <option value="">Pilih Instansi</option>
+                        @foreach($dinas as $d)
+                            <option value="{{ $d->id }}" {{ old('instansi_id', $room->instansi_id) == $d->id ? 'selected' : '' }}>
+                                {{ $d->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('instansi_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+                @endif
                 <div class="mb-3">
                     <label for="foto" class="form-label">Foto Ruangan</label>
                     <input class="form-control @error('foto') is-invalid @enderror" 

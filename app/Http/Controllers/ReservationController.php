@@ -43,10 +43,13 @@ class ReservationController extends Controller
             $reservationData['fasilitas_terpilih'] = null;
         }
         $reservation = Reservation::create($reservationData);
-        $adminEmail = config('mail.admin_address');
-        if ($adminEmail) {
-            Mail::to($adminEmail)->send(new NewReservationAdminNotification($reservation));
+
+        $room = RoomInfo::find($validatedData['room_info_id']);
+        $admins = \App\Models\Admin::where('instansi_id', $room->instansi_id)->get();
+        foreach ($admins as $admin) {
+            Mail::to($admin->email)->send(new NewReservationAdminNotification($reservation));
         }
+
         return redirect()->route('reservations.success');
     }
 

@@ -32,46 +32,62 @@ class AdminController extends Controller
 
     public function adminCreate()
     {
-        return view('admin.admins.create');
+        $dinas = Dinas::orderBy('name')->get();
+        return view('admin.admins.create', compact('dinas'));
     }
 
     public function adminStore(Request $request)
     {
         $request->validate([
             'username' => 'required|string|max:255|unique:admins,username',
+            'email' => 'required|string|email|max:255|unique:admins,email', // Tambahkan validasi email
             'password' => 'required|string|min:8|confirmed',
             'role' => ['required', Rule::in(['admin', 'superadmin'])],
+            'instansi_id' => 'required_if:role,admin|nullable|exists:dinas,id',
         ]);
 
         \App\Models\Admin::create([
             'username' => $request->username,
+            'email' => $request->email, // Simpan email
             'password' => Hash::make($request->password),
             'role' => $request->role,
+            'instansi_id' => $request->role === 'superadmin' ? null : $request->instansi_id,
         ]);
 
         return redirect()->route('admin.admins.index')->with('success', 'Admin baru berhasil ditambahkan.');
     }
 
+
     public function adminEdit(\App\Models\Admin $admin)
     {
-        return view('admin.admins.edit', compact('admin'));
+        $dinas = auth()->guard('admin')->user()->role === 'superadmin' ? Dinas::orderBy('name')->get() : null;
+        return view('admin.admins.edit', compact('admin', 'dinas'));
     }
+
 
     public function adminUpdate(Request $request, \App\Models\Admin $admin)
     {
         $request->validate([
             'username' => ['required', 'string', 'max:255', Rule::unique('admins')->ignore($admin->id)],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('admins')->ignore($admin->id)], // Validasi email
             'password' => 'nullable|string|min:8|confirmed',
-            'role' => ['required', Rule::in(['admin', 'superadmin'])],
+            'role' => auth()->guard('admin')->user()->role === 'superadmin' ? ['required', Rule::in(['admin', 'superadmin'])] : 'nullable',
+            'instansi_id' => auth()->guard('admin')->user()->role === 'superadmin' && $request->role === 'admin' ? 'required|exists:dinas,id' : 'nullable',
         ]);
 
-        $data = $request->only('username', 'role');
+        $data = $request->only('username', 'email');
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }
 
+        if (auth()->guard('admin')->user()->role === 'superadmin') {
+            $data['role'] = $request->role;
+            $data['instansi_id'] = $request->role === 'admin' ? $request->instansi_id : null;
+        }
+
         $admin->update($data);
-        return redirect()->route('admin.admins.index')->with('success', 'Data admin berhasil diperbarui.');
+
+        return redirect()->route('admin.admins.index')->with('success', 'Informasi admin berhasil diperbarui.');
     }
 
     public function adminDestroy(\App\Models\Admin $admin)
@@ -157,9 +173,11 @@ class AdminController extends Controller
         return view('admin.room.index', compact('rooms'));
     }
 
+
     public function roomCreate()
     {
-        return view('admin.room.create');
+        $dinas = auth()->guard('admin')->user()->role === 'superadmin' ? Dinas::orderBy('name')->get() : null;
+        return view('admin.room.create', compact('dinas'));
     }
 
     public function roomStore(Request $request)
@@ -170,23 +188,31 @@ class AdminController extends Controller
             'kapasitas' => 'required|integer|min:1',
             'fasilitas' => 'required|string',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'instansi_id' => auth()->guard('admin')->user()->role === 'superadmin' ? 'required|exists:dinas,id' : 'nullable',
         ]);
-        
+
         $data = $request->only(['nama_ruangan', 'deskripsi', 'kapasitas', 'fasilitas']);
-        
+
+        if (auth()->guard('admin')->user()->role === 'superadmin') {
+            $data['instansi_id'] = $request->instansi_id;
+        } else {
+            $data['instansi_id'] = auth()->guard('admin')->user()->instansi_id;
+        }
+
         if ($request->hasFile('foto')) {
             $path = $request->file('foto')->store('room_photos', 'public');
             $data['foto'] = $path;
         }
-        
+
         RoomInfo::create($data);
-        
+
         return redirect()->route('admin.room.index')->with('success', 'Ruangan baru berhasil ditambahkan.');
     }
-    
+
     public function roomEdit(RoomInfo $room)
     {
-        return view('admin.room.edit', compact('room'));
+        $dinas = auth()->guard('admin')->user()->role === 'superadmin' ? Dinas::orderBy('name')->get() : null;
+        return view('admin.room.edit', compact('room', 'dinas'));
     }
 
     public function roomUpdate(Request $request, RoomInfo $room)
@@ -197,10 +223,15 @@ class AdminController extends Controller
             'kapasitas' => 'required|integer|min:1',
             'fasilitas' => 'required|string',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'instansi_id' => auth()->guard('admin')->user()->role === 'superadmin' ? 'required|exists:dinas,id' : 'nullable',
         ]);
-        
+
         $data = $request->only(['nama_ruangan', 'deskripsi', 'kapasitas', 'fasilitas']);
-            
+
+        if (auth()->guard('admin')->user()->role === 'superadmin') {
+            $data['instansi_id'] = $request->instansi_id;
+        }
+
         if ($request->hasFile('foto')) {
             if ($room->foto) {
                 Storage::disk('public')->delete($room->foto);
@@ -210,7 +241,7 @@ class AdminController extends Controller
         }
 
         $room->update($data);
-            
+
         return redirect()->route('admin.room.index')->with('success', 'Informasi ruangan berhasil diperbarui.');
     }
 

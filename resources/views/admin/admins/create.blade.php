@@ -17,6 +17,15 @@
                     @error('username')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
+                {{-- TAMBAHKAN BAGIAN INI --}}
+                <div class="mb-3">
+                    <label for="email" class="form-label">Alamat Email</label>
+                    <input type="email" class="form-control form-control-lg @error('email') is-invalid @enderror"
+                           id="email" name="email" value="{{ old('email') }}" required>
+                    @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+                {{-- AKHIR BAGIAN TAMBAHAN --}}
+
                 <div class="mb-3">
                     <label for="role" class="form-label">Role</label>
                     <select class="form-select form-select-lg @error('role') is-invalid @enderror" id="role" name="role" required>
@@ -24,6 +33,17 @@
                         <option value="superadmin" {{ old('role') == 'superadmin' ? 'selected' : '' }}>Superadmin</option>
                     </select>
                     @error('role')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="mb-3" id="instansi-select">
+                    <label for="instansi_id" class="form-label">Instansi</label>
+                    <select class="form-select form-select-lg @error('instansi_id') is-invalid @enderror" id="instansi_id" name="instansi_id">
+                        <option value="">Pilih Instansi</option>
+                        @foreach($dinas as $d)
+                            <option value="{{ $d->id }}" {{ old('instansi_id') == $d->id ? 'selected' : '' }}>{{ $d->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('instansi_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="mb-3">
@@ -51,4 +71,24 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const roleSelect = document.getElementById('role');
+    const instansiSelectDiv = document.getElementById('instansi-select');
+
+    function toggleInstansiSelect() {
+        if (roleSelect.value === 'superadmin') {
+            instansiSelectDiv.style.display = 'none';
+        } else {
+            instansiSelectDiv.style.display = 'block';
+        }
+    }
+
+    toggleInstansiSelect(); 
+    roleSelect.addEventListener('change', toggleInstansiSelect);
+});
+</script>
 @endsection
