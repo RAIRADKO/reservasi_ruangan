@@ -23,32 +23,6 @@ use Carbon\Carbon;
 
 class AdminController extends Controller
 {
-    public function checkoutReservation(Request $request, Reservation $reservation)
-    {
-        $admin = auth()->guard('admin')->user();
-        
-        if ($admin->role !== 'superadmin' && $reservation->roomInfo->instansi_id !== $admin->instansi_id) {
-            return back()->with('error', 'Anda tidak memiliki hak untuk melakukan check-out pada reservasi ini.');
-        }
-
-        $endTime = Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai);
-        if ($reservation->status !== Reservation::STATUS_APPROVED || $endTime->isFuture()) {
-            return back()->with('error', 'Reservasi ini belum dapat di-checkout.');
-        }
-        
-        if ($reservation->checked_out_at) {
-            return back()->with('error', 'Reservasi ini sudah di-checkout sebelumnya.');
-        }
-
-        $reservation->update([
-            'status' => Reservation::STATUS_COMPLETED,
-            'checked_out_at' => now(),
-            'feedback' => 'Checked out by admin: ' . $admin->username,
-        ]);
-
-        return back()->with('success', 'Reservasi untuk ' . $reservation->nama . ' berhasil di-checkout.');
-    }
-
     public function adminIndex()
     {
         $admins = \App\Models\Admin::paginate(10);

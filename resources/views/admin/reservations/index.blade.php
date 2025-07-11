@@ -52,22 +52,7 @@
                     </td>
                     <td>
                         <div class="d-flex flex-column flex-md-row gap-1 justify-content-center">
-                            @php
-                                $isPast = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai)->isPast();
-                            @endphp
-
-                            @if($reservation->status == 'approved' && $isPast && is_null($reservation->checked_out_at))
-                                {{-- Tombol Check Out --}}
-                                <button type="button" class="btn btn-sm btn-info checkout-btn"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#checkoutModal"
-                                        data-reservation-id="{{ $reservation->id }}"
-                                        data-reservation-name="{{ $reservation->nama }}">
-                                    <span class="d-none d-md-inline">Check Out</span>
-                                    <i class="bi bi-box-arrow-right d-md-none"></i>
-                                </button>
-                            @endif
-
+                            {{-- Tampilkan tombol hanya jika status reservasi 'pending' --}}
                             @if($reservation->status == 'pending')
                                 {{-- Tombol Approve --}}
                                 <form method="POST" action="{{ route('admin.reservations.update-status', $reservation->id) }}" class="d-grid">
@@ -101,59 +86,6 @@
                                 <i class="bi bi-trash d-md-none"></i>
                             </button>
                         </div>
-{{-- Modal Checkout BARU --}}
-<div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="checkoutModalLabel">Konfirmasi Check Out</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="checkoutForm" method="POST" action="">
-                @csrf
-                @method('PUT')
-                <div class="modal-body">
-                    <p>Apakah Anda yakin ingin menyelesaikan (check out) reservasi untuk <strong id="checkoutReservationName"></strong>?</p>
-                    <p class="text-muted small">Tindakan ini akan mengubah status reservasi menjadi "Completed".</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-info">Ya, Check Out</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-@section('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  // ... (script untuk reject modal yang sudah ada) ...
-
-  // Script BARU untuk modal checkout
-  const checkoutModal = document.getElementById('checkoutModal');
-  if (checkoutModal) {
-      checkoutModal.addEventListener('show.bs.modal', function (event) {
-          const button = event.relatedTarget;
-          const reservationId = button.getAttribute('data-reservation-id');
-          const reservationName = button.getAttribute('data-reservation-name');
-          
-          const modalReservationName = checkoutModal.querySelector('#checkoutReservationName');
-          const checkoutForm = checkoutModal.querySelector('#checkoutForm');
-          
-          const actionUrl = `{{ url('admin/reservations') }}/${reservationId}/checkout`;
-          
-          modalReservationName.textContent = reservationName;
-          checkoutForm.action = actionUrl;
-      });
-  }
-
-  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-  });
-});
-</script>
-@endsection
                     </td>
                 </tr>
                 @endforeach
@@ -162,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
 </div>
 
-{{-- Reject Modal (anda bisa meletakkan modal di sini atau di layout utama) --}}
+{{-- Reject Modal --}}
 <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -188,35 +120,36 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
     </div>
 </div>
-
 @endsection
 
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  const rejectModal = document.getElementById('rejectModal');
-  if (rejectModal) {
-      rejectModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const reservationId = button.getAttribute('data-reservation-id');
-        const reservationName = button.getAttribute('data-reservation-name');
-        
-        const modalTitle = rejectModal.querySelector('.modal-title');
-        const modalBodyReservationName = rejectModal.querySelector('#reservationName');
-        const rejectForm = rejectModal.querySelector('#rejectForm');
-        
-        const actionUrl = `{{ url('admin/reservations') }}/${reservationId}/update-status`;
-        
-        modalTitle.textContent = 'Alasan Penolakan';
-        modalBodyReservationName.textContent = reservationName;
-        rejectForm.action = actionUrl;
-      });
-  }
+    // Script untuk modal reject
+    const rejectModal = document.getElementById('rejectModal');
+    if (rejectModal) {
+        rejectModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const reservationId = button.getAttribute('data-reservation-id');
+            const reservationName = button.getAttribute('data-reservation-name');
 
-  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-  });
+            const modalTitle = rejectModal.querySelector('.modal-title');
+            const modalBodyReservationName = rejectModal.querySelector('#reservationName');
+            const rejectForm = rejectModal.querySelector('#rejectForm');
+
+            const actionUrl = `{{ url('admin/reservations') }}/${reservationId}/update-status`;
+
+            modalTitle.textContent = 'Alasan Penolakan';
+            modalBodyReservationName.textContent = reservationName;
+            rejectForm.action = actionUrl;
+        });
+    }
+
+    // Script untuk tooltip
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
 });
 </script>
 @endsection
