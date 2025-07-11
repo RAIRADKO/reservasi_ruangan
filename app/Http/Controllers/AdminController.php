@@ -19,10 +19,11 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Http\Requests\StoreReservationRequest; // <-- BARIS INI DITAMBAHKAN
+use App\Http\Requests\StoreReservationRequest;
+use Carbon\Carbon; // <-- DITAMBAHKAN
 
 class AdminController extends Controller
-
+{
     public function checkoutReservation(Request $request, Reservation $reservation)
     {
         $admin = auth()->guard('admin')->user();
@@ -51,7 +52,7 @@ class AdminController extends Controller
 
         return back()->with('success', 'Reservasi untuk ' . $reservation->nama . ' berhasil di-checkout.');
     }
-{
+
     public function adminIndex()
     {
         $admins = \App\Models\Admin::paginate(10);

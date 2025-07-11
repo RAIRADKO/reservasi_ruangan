@@ -66,7 +66,9 @@
                                     <span class="d-none d-md-inline">Check Out</span>
                                     <i class="bi bi-box-arrow-right d-md-none"></i>
                                 </button>
-                            @elseif($reservation->status == 'pending')
+                            @endif
+
+                            @if($reservation->status == 'pending')
                                 {{-- Tombol Approve --}}
                                 <form method="POST" action="{{ route('admin.reservations.update-status', $reservation->id) }}" class="d-grid">
                                     @csrf
