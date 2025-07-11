@@ -54,7 +54,7 @@ class ReservationController extends Controller
 
         Reservation::create($reservationData);
 
-        return redirect()->route('reservations.index')->with('success', 'Reservasi Anda telah berhasil dikirim dan sedang menunggu persetujuan.');
+        return redirect()->route('user.reservations')->with('success', 'Reservasi Anda telah berhasil dikirim dan sedang menunggu persetujuan.');
     }
 
     public function cancel(Reservation $reservation)
