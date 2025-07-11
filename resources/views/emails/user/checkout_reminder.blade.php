@@ -13,7 +13,7 @@
 
     <p>Halo, <strong>{{ $reservation->nama }}</strong>!</p>
 
-    <p>Sistem kami mencatat bahwa sesi reservasi Anda untuk ruangan <strong>{{ $reservation->roomInfo->nama_ruangan }}</strong> telah berakhir 15 menit yang lalu, namun Anda belum melakukan proses <i>check out</i>.</p>
+    <p>Sistem kami mencatat bahwa sesi reservasi Anda untuk ruangan <strong>{{ $reservation->roomInfo->nama_ruangan }}</strong> telah berakhir, namun Anda belum melakukan proses <i>check out</i>.</p>
 
     <div class="info-card">
         <h3>📋 Detail Reservasi Anda</h3>
@@ -31,6 +31,10 @@
                     <td>⏰ Waktu</td>
                     <td>{{ date('H:i', strtotime($reservation->jam_mulai)) }} - {{ date('H:i', strtotime($reservation->jam_selesai)) }}</td>
                 </tr>
+                <tr>
+                    <td>📬 Pengingat Ke</td>
+                    <td>{{ ($reservation->reminder_count ?? 0) + 1 }}</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -41,10 +45,18 @@
             <li>Memberi tahu kami bahwa Anda telah selesai menggunakan ruangan.</li>
             <li>Memungkinkan kami mengumpulkan masukan Anda untuk perbaikan layanan.</li>
             <li>Memperbarui status ruangan agar dapat digunakan oleh pengguna lain.</li>
+            <li>Membantu kami memberikan layanan yang lebih baik untuk semua pengguna.</li>
         </ul>
     </div>
 
-    <p>Mohon untuk segera melakukan <i>check out</i> dengan menekan tombol di bawah ini. Notifikasi ini akan terus dikirim setiap 15 menit hingga Anda melakukan <i>check out</i>.</p>
+    <div class="info-card" style="background-color: #fff3cd; border-left: 4px solid #ffc107;">
+        <h4 style="color: #856404;">⚠️ Perhatian</h4>
+        <p style="color: #856404; margin-bottom: 0;">
+            Jika Anda tidak melakukan <i>check out</i> dalam waktu <strong>12 jam</strong> setelah sesi berakhir, sistem akan secara otomatis melakukan <i>check out</i> untuk Anda dengan rating default 5/5.
+        </p>
+    </div>
+
+    <p>Mohon untuk segera melakukan <i>check out</i> dengan menekan tombol di bawah ini. Pengingat akan dikirim setiap <strong>30 menit</strong> hingga Anda melakukan <i>check out</i> atau hingga batas waktu 12 jam tercapai.</p>
 
     <div style="text-align: center; margin: 30px 0;">
         <a href="{{ $url }}" class="button" style="background: linear-gradient(135deg, #198754 0%, #20c997 100%);">✅ Lakukan Check Out Sekarang</a>
