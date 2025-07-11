@@ -17,11 +17,72 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+
 use Illuminate\Validation\Rule;
+
 use Maatwebsite\Excel\Facades\Excel;
 
 class AdminController extends Controller
 {
+    public function adminIndex()
+    {
+        $admins = \App\Models\Admin::paginate(10);
+        return view('admin.admins.index', compact('admins'));
+    }
+
+    public function adminCreate()
+    {
+        return view('admin.admins.create');
+    }
+
+    public function adminStore(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|string|max:255|unique:admins,username',
+            'password' => 'required|string|min:8|confirmed',
+            'role' => ['required', Rule::in(['admin', 'superadmin'])],
+        ]);
+
+        \App\Models\Admin::create([
+            'username' => $request->username,
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
+        ]);
+
+        return redirect()->route('admin.admins.index')->with('success', 'Admin baru berhasil ditambahkan.');
+    }
+
+    public function adminEdit(\App\Models\Admin $admin)
+    {
+        return view('admin.admins.edit', compact('admin'));
+    }
+
+    public function adminUpdate(Request $request, \App\Models\Admin $admin)
+    {
+        $request->validate([
+            'username' => ['required', 'string', 'max:255', Rule::unique('admins')->ignore($admin->id)],
+            'password' => 'nullable|string|min:8|confirmed',
+            'role' => ['required', Rule::in(['admin', 'superadmin'])],
+        ]);
+
+        $data = $request->only('username', 'role');
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $admin->update($data);
+        return redirect()->route('admin.admins.index')->with('success', 'Data admin berhasil diperbarui.');
+    }
+
+    public function adminDestroy(\App\Models\Admin $admin)
+    {
+        // Mencegah superadmin terakhir dihapus
+        if ($admin->role === 'superadmin' && \App\Models\Admin::where('role', 'superadmin')->count() === 1) {
+            return redirect()->route('admin.admins.index')->with('error', 'Tidak dapat menghapus superadmin terakhir.');
+        }
+        $admin->delete();
+        return redirect()->route('admin.admins.index')->with('success', 'Admin berhasil dihapus.');
+    }
     public function dashboard()
     {
         $pendingCount = Reservation::where('status', Reservation::STATUS_PENDING)->count();

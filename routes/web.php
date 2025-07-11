@@ -132,4 +132,12 @@ Route::prefix('admin')->name('admin.')->middleware(['admin', 'role:superadmin'])
     Route::delete('users/{user}', [AdminController::class, 'usersDestroy'])->name('users.destroy');
     Route::put('users/{user}/approve', [AdminController::class, 'approveUser'])->name('users.approve');
     Route::put('users/{user}/reject', [AdminController::class, 'rejectUser'])->name('users.reject');
+
+    // Manajemen Admin
+    Route::get('admins', [AdminController::class, 'adminIndex'])->name('admins.index');
+    Route::get('admins/create', [AdminController::class, 'adminCreate'])->name('admins.create');
+    Route::post('admins', [AdminController::class, 'adminStore'])->name('admins.store');
+    Route::get('admins/{admin}/edit', [AdminController::class, 'adminEdit'])->name('admins.edit');
+    Route::put('admins/{admin}', [AdminController::class, 'adminUpdate'])->name('admins.update');
+    Route::delete('admins/{admin}', [AdminController::class, 'adminDestroy'])->name('admins.destroy');
 });

@@ -411,6 +411,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.admins.*') ? 'active' : '' }}"
+                                href="{{ route('admin.admins.index') }}">
+                                <i class="bi bi-person-lock me-2"></i>
+                                Manajemen Admin
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.dinas.*') ? 'active' : '' }}"
                                 href="{{ route('admin.dinas.index') }}">
                                 <i class="bi bi-building me-2"></i>
