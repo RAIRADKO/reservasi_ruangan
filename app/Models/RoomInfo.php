@@ -18,6 +18,7 @@ class RoomInfo extends Model
         'kapasitas',
         'fasilitas',
         'foto',
+        'instansi_id'
     ];
 
     public function reservations(): HasMany

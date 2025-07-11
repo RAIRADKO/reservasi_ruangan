@@ -16,16 +16,26 @@ class CheckRole
 
         $admin = Auth::guard('admin')->user();
 
+        // Superadmin selalu punya akses
         if ($admin->role === 'superadmin') {
             return $next($request);
         }
 
-        $reservation = $request->route('reservation');
-
+        // Cek jika role admin sesuai
         if (in_array($admin->role, $roles)) {
+            $reservation = $request->route('reservation');
+            $room = $request->route('room');
+
+            // Cek kepemilikan reservasi
             if ($reservation && $reservation->roomInfo->instansi_id !== $admin->instansi_id) {
                 return redirect()->route('admin.dashboard')->with('error', 'Anda tidak memiliki akses ke reservasi ini.');
             }
+
+            // Cek kepemilikan ruangan
+            if ($room && $room->instansi_id !== $admin->instansi_id) {
+                return redirect()->route('admin.dashboard')->with('error', 'Anda tidak memiliki akses ke ruangan ini.');
+            }
+            
             return $next($request);
         }
 

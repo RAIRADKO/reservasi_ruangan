@@ -116,10 +116,16 @@ class AdminController extends Controller
 
     public function reservations()
     {
-        $reservations = Reservation::with(['user', 'roomInfo', 'dinas'])
-            ->orderBy('tanggal', 'desc')
-            ->paginate(10);
-            
+        $admin = auth()->guard('admin')->user();
+        $reservationsQuery = Reservation::with(['user', 'roomInfo', 'dinas']);
+
+        if ($admin->role !== 'superadmin') {
+            $reservationsQuery->whereHas('roomInfo', function ($query) use ($admin) {
+                $query->where('instansi_id', $admin->instansi_id);
+            });
+        }
+
+        $reservations = $reservationsQuery->orderBy('tanggal', 'desc')->paginate(10);
         return view('admin.reservations.index', compact('reservations'));
     }
 
@@ -169,7 +175,14 @@ class AdminController extends Controller
 
     public function roomIndex()
     {
-        $rooms = RoomInfo::paginate(10);
+        $admin = auth()->guard('admin')->user();
+        $roomsQuery = RoomInfo::query();
+
+        if ($admin->role !== 'superadmin') {
+            $roomsQuery->where('instansi_id', $admin->instansi_id);
+        }
+
+        $rooms = $roomsQuery->paginate(10);
         return view('admin.room.index', compact('rooms'));
     }
 
@@ -182,21 +195,27 @@ class AdminController extends Controller
 
     public function roomStore(Request $request)
     {
+        $admin = auth()->guard('admin')->user();
+        $isSuperAdmin = $admin->role === 'superadmin';
+
         $request->validate([
             'nama_ruangan' => 'required|string|max:100|unique:room_infos,nama_ruangan',
             'deskripsi' => 'required|string',
             'kapasitas' => 'required|integer|min:1',
             'fasilitas' => 'required|string',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'instansi_id' => auth()->guard('admin')->user()->role === 'superadmin' ? 'required|exists:dinas,id' : 'nullable',
+            // Validasi instansi_id hanya wajib untuk superadmin
+            'instansi_id' => $isSuperAdmin ? 'required|exists:dinas,id' : 'nullable',
         ]);
 
         $data = $request->only(['nama_ruangan', 'deskripsi', 'kapasitas', 'fasilitas']);
 
-        if (auth()->guard('admin')->user()->role === 'superadmin') {
+        if ($isSuperAdmin) {
+            // Jika superadmin, ambil instansi_id dari input form
             $data['instansi_id'] = $request->instansi_id;
         } else {
-            $data['instansi_id'] = auth()->guard('admin')->user()->instansi_id;
+            // Jika admin biasa, ambil instansi_id dari profil admin yang login
+            $data['instansi_id'] = $admin->instansi_id;
         }
 
         if ($request->hasFile('foto')) {
@@ -217,18 +236,27 @@ class AdminController extends Controller
 
     public function roomUpdate(Request $request, RoomInfo $room)
     {
+        $admin = auth()->guard('admin')->user();
+        $isSuperAdmin = $admin->role === 'superadmin';
+
+        // Mencegah admin biasa mengedit ruangan dari instansi lain
+        if (!$isSuperAdmin && $room->instansi_id !== $admin->instansi_id) {
+            return redirect()->route('admin.room.index')->with('error', 'Anda tidak memiliki hak untuk mengubah ruangan ini.');
+        }
+
         $request->validate([
             'nama_ruangan' => ['required', 'string', 'max:100', Rule::unique('room_infos')->ignore($room->id)],
             'deskripsi' => 'required|string',
             'kapasitas' => 'required|integer|min:1',
             'fasilitas' => 'required|string',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'instansi_id' => auth()->guard('admin')->user()->role === 'superadmin' ? 'required|exists:dinas,id' : 'nullable',
+            'instansi_id' => $isSuperAdmin ? 'required|exists:dinas,id' : 'nullable',
         ]);
 
         $data = $request->only(['nama_ruangan', 'deskripsi', 'kapasitas', 'fasilitas']);
 
-        if (auth()->guard('admin')->user()->role === 'superadmin') {
+        // Hanya superadmin yang dapat mengubah instansi_id ruangan
+        if ($isSuperAdmin) {
             $data['instansi_id'] = $request->instansi_id;
         }
 
