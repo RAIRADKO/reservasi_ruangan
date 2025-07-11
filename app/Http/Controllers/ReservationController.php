@@ -1,56 +1,75 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreReservationRequest;
+use App\Models\BlockedDate;
+use App\Models\Dinas;
 use App\Models\Reservation;
 use App\Models\RoomInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\StoreReservationRequest;
-use App\Models\BlockedDate;
-use App\Models\Dinas;
-use App\Mail\NewReservationAdminNotification;
-use Illuminate\Support\Facades\Mail;
 
 class ReservationController extends Controller
 {
+    public function index()
+    {
+        $user = Auth::user();
+        $reservations = Reservation::where('user_id', $user->id)
+                                   ->with('roomInfo')
+                                   ->orderBy('tanggal', 'desc')
+                                   ->paginate(10);
+
+        return view('reservations.index', compact('reservations'));
+    }
+
     public function create()
     {
-        $rooms = RoomInfo::all(); 
+        $rooms = RoomInfo::orderBy('nama_ruangan')->get();
         $blockedDates = BlockedDate::pluck('date')->map->format('Y-m-d')->toArray();
-        $dinas = Dinas::orderBy('name')->get(); 
+        $dinas = Dinas::orderBy('name')->get(); // Ambil data dinas
+
         return view('reservations.create', compact('rooms', 'blockedDates', 'dinas'));
     }
 
     public function store(StoreReservationRequest $request)
     {
         $validatedData = $request->validated();
-        $reservationData = [
-            'user_id' => Auth::id(),
-            'room_info_id' => $validatedData['room_info_id'],
-            'dinas_id' => $validatedData['dinas_id'],
-            'nama' => $validatedData['nama'],
-            'kontak' => $validatedData['kontak'],
-            'tanggal' => $validatedData['tanggal'],
-            'jam_mulai' => $validatedData['jam_mulai'],
-            'jam_selesai' => $validatedData['jam_selesai'],
-            'keperluan' => $validatedData['keperluan'],
-            'status' => Reservation::STATUS_PENDING,
-        ];
-        if (isset($validatedData['fasilitas']) && is_array($validatedData['fasilitas'])) {
-            $reservationData['fasilitas_terpilih'] = implode(',', $validatedData['fasilitas']);
-        } else {
-            $reservationData['fasilitas_terpilih'] = null;
-        }
-        $reservation = Reservation::create($reservationData);
+        $user = Auth::user();
 
-        $room = RoomInfo::find($validatedData['room_info_id']);
-        $admins = \App\Models\Admin::where('instansi_id', $room->instansi_id)->get();
-        foreach ($admins as $admin) {
-            Mail::to($admin->email)->send(new NewReservationAdminNotification($reservation));
+        // Cek konflik jadwal sebelum membuat reservasi
+        if (Reservation::hasConflict($validatedData['tanggal'], $validatedData['jam_mulai'], $validatedData['jam_selesai'], $validatedData['room_info_id'])) {
+            return back()->with('error', 'Ruangan sudah dibooking pada jam tersebut. Silakan pilih jam lain.');
         }
 
-        return redirect()->route('reservations.success');
+        // Gabungkan data yang divalidasi dengan user_id dan status
+        $reservationData = array_merge($validatedData, [
+            'user_id' => $user->id,
+            'nama' => $user->name, // Ambil nama dari user yang login
+            'kontak' => $user->nip, // Ambil NIP sebagai kontak
+            'fasilitas_terpilih' => isset($validatedData['fasilitas']) ? implode(',', $validatedData['fasilitas']) : null,
+            // --- INI BAGIAN PENTING ---
+            // Pastikan status default adalah 'pending'
+            'status' => Reservation::STATUS_PENDING, 
+        ]);
+
+        Reservation::create($reservationData);
+
+        return redirect()->route('reservations.index')->with('success', 'Reservasi Anda telah berhasil dikirim dan sedang menunggu persetujuan.');
+    }
+
+    public function cancel(Reservation $reservation)
+    {
+        if ($reservation->user_id !== Auth::id()) {
+            abort(403, 'Anda tidak memiliki hak untuk membatalkan reservasi ini.');
+        }
+
+        if ($reservation->status !== Reservation::STATUS_PENDING) {
+            return back()->with('error', 'Reservasi yang sudah diproses tidak dapat dibatalkan.');
+        }
+
+        $reservation->update(['status' => Reservation::STATUS_CANCELED]);
+
+        return back()->with('success', 'Reservasi berhasil dibatalkan.');
     }
 
     public function success()

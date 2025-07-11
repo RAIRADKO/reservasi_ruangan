@@ -40,13 +40,13 @@
                     <td class="d-none d-md-table-cell small">{{ $reservation->jam_range }}</td>
                     <td class="d-none d-lg-table-cell small">{{ $reservation->keperluan }}</td>
                     <td>
-                        <span class="badge bg-{{ $reservation->status == 'approved' ? 'success' : ($reservation->status == 'pending' ? 'warning' : ($reservation->status == 'completed' ? 'primary' : ($reservation->status == 'cancelled' ? 'secondary' : 'danger'))) }} small">
-                            {{ ucfirst($reservation->status == 'cancelled' ? 'Cancelled' : $reservation->status) }}
+                        <span class="badge bg-{{ $reservation->status == 'approved' ? 'success' : ($reservation->status == 'pending' ? 'warning' : ($reservation->status == 'completed' ? 'primary' : ($reservation->status == 'canceled' ? 'secondary' : 'danger'))) }} small">
+                            {{ ucfirst($reservation->status == 'canceled' ? 'Canceled' : $reservation->status) }}
                         </span>
                         @if($reservation->status == 'rejected' && $reservation->rejection_reason)
                             <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip" title="Alasan: {{ $reservation->rejection_reason }}"></i>
                         @endif
-                        @if($reservation->status == 'cancelled')
+                        @if($reservation->status == 'canceled')
                             <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip" title="Dibatalkan oleh user"></i>
                         @endif
                     </td>

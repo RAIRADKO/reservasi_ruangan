@@ -19,8 +19,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Http\Requests\StoreReservationRequest;
-use Carbon\Carbon; // <-- DITAMBAHKAN
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
@@ -28,12 +27,10 @@ class AdminController extends Controller
     {
         $admin = auth()->guard('admin')->user();
         
-        // Pengecekan otorisasi: pastikan admin dapat mengelola reservasi ini
         if ($admin->role !== 'superadmin' && $reservation->roomInfo->instansi_id !== $admin->instansi_id) {
             return back()->with('error', 'Anda tidak memiliki hak untuk melakukan check-out pada reservasi ini.');
         }
 
-        // Pengecekan logika: pastikan reservasi dalam status yang bisa di-checkout
         $endTime = Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai);
         if ($reservation->status !== Reservation::STATUS_APPROVED || $endTime->isFuture()) {
             return back()->with('error', 'Reservasi ini belum dapat di-checkout.');
@@ -43,11 +40,10 @@ class AdminController extends Controller
             return back()->with('error', 'Reservasi ini sudah di-checkout sebelumnya.');
         }
 
-        // Lakukan proses checkout
         $reservation->update([
             'status' => Reservation::STATUS_COMPLETED,
             'checked_out_at' => now(),
-            'feedback' => 'Checked out by admin: ' . $admin->username, // Catatan checkout oleh admin
+            'feedback' => 'Checked out by admin: ' . $admin->username,
         ]);
 
         return back()->with('success', 'Reservasi untuk ' . $reservation->nama . ' berhasil di-checkout.');
@@ -69,7 +65,7 @@ class AdminController extends Controller
     {
         $request->validate([
             'username' => 'required|string|max:255|unique:admins,username',
-            'email' => 'required|string|email|max:255|unique:admins,email', // Tambahkan validasi email
+            'email' => 'required|string|email|max:255|unique:admins,email',
             'password' => 'required|string|min:8|confirmed',
             'role' => ['required', Rule::in(['admin', 'superadmin'])],
             'instansi_id' => 'required_if:role,admin|nullable|exists:dinas,id',
@@ -77,7 +73,7 @@ class AdminController extends Controller
 
         \App\Models\Admin::create([
             'username' => $request->username,
-            'email' => $request->email, // Simpan email
+            'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
             'instansi_id' => $request->role === 'superadmin' ? null : $request->instansi_id,
@@ -98,7 +94,7 @@ class AdminController extends Controller
     {
         $request->validate([
             'username' => ['required', 'string', 'max:255', Rule::unique('admins')->ignore($admin->id)],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('admins')->ignore($admin->id)], // Validasi email
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('admins')->ignore($admin->id)],
             'password' => 'nullable|string|min:8|confirmed',
             'role' => auth()->guard('admin')->user()->role === 'superadmin' ? ['required', Rule::in(['admin', 'superadmin'])] : 'nullable',
             'instansi_id' => auth()->guard('admin')->user()->role === 'superadmin' && $request->role === 'admin' ? 'required|exists:dinas,id' : 'nullable',
@@ -121,7 +117,6 @@ class AdminController extends Controller
 
     public function adminDestroy(\App\Models\Admin $admin)
     {
-        // Mencegah superadmin terakhir dihapus
         if ($admin->role === 'superadmin' && \App\Models\Admin::where('role', 'superadmin')->count() === 1) {
             return redirect()->route('admin.admins.index')->with('error', 'Tidak dapat menghapus superadmin terakhir.');
         }
@@ -194,12 +189,14 @@ class AdminController extends Controller
         $reservation->update($updateData);
         $reservation->load('user');
 
-        if ($newStatus === Reservation::STATUS_APPROVED && $oldStatus !== Reservation::STATUS_APPROVED) {
-            Mail::to($reservation->user->email)->send(new ReservationApprovedUserNotification($reservation));
-        }
-
-        if ($newStatus === Reservation::STATUS_REJECTED && $oldStatus !== Reservation::STATUS_REJECTED) {
-            Mail::to($reservation->user->email)->send(new ReservationRejectedUserNotification($reservation));
+        if ($reservation->user) { // Pastikan user ada sebelum kirim email
+            if ($newStatus === Reservation::STATUS_APPROVED && $oldStatus !== Reservation::STATUS_APPROVED) {
+                Mail::to($reservation->user->email)->send(new ReservationApprovedUserNotification($reservation));
+            }
+    
+            if ($newStatus === Reservation::STATUS_REJECTED && $oldStatus !== Reservation::STATUS_REJECTED) {
+                Mail::to($reservation->user->email)->send(new ReservationRejectedUserNotification($reservation));
+            }
         }
         
         return back()->with('success', 'Status reservasi berhasil diperbarui.');
@@ -242,17 +239,14 @@ class AdminController extends Controller
             'kapasitas' => 'required|integer|min:1',
             'fasilitas' => 'required|string',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            // Validasi instansi_id hanya wajib untuk superadmin
             'instansi_id' => $isSuperAdmin ? 'required|exists:dinas,id' : 'nullable',
         ]);
 
         $data = $request->only(['nama_ruangan', 'deskripsi', 'kapasitas', 'fasilitas']);
 
         if ($isSuperAdmin) {
-            // Jika superadmin, ambil instansi_id dari input form
             $data['instansi_id'] = $request->instansi_id;
         } else {
-            // Jika admin biasa, ambil instansi_id dari profil admin yang login
             $data['instansi_id'] = $admin->instansi_id;
         }
 
@@ -277,7 +271,6 @@ class AdminController extends Controller
         $admin = auth()->guard('admin')->user();
         $isSuperAdmin = $admin->role === 'superadmin';
 
-        // Mencegah admin biasa mengedit ruangan dari instansi lain
         if (!$isSuperAdmin && $room->instansi_id !== $admin->instansi_id) {
             return redirect()->route('admin.room.index')->with('error', 'Anda tidak memiliki hak untuk mengubah ruangan ini.');
         }
@@ -293,7 +286,6 @@ class AdminController extends Controller
 
         $data = $request->only(['nama_ruangan', 'deskripsi', 'kapasitas', 'fasilitas']);
 
-        // Hanya superadmin yang dapat mengubah instansi_id ruangan
         if ($isSuperAdmin) {
             $data['instansi_id'] = $request->instansi_id;
         }
@@ -457,7 +449,6 @@ class AdminController extends Controller
         if ($user->status !== 'approved') {
             $user->update(['status' => 'approved']);
             
-            // Kirim email notifikasi ke pengguna
             Mail::to($user->email)->send(new UserApprovedNotification($user));
         }
 
@@ -467,7 +458,6 @@ class AdminController extends Controller
     public function rejectUser(User $user)
     {
         $user->update(['status' => 'rejected']);
-        // Anda bisa menambahkan notifikasi email penolakan ke user di sini jika diperlukan
         return back()->with('success', 'Pengguna ' . $user->name . ' telah ditolak.');
     }
 
@@ -512,7 +502,6 @@ class AdminController extends Controller
         $admin = auth()->guard('admin')->user();
         $roomsQuery = RoomInfo::query();
 
-        // Filter ruangan berdasarkan instansi admin
         if ($admin->role !== 'superadmin') {
             $roomsQuery->where('instansi_id', $admin->instansi_id);
         }
@@ -524,14 +513,32 @@ class AdminController extends Controller
         return view('admin.reservations.create', compact('rooms', 'blockedDates', 'dinas', 'admin'));
     }
 
-    public function storeReservation(StoreReservationRequest $request)
+    public function storeReservation(Request $request)
     {
-        $validatedData = $request->validated();
+        // **PERBAIKAN UTAMA: Validasi manual untuk admin**
+        $validatedData = $request->validate([
+            'room_info_id' => 'required|exists:room_infos,id',
+            'dinas_id' => 'required|exists:dinas,id',
+            'nama' => 'required|string|max:100',
+            'kontak' => 'required|string|max:100',
+            'tanggal' => 'required|date|after_or_equal:today',
+            'jam_mulai' => 'required|date_format:H:i',
+            'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
+            'keperluan' => 'required|string|max:255',
+            'fasilitas' => 'nullable|array',
+            'fasilitas.*' => 'string|max:100',
+        ]);
+        
         $admin = auth()->guard('admin')->user();
         
+        // Cek konflik sebelum menyimpan
+        if (Reservation::hasConflict($validatedData['tanggal'], $validatedData['jam_mulai'], $validatedData['jam_selesai'], $validatedData['room_info_id'])) {
+            return back()->with('error', 'Ruangan sudah dibooking pada jam tersebut. Silakan pilih jam lain.');
+        }
+        
         $reservationData = [
-            'admin_id' => $admin->id, // Menyimpan ID admin yang membuat reservasi
-            'user_id' => null, // Reservasi oleh admin tidak terikat user biasa
+            'admin_id' => $admin->id,
+            'user_id' => null,
             'room_info_id' => $validatedData['room_info_id'],
             'dinas_id' => $validatedData['dinas_id'],
             'nama' => $validatedData['nama'],
@@ -540,7 +547,7 @@ class AdminController extends Controller
             'jam_mulai' => $validatedData['jam_mulai'],
             'jam_selesai' => $validatedData['jam_selesai'],
             'keperluan' => $validatedData['keperluan'],
-            'status' => Reservation::STATUS_APPROVED, // Otomatis disetujui
+            'status' => Reservation::STATUS_APPROVED, // Langsung disetujui
             'fasilitas_terpilih' => isset($validatedData['fasilitas']) ? implode(',', $validatedData['fasilitas']) : null,
         ];
 
