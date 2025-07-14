@@ -80,7 +80,7 @@
     }
     
     .fc-event-booked {
-        background-color: rgba(255, 193, 7, 0.7) !important; 
+        background-color: #0F172A !important;
         border: none;
     }
     
