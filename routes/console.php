@@ -8,11 +8,8 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Jalankan command setiap 15 menit untuk memeriksa reminder dan auto checkout
+// CUKUP SATU BARIS INI
 Schedule::command('reservations:send-checkout-reminders')
-    ->everyFifteenMinutes()
+    ->everyMinute()
     ->withoutOverlapping()
     ->runInBackground();
-
-// Opsional: Jalankan command khusus untuk auto checkout setiap jam
-// Schedule::command('reservations:auto-checkout')->hourly();
