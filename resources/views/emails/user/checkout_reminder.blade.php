@@ -39,6 +39,10 @@
         </table>
     </div>
 
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ $url }}" class="button" style="background: linear-gradient(135deg, #198754 0%, #20c997 100%);">✅ Lakukan Check Out Sekarang</a>
+    </div>
+
     <div class="info-list">
         <h4>❓ Mengapa Check Out Penting?</h4>
         <ul>
