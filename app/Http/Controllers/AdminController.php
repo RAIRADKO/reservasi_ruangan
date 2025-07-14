@@ -121,19 +121,36 @@ class AdminController extends Controller
         return view('admin.dashboard', compact('pendingCount', 'approvedCount', 'completedCount', 'reservations', 'userCount'));
     }
 
-    public function reservations()
+    public function reservations(Request $request)
     {
         $admin = auth()->guard('admin')->user();
         $reservationsQuery = Reservation::with(['user', 'roomInfo', 'dinas']);
+        $roomsQuery = RoomInfo::query();
 
+        // Filter reservasi dan ruangan berdasarkan instansi admin
         if ($admin->role !== 'superadmin') {
             $reservationsQuery->whereHas('roomInfo', function ($query) use ($admin) {
                 $query->where('instansi_id', $admin->instansi_id);
             });
+            $roomsQuery->where('instansi_id', $admin->instansi_id);
         }
 
-        $reservations = $reservationsQuery->orderBy('tanggal', 'desc')->paginate(10);
-        return view('admin.reservations.index', compact('reservations'));
+        // Filter berdasarkan tanggal
+        if ($request->filled('date')) {
+            $reservationsQuery->whereDate('tanggal', $request->date);
+        }
+
+        // Filter berdasarkan ID ruangan dari dropdown
+        if ($request->filled('room_id')) {
+            $reservationsQuery->where('room_info_id', $request->room_id);
+        }
+
+        $reservations = $reservationsQuery->orderBy('tanggal', 'desc')->paginate(10)->withQueryString();
+        
+        // Ambil daftar ruangan yang sudah difilter untuk dropdown
+        $rooms = $roomsQuery->orderBy('nama_ruangan')->get();
+
+        return view('admin.reservations.index', compact('reservations', 'rooms'));
     }
 
     public function exportReservations()
@@ -507,7 +524,6 @@ class AdminController extends Controller
 
     public function storeReservation(Request $request)
     {
-        // **PERBAIKAN UTAMA: Validasi manual untuk admin**
         $validatedData = $request->validate([
             'room_info_id' => 'required|exists:room_infos,id',
             'dinas_id' => 'required|exists:dinas,id',
@@ -523,7 +539,6 @@ class AdminController extends Controller
         
         $admin = auth()->guard('admin')->user();
         
-        // Cek konflik sebelum menyimpan
         if (Reservation::hasConflict($validatedData['tanggal'], $validatedData['jam_mulai'], $validatedData['jam_selesai'], $validatedData['room_info_id'])) {
             return back()->with('error', 'Ruangan sudah dibooking pada jam tersebut. Silakan pilih jam lain.');
         }
@@ -539,7 +554,7 @@ class AdminController extends Controller
             'jam_mulai' => $validatedData['jam_mulai'],
             'jam_selesai' => $validatedData['jam_selesai'],
             'keperluan' => $validatedData['keperluan'],
-            'status' => Reservation::STATUS_APPROVED, // Langsung disetujui
+            'status' => Reservation::STATUS_APPROVED,
             'fasilitas_terpilih' => isset($validatedData['fasilitas']) ? implode(',', $validatedData['fasilitas']) : null,
         ];
 

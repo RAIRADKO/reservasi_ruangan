@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="container-fluid py-3">
-    <!-- Header Section -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3">
@@ -26,29 +25,42 @@
             </div>
         </div>
     </div>
-
-    <!-- Stats Cards (Optional - can be added if you have stats data) -->
-    <div class="row mb-4 d-none" id="statsCards">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
-                                <i class="bi bi-calendar-event text-primary fs-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="card-title mb-1">Total Reservasi</h6>
-                            <h4 class="mb-0 text-primary">{{ $reservations->count() }}</h4>
-                        </div>
+    
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-bottom-0 py-3">
+            <h5 class="mb-0 text-dark fw-semibold">
+                <i class="bi bi-funnel me-2"></i>
+                Filter Reservasi
+            </h5>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('admin.reservations.index') }}" method="GET">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label for="date_filter" class="form-label">Filter Berdasarkan Tanggal</label>
+                        <input type="date" class="form-control" id="date_filter" name="date" value="{{ request('date') }}">
+                    </div>
+                    <div class="col-md-5">
+                        <label for="room_filter" class="form-label">Filter Berdasarkan Ruangan</label>
+                        <select class="form-select" id="room_filter" name="room_id">
+                            <option value="">-- Semua Ruangan --</option>
+                            @foreach($rooms as $room)
+                                <option value="{{ $room->id }}" {{ request('room_id') == $room->id ? 'selected' : '' }}>
+                                    {{ $room->nama_ruangan }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search me-1"></i> Filter
+                        </button>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 
-    <!-- Main Content Card -->
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white border-bottom-0 py-3">
             <div class="row align-items-center">
@@ -57,19 +69,6 @@
                         <i class="bi bi-table me-2"></i>
                         Daftar Reservasi
                     </h5>
-                </div>
-                <div class="col-auto">
-                    <div class="d-flex gap-2">
-                        <!-- Filter buttons could be added here -->
-                        <button class="btn btn-outline-secondary btn-sm" type="button">
-                            <i class="bi bi-funnel me-1"></i>
-                            Filter
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm" type="button">
-                            <i class="bi bi-arrow-clockwise me-1"></i>
-                            Refresh
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -187,7 +186,6 @@
                             <td class="py-3">
                                 <div class="d-flex flex-wrap gap-1 justify-content-center">
                                     @if($reservation->status == 'pending')
-                                        <!-- Approve Button -->
                                         <form method="POST" action="{{ route('admin.reservations.update-status', $reservation->id) }}" class="d-inline">
                                             @csrf
                                             @method('PUT')
@@ -199,7 +197,6 @@
                                             </button>
                                         </form>
 
-                                        <!-- Reject Button -->
                                         <button type="button" class="btn btn-sm btn-danger d-flex align-items-center reject-btn" 
                                                 data-bs-toggle="modal" 
                                                 data-bs-target="#rejectModal"
@@ -212,7 +209,6 @@
                                     @endif
 
                                     @if($reservation->status == 'approved' && $reservation->admin_id)
-                                        <!-- Check Out Button -->
                                         <form method="POST" action="{{ route('admin.reservations.checkout', $reservation->id) }}" class="d-inline">
                                             @csrf
                                             @method('PATCH')
@@ -224,7 +220,6 @@
                                         </form>
                                     @endif
                                     
-                                    <!-- Delete Button -->
                                     <button type="button" class="btn btn-sm btn-outline-danger d-flex align-items-center" 
                                             data-bs-toggle="modal" 
                                             data-bs-target="#confirmDeleteModal"
@@ -243,10 +238,10 @@
                                 <div class="d-flex flex-column align-items-center">
                                     <i class="bi bi-calendar-x text-muted mb-3" style="font-size: 3rem;"></i>
                                     <h5 class="text-muted">Tidak ada reservasi</h5>
-                                    <p class="text-muted mb-3">Belum ada reservasi yang dibuat</p>
-                                    <a href="{{ route('admin.reservations.create') }}" class="btn btn-primary">
-                                        <i class="bi bi-plus-circle me-2"></i>
-                                        Buat Reservasi Pertama
+                                    <p class="text-muted mb-3">Belum ada reservasi yang dibuat atau sesuai dengan filter Anda.</p>
+                                    <a href="{{ route('admin.reservations.index') }}" class="btn btn-secondary">
+                                        <i class="bi bi-arrow-clockwise me-2"></i>
+                                        Reset Filter
                                     </a>
                                 </div>
                             </td>
@@ -258,7 +253,6 @@
         </div>
     </div>
 
-    <!-- Pagination (if needed) -->
     @if(method_exists($reservations, 'links'))
         <div class="d-flex justify-content-center mt-4">
             {{ $reservations->links() }}
@@ -266,7 +260,6 @@
     @endif
 </div>
 
-<!-- Reject Modal -->
 <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
@@ -320,90 +313,29 @@
     </div>
 </div>
 
-<!-- Custom Styles -->
-<style>
-    .avatar-sm {
-        width: 32px;
-        height: 32px;
-        font-size: 0.875rem;
-    }
-
-    .cursor-pointer {
-        cursor: pointer;
-    }
-
-    .table-hover tbody tr:hover {
-        background-color: rgba(0, 0, 0, 0.02);
-    }
-
-    .card {
-        border-radius: 12px;
-    }
-
-    .btn {
-        border-radius: 8px;
-        font-weight: 500;
-    }
-
-    .badge {
-        font-size: 0.75rem;
-        padding: 0.5rem 0.75rem;
-        border-radius: 6px;
-    }
-
-    .modal-content {
-        border-radius: 16px;
-    }
-
-    .btn-sm {
-        padding: 0.375rem 0.75rem;
-        font-size: 0.8125rem;
-    }
-
-    @media (max-width: 768px) {
-        .container-fluid {
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-        
-        .card-body {
-            padding: 0.5rem;
-        }
-        
-        .table td, .table th {
-            padding: 0.5rem;
-        }
-    }
-</style>
 @endsection
 
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Initialize tooltips
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
-    // Reject modal functionality
     const rejectModal = document.getElementById('rejectModal');
     if (rejectModal) {
         rejectModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
             const reservationId = button.getAttribute('data-reservation-id');
             const reservationName = button.getAttribute('data-reservation-name');
-
             const modalBodyReservationName = rejectModal.querySelector('#reservationName');
             const rejectForm = rejectModal.querySelector('#rejectForm');
-
             const actionUrl = `{{ url('admin/reservations') }}/${reservationId}/update-status`;
-
             modalBodyReservationName.textContent = reservationName;
             rejectForm.action = actionUrl;
         });
 
-        // Reset form when modal is hidden
         rejectModal.addEventListener('hidden.bs.modal', function (event) {
             const form = rejectModal.querySelector('#rejectForm');
             const textarea = form.querySelector('#rejection_reason');
@@ -411,7 +343,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Add loading state to buttons
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
         form.addEventListener('submit', function() {
@@ -421,7 +352,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const originalText = submitBtn.innerHTML;
                 submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Processing...';
                 
-                // Re-enable after 5 seconds as fallback
                 setTimeout(() => {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
@@ -429,16 +359,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-
-    // Auto-refresh functionality (optional)
-    let autoRefreshInterval;
-    const refreshBtn = document.querySelector('.btn-outline-secondary');
-    
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', function() {
-            location.reload();
-        });
-    }
 });
 </script>
 @endsection
