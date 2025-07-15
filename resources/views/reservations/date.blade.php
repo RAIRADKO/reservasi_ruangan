@@ -336,30 +336,402 @@
     @endif
 </div>
 
+<!-- Modal dengan tampilan yang diperbaiki -->
 <div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="reservationModalLabel">Detail Reservasi</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg">
+      <!-- Header dengan gradient -->
+      <div class="modal-header bg-gradient-primary text-white border-0 p-4">
+        <div class="d-flex align-items-center">
+          <div class="modal-icon me-3">
+            <i class="bi bi-calendar-check-fill fs-3"></i>
+          </div>
+          <div>
+            <h5 class="modal-title mb-0" id="reservationModalLabel">Detail Reservasi</h5>
+            <small class="opacity-75">Informasi lengkap reservasi</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <p><strong>Pemesan:</strong> <span id="modalNama"></span></p>
-        <p><strong>Instansi:</strong> <span id="modalInstansi"></span></p>
-        <p><strong>Ruangan:</strong> <span id="modalRuangan"></span></p>
-        <p><strong>Tanggal:</strong> <span id="modalTanggal"></span></p>
-        <p><strong>Waktu:</strong> <span id="modalJamMulai"></span> - <span id="modalJamSelesai"></span></p>
-        <p><strong>Durasi:</strong> <span id="modalDurasi"></span></p>
-        <p><strong>Keperluan:</strong></p>
-        <p id="modalKeperluan"></p>
-        <p><strong>Status:</strong> <span class="badge bg-success" id="modalStatus"></span></p>
+      
+      <!-- Body dengan layout yang lebih baik -->
+      <div class="modal-body p-0">
+        <!-- Section Info Pemesan -->
+        <div class="info-section p-4 border-bottom">
+          <div class="section-header mb-3">
+            <h6 class="fw-bold text-primary mb-0">
+              <i class="bi bi-person-circle me-2"></i>
+              Informasi Pemesan
+            </h6>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="info-item d-flex align-items-center mb-3">
+                <div class="info-icon me-3">
+                  <div class="icon-circle bg-primary bg-opacity-10 text-primary">
+                    <i class="bi bi-person-fill"></i>
+                  </div>
+                </div>
+                <div>
+                  <small class="text-muted d-block">Nama Pemesan</small>
+                  <strong id="modalNama">-</strong>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="info-item d-flex align-items-center mb-3">
+                <div class="info-icon me-3">
+                  <div class="icon-circle bg-success bg-opacity-10 text-success">
+                    <i class="bi bi-building"></i>
+                  </div>
+                </div>
+                <div>
+                  <small class="text-muted d-block">Instansi</small>
+                  <strong id="modalInstansi">-</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Info Reservasi -->
+        <div class="info-section p-4 border-bottom">
+          <div class="section-header mb-3">
+            <h6 class="fw-bold text-primary mb-0">
+              <i class="bi bi-calendar-event me-2"></i>
+              Detail Reservasi
+            </h6>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="info-item d-flex align-items-center mb-3">
+                <div class="info-icon me-3">
+                  <div class="icon-circle bg-info bg-opacity-10 text-info">
+                    <i class="bi bi-door-open-fill"></i>
+                  </div>
+                </div>
+                <div>
+                  <small class="text-muted d-block">Ruangan</small>
+                  <strong id="modalRuangan">-</strong>
+                </div>
+              </div>
+              <div class="info-item d-flex align-items-center mb-3">
+                <div class="info-icon me-3">
+                  <div class="icon-circle bg-warning bg-opacity-10 text-warning">
+                    <i class="bi bi-calendar-day-fill"></i>
+                  </div>
+                </div>
+                <div>
+                  <small class="text-muted d-block">Tanggal</small>
+                  <strong id="modalTanggal">-</strong>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="info-item d-flex align-items-center mb-3">
+                <div class="info-icon me-3">
+                  <div class="icon-circle bg-danger bg-opacity-10 text-danger">
+                    <i class="bi bi-clock-fill"></i>
+                  </div>
+                </div>
+                <div>
+                  <small class="text-muted d-block">Waktu</small>
+                  <strong>
+                    <span id="modalJamMulai">-</span> - <span id="modalJamSelesai">-</span>
+                  </strong>
+                </div>
+              </div>
+              <div class="info-item d-flex align-items-center mb-3">
+                <div class="info-icon me-3">
+                  <div class="icon-circle bg-secondary bg-opacity-10 text-secondary">
+                    <i class="bi bi-hourglass-split"></i>
+                  </div>
+                </div>
+                <div>
+                  <small class="text-muted d-block">Durasi</small>
+                  <strong id="modalDurasi">-</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Keperluan -->
+        <div class="info-section p-4 border-bottom">
+          <div class="section-header mb-3">
+            <h6 class="fw-bold text-primary mb-0">
+              <i class="bi bi-journal-text me-2"></i>
+              Keperluan
+            </h6>
+          </div>
+          <div class="keperluan-box p-3 bg-light rounded-3">
+            <p class="mb-0" id="modalKeperluan">-</p>
+          </div>
+        </div>
+
+        <!-- Section Status -->
+        <div class="info-section p-4">
+          <div class="section-header mb-3">
+            <h6 class="fw-bold text-primary mb-0">
+              <i class="bi bi-check-circle me-2"></i>
+              Status Reservasi
+            </h6>
+          </div>
+          <div class="status-display d-flex align-items-center">
+            <div class="status-icon me-3">
+              <div class="icon-circle bg-success bg-opacity-10 text-success">
+                <i class="bi bi-check-circle-fill"></i>
+              </div>
+            </div>
+            <div>
+              <span class="badge bg-success fs-6 px-3 py-2" id="modalStatus">Disetujui</span>
+              <small class="text-muted d-block mt-1">Reservasi telah dikonfirmasi</small>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+      
+      <!-- Footer -->
+      <div class="modal-footer border-0 p-4 bg-light">
+        <div class="d-flex justify-content-between align-items-center w-100">
+          <div class="modal-info">
+            <small class="text-muted">
+              <i class="bi bi-info-circle me-1"></i>
+              Informasi reservasi yang telah disetujui
+            </small>
+          </div>
+          <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">
+            <i class="bi bi-check-lg me-2"></i>
+            Tutup
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+/* Styles untuk modal yang diperbaiki */
+.modal-content {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #0F172A 0%, #1e293b 100%);
+}
+
+.modal-icon {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-section {
+  transition: all 0.3s ease;
+}
+
+.info-section:hover {
+  background-color: #f8f9fa;
+}
+
+.section-header {
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.section-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, #0066cc, #004499);
+  border-radius: 2px;
+}
+
+.info-item {
+  transition: all 0.3s ease;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.info-item:hover {
+  background-color: rgba(0, 102, 204, 0.05);
+  transform: translateX(5px);
+}
+
+.icon-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.info-item:hover .icon-circle {
+  transform: scale(1.1);
+}
+
+.keperluan-box {
+  border-left: 4px solid #0066cc;
+  transition: all 0.3s ease;
+}
+
+.keperluan-box:hover {
+  background-color: #e3f2fd !important;
+  transform: translateX(5px);
+}
+
+.status-display {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.status-display:hover {
+  background-color: rgba(40, 167, 69, 0.05);
+  border-color: #28a745;
+}
+
+.modal-footer {
+  border-radius: 0 0 1rem 1rem;
+}
+
+.btn-primary {
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+}
+
+/* Animasi untuk modal */
+.modal.fade .modal-dialog {
+  transform: scale(0.8) translateY(-50px);
+  transition: all 0.3s ease;
+}
+
+.modal.show .modal-dialog {
+  transform: scale(1) translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal-dialog {
+    margin: 1rem;
+  }
+  
+  .modal-body .row {
+    margin: 0;
+  }
+  
+  .modal-body .col-md-6 {
+    padding: 0;
+  }
+  
+  .info-item {
+    margin-bottom: 1rem !important;
+  }
+  
+  .modal-header {
+    padding: 1.5rem !important;
+  }
+  
+  .modal-header .modal-title {
+    font-size: 1.1rem;
+  }
+  
+  .modal-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .modal-icon i {
+    font-size: 1.2rem;
+  }
+  
+  .icon-circle {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+  
+  .info-section {
+    padding: 1.5rem !important;
+  }
+  
+  .modal-footer {
+    padding: 1.5rem !important;
+  }
+  
+  .modal-footer .d-flex {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .modal-info {
+    text-align: center;
+  }
+}
+
+/* Loading animation untuk saat modal dibuka */
+.modal-body .info-item {
+  opacity: 0;
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.modal-body .info-item:nth-child(1) { animation-delay: 0.1s; }
+.modal-body .info-item:nth-child(2) { animation-delay: 0.2s; }
+.modal-body .info-item:nth-child(3) { animation-delay: 0.3s; }
+.modal-body .info-item:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover effect untuk close button */
+.btn-close-white:hover {
+  transform: rotate(90deg);
+  transition: transform 0.3s ease;
+}
+
+/* Custom scrollbar untuk modal body jika terlalu panjang */
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+</style>
 @endsection
 
 @section('styles')
