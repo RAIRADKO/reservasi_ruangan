@@ -429,6 +429,8 @@
                                         <h6 class="mb-0 fw-bold">{{ $event->roomInfo->nama_ruangan }}</h6>
                                         <small class="text-muted">
                                             {{ date('H:i', strtotime($event->jam_mulai)) }} - {{ date('H:i', strtotime($event->jam_selesai)) }}
+                                            <span class="mx-1 text-muted">&bull;</span>
+                                            {{ Str::limit($event->keperluan, 10) }}
                                         </small>
                                     </div>
                                 </div>
