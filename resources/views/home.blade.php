@@ -80,7 +80,7 @@
     }
     
     .fc-event-booked {
-        background-color: #000080 !important;
+        background-color: #3895D3 !important;
         border: none;
     }
     
@@ -90,7 +90,7 @@
     }
     
     .fc-event-not-available {
-        background-color: rgba(108, 117, 125, 0.7) !important;
+        background-color: rgba(108, 117, 125, 1) !important;
         border: none;
     }
     

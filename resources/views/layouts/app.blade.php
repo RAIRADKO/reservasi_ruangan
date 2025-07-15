@@ -263,7 +263,7 @@
         .navbar-app-name {
             font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 0;
+            margin-bottom: 0.50rem;
         }
 
         .navbar-jargon {

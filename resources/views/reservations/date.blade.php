@@ -830,6 +830,10 @@
     }
 
     .card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 3px solid #0d6efd !important; 
         transition: all 0.3s ease;
     }
 
