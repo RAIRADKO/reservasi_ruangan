@@ -255,6 +255,56 @@
             border-radius: 0.5rem;
         }
 
+        /* Styling untuk jargon */
+        .navbar-brand-text {
+            line-height: 1;
+        }
+
+        .navbar-app-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0;
+        }
+
+        .navbar-jargon {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: #94a3b8 !important;
+            margin-top: -2px;
+            opacity: 0.9;
+        }
+
+        /* Responsive adjustments untuk jargon */
+        @media (max-width: 991.98px) {
+            .navbar-app-name {
+                font-size: 1.2rem;
+            }
+            
+            .navbar-jargon {
+                font-size: 0.65rem;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .navbar-app-name {
+                font-size: 1rem;
+            }
+            
+            .navbar-jargon {
+                font-size: 0.6rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .navbar-app-name {
+                font-size: 0.9rem;
+            }
+            
+            .navbar-jargon {
+                font-size: 0.55rem;
+            }
+        }
+
         
         .footer-custom {
             background: linear-gradient(135deg, #0F172A 0%, #1e293b 100%);
@@ -408,7 +458,10 @@
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ route('home') }}">
                 <img src="{{ asset('img/Lambang_Kabupaten_Purworejo.png') }}" alt="Logo Kabupaten Purworejo" class="navbar-logo me-3">
-                <span>CommandBook</span>
+                <div class="navbar-brand-text">
+                    <div class="navbar-app-name">CommandBook</div>
+                    <div class="navbar-jargon">Mewujudkan Tata Kelola Perkantoran yang Modern, Efisien, dan Terintegrasi</div>
+                </div>
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
