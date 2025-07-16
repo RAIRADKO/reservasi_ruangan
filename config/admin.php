@@ -3,13 +3,14 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Kredensial Admin Default
+    | Konfigurasi Admin
     |--------------------------------------------------------------------------
     |
-    | Nilai ini digunakan oleh DatabaseSeeder untuk membuat akun admin
-    | pertama kali. Sebaiknya ganti nilai default ini di file .env Anda.
+    | Kredensial admin default telah dihapus dari file konfigurasi.
+    | Silakan gunakan SuperAdminSeeder.php untuk membuat akun admin pertama
+    | dengan kredensial yang aman. Setelah proses instalasi, segera ganti
+    | username dan password super admin Anda.
     |
     */
-    'username' => env('ADMIN_USERNAME', 'admin'),
-    'password' => env('ADMIN_PASSWORD', 'password'),
+    // Tidak ada kredensial default di sini. Gunakan seeder untuk setup admin.
 ];
