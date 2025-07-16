@@ -30,7 +30,7 @@ class ForgotPasswordController extends Controller
                     ->first();
         if (!$user) {
             return back()->withInput($request->only('nip', 'email'))
-                         ->withErrors(['email' => 'NIP dan Alamat Email yang Anda masukkan tidak cocok.']);
+                        ->withErrors(['email' => 'Informasi yang diberikan tidak cocok dengan data kami.']);
         }
         $response = $this->broker()->sendResetLink(
             $request->only('email')

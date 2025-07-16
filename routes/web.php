@@ -25,7 +25,7 @@ Route::get('/reservations/date/{date}/room/{room}', [RoomController::class, 'sho
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [LoginController::class, 'login']);
+    Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:5,1'); // Tambahkan ini
 
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
@@ -78,7 +78,7 @@ Route::middleware('auth')->group(function () {
 // ==========================
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AdminLoginController::class, 'login'])->name('login.submit');
+    Route::post('/login', [AdminLoginController::class, 'login'])->name('login.submit')->middleware('throttle:5,1'); // Tambahkan ini
     Route::post('/logout', [AdminLoginController::class, 'logout'])->name('logout');
 });
 
