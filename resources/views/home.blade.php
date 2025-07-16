@@ -79,24 +79,53 @@
         border-radius: 12px 12px 0 0 !important;
     }
     
+
     .fc-event-booked {
         background-color: #3895D3 !important;
         border: none;
+        color: #fff !important;
+        font-size: 1.1em;
+        font-weight: bold;
+        text-shadow: 0 1px 4px #1261A0, 0 0 2px #1261A0;
     }
-    
     .fc-event-full {
-        background-color: rgba(220, 53, 69, 0.7) !important;
+        background-color: #dc3545 !important;
         border: none;
+        color: #fff !important;
+        font-size: 1.1em;
+        font-weight: bold;
+        text-shadow: 0 1px 4px #a71d2a, 0 0 2px #a71d2a;
     }
-    
     .fc-event-not-available {
-        background-color: rgba(108, 117, 125, 1) !important;
+        background-color: #6c757d !important;
         border: none;
+        color: #fff !important;
+        font-size: 1.1em;
+        font-weight: bold;
+        text-shadow: 0 1px 4px #343a40, 0 0 2px #343a40;
     }
-    
     .fc-event-available {
-        background-color: rgba(25, 135, 84, 0.7) !important;
+        background-color: #198754 !important;
         border: none;
+        color: #fff !important;
+        font-size: 1.1em;
+        font-weight: bold;
+        text-shadow: 0 1px 4px #145c32, 0 0 2px #145c32;
+    }
+
+    /* Responsive event text for calendar on mobile */
+    @media (max-width: 576px) {
+        .fc .fc-event-title, .fc .fc-event-time, .fc .fc-event {
+            font-size: 0.78em !important;
+            line-height: 1.1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .fc .fc-daygrid-event {
+            padding: 1px 2px !important;
+            min-height: 18px;
+        }
     }
     
     .fc-day-today {
@@ -216,8 +245,10 @@
     .fc-event-full .fc-daygrid-day-number,
     .fc-event-not-available .fc-daygrid-day-number,
     .fc-event-available .fc-daygrid-day-number {
-        color: #000 !important;
-        font-weight: 600;
+        color: #fff !important;
+        font-weight: bold;
+        font-size: 1.15em;
+        text-shadow: 0 1px 4px #000, 0 0 2px #000;
     }
     
     #calendar {
@@ -420,17 +451,17 @@
                 @if(count($todayEvents) > 0)
                     <div class="list-group">
                         @foreach($todayEvents as $event)
-                            <div class="list-group-item border-0 py-2 px-0">
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 36px; height: 36px;">
+                            <div class="list-group-item border-0 py-2 px-0 today-event-item">
+                                <div class="d-flex align-items-center flex-wrap flex-md-nowrap">
+                                    <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-2 today-event-icon">
                                         <i class="bi bi-calendar-check"></i>
                                     </div>
-                                    <div>
-                                        <h6 class="mb-0 fw-bold">{{ $event->roomInfo->nama_ruangan }}</h6>
-                                        <small class="text-muted">
+                                    <div class="flex-grow-1 min-width-0">
+                                        <h6 class="mb-0 fw-bold today-event-room text-truncate">{{ $event->roomInfo->nama_ruangan }}</h6>
+                                        <small class="text-muted today-event-detail">
                                             {{ date('H:i', strtotime($event->jam_mulai)) }} - {{ date('H:i', strtotime($event->jam_selesai)) }}
                                             <span class="mx-1 text-muted">&bull;</span>
-                                            {{ Str::limit($event->keperluan, 10) }}
+                                            {{ Str::limit($event->keperluan, 30) }}
                                         </small>
                                     </div>
                                 </div>
@@ -446,6 +477,45 @@
             </div>
         </div>
     </div>
+    <style>
+    /* Responsive styling for today's event list */
+    .today-event-item {
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+    }
+    .today-event-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+    .today-event-room {
+        font-size: 1rem;
+        max-width: 180px;
+    }
+    .today-event-detail {
+        font-size: 0.92rem;
+    }
+    @media (max-width: 576px) {
+        .today-event-item {
+            padding-top: 0.3rem !important;
+            padding-bottom: 0.3rem !important;
+        }
+        .today-event-icon {
+            width: 28px;
+            height: 28px;
+            font-size: 0.95rem;
+            margin-right: 0.7rem !important;
+        }
+        .today-event-room {
+            font-size: 0.95rem;
+            max-width: 110px;
+        }
+        .today-event-detail {
+            font-size: 0.8rem;
+        }
+    }
+    </style>
     @else
     {{-- Additional content for non-logged in users --}}
     <div class="col-md-6">
@@ -581,7 +651,7 @@
                 <span class="badge bg-secondary">
                     <i class="bi bi-x-circle me-1"></i>Tidak Tersedia
                 </span>
-                <span class="badge bg-warning">
+                <span class="badge" style="background-color: #0d6efd; color: #fff;">
                     <i class="bi bi-check-circle me-1"></i>Terisi
                 </span>
                 <span class="badge bg-success">
