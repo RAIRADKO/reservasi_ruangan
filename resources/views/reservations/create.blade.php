@@ -94,12 +94,17 @@
                 <h5 class="text-primary mb-3"><i class="bi bi-door-closed me-2"></i>Detail Ruangan</h5>
                 <div class="mb-3">
                     <label for="room_info_id" class="form-label">Pilih Ruangan</label>
+                    <!-- Search bar untuk filter ruangan -->
+                    <div class="input-group mb-2">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="search-room" placeholder="Cari ruangan...">
+                    </div>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-door-open"></i></span>
                         <select class="form-select" id="room_info_id" name="room_info_id" required>
                             <option value="" disabled {{ old('room_info_id') ? '' : 'selected' }}>-- Pilih Ruangan --</option>
                             @foreach($rooms as $room)
-                                <option value="{{ $room->id }}" data-fasilitas="{{ $room->fasilitas }}" {{ old('room_info_id') == $room->id ? 'selected' : '' }}>
+                                <option value="{{ $room->id }}" data-fasilitas="{{ $room->fasilitas }}" data-nama="{{ strtolower($room->nama_ruangan) }}" data-kapasitas="{{ $room->kapasitas }}" {{ old('room_info_id') == $room->id ? 'selected' : '' }}>
                                     {{ $room->nama_ruangan }} (Kapasitas: {{ $room->kapasitas }} orang)
                                 </option>
                             @endforeach
@@ -221,8 +226,42 @@
 document.addEventListener('DOMContentLoaded', function() {
     // ... kode JavaScript yang sudah ada ...
     const roomSelect = document.getElementById('room_info_id');
+    const searchRoomInput = document.getElementById('search-room');
     const fasilitasWrapper = document.getElementById('fasilitas-wrapper');
     const fasilitasChecklist = document.getElementById('fasilitas-checklist');
+
+    // Fitur search/filter ruangan
+    if (searchRoomInput && roomSelect) {
+        searchRoomInput.addEventListener('input', function() {
+            const searchValue = this.value.trim().toLowerCase();
+            let found = false;
+            Array.from(roomSelect.options).forEach(option => {
+                if (!option.value) return; // skip placeholder
+                const nama = option.getAttribute('data-nama') || '';
+                const kapasitas = option.getAttribute('data-kapasitas') || '';
+                const text = option.textContent.toLowerCase();
+                // Cocokkan nama ruangan, kapasitas, atau isi text
+                if (
+                    nama.includes(searchValue) ||
+                    kapasitas.includes(searchValue) ||
+                    text.includes(searchValue)
+                ) {
+                    option.style.display = '';
+                    if (!found) {
+                        roomSelect.value = option.value;
+                        found = true;
+                    }
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+            if (!found) {
+                roomSelect.value = '';
+            }
+            // Trigger event agar fasilitas ikut update
+            roomSelect.dispatchEvent(new Event('change'));
+        });
+    }
 
     function updateFasilitas() {
         fasilitasChecklist.innerHTML = '';
