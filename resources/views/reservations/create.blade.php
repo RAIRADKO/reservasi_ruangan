@@ -24,6 +24,7 @@
         display: inline-block;
     }
 
+
     .fasilitas-item .btn .icon-checked,
     .fasilitas-item .btn-check:checked ~ .btn .icon-unchecked {
         display: none;
@@ -219,12 +220,84 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // ... kode JavaScript yang sudah ada ...
-    
+    const roomSelect = document.getElementById('room_info_id');
+    const fasilitasWrapper = document.getElementById('fasilitas-wrapper');
+    const fasilitasChecklist = document.getElementById('fasilitas-checklist');
+
+    function updateFasilitas() {
+        fasilitasChecklist.innerHTML = '';
+
+        const selectedOption = roomSelect.options[roomSelect.selectedIndex];
+
+        if (!selectedOption || !selectedOption.value) {
+            fasilitasWrapper.style.display = 'none';
+            return;
+        }
+
+        const fasilitasData = selectedOption.getAttribute('data-fasilitas');
+
+        if (fasilitasData && fasilitasData.trim() !== '') {
+            const fasilitasArray = fasilitasData.split(',').map(item => item.trim()).filter(item => item);
+
+            if (fasilitasArray.length > 0) {
+                fasilitasArray.forEach(fasilitas => {
+                    const uniqueId = 'fasilitas-' + fasilitas.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'fasilitas-item';
+
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.className = 'btn-check';
+                    input.name = 'fasilitas[]';
+                    input.id = uniqueId;
+                    input.value = fasilitas;
+                    input.autocomplete = 'off';
+
+                    const label = document.createElement('label');
+                    label.className = 'btn btn-outline-primary';
+                    label.htmlFor = uniqueId;
+                    label.innerHTML = `
+                        <i class="bi bi-square icon-unchecked me-2"></i>
+                        <i class="bi bi-check-square-fill icon-checked me-2"></i>
+                        <span>${fasilitas}</span>
+                    `;
+
+                    itemDiv.appendChild(input);
+                    itemDiv.appendChild(label);
+                    fasilitasChecklist.appendChild(itemDiv);
+                });
+                fasilitasWrapper.style.display = 'block';
+            } else {
+                fasilitasChecklist.innerHTML = '<div class="text-muted small">Ruangan ini tidak memiliki fasilitas khusus.</div>';
+                fasilitasWrapper.style.display = 'block';
+            }
+        } else {
+            fasilitasChecklist.innerHTML = '<div class="text-muted small">Ruangan ini tidak memiliki fasilitas khusus.</div>';
+            fasilitasWrapper.style.display = 'block';
+        }
+    }
+
+    roomSelect.addEventListener('change', updateFasilitas);
+    updateFasilitas();
+
+    const blockedDates = @json($blockedDates ?? []);
+    const tanggalInput = document.getElementById('tanggal');
+    const submitButton = document.getElementById('submitButton');
+    const dateWarning = document.getElementById('date-warning');
+    const checkAvailabilityButton = document.getElementById('checkAvailabilityButton');
+    const availabilityResult = document.getElementById('availability-result');
+    const availabilityMessage = document.getElementById('availability-message');
+    const existingReservationsList = document.getElementById('existing-reservations');
+    const reservationList = document.getElementById('reservation-list');
+    const jamMulai = document.getElementById('jam_mulai');
+    const jamSelesai = document.getElementById('jam_selesai');
+
     // Toggle untuk multi-hari
     const toggleMultiDay = document.getElementById('toggleMultiDay');
     const multiDayContainer = document.getElementById('multiDayContainer');
     const tanggalSelesaiInput = document.getElementById('tanggal_selesai');
-    
+
     // Jika ada nilai tanggal selesai dari old input, tampilkan container
     if ("{{ old('tanggal_selesai') }}") {
         multiDayContainer.style.display = 'block';
@@ -232,7 +305,7 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleMultiDay.classList.add('btn-outline-danger');
         toggleMultiDay.classList.remove('btn-outline-primary');
     }
-    
+
     toggleMultiDay.addEventListener('click', function() {
         if (multiDayContainer.style.display === 'none') {
             // Tampilkan input tanggal selesai
@@ -240,10 +313,10 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleMultiDay.innerHTML = '<i class="bi bi-dash-circle me-1"></i> Hapus Hari Tambahan';
             toggleMultiDay.classList.add('btn-outline-danger');
             toggleMultiDay.classList.remove('btn-outline-primary');
-            
+
             // Set nilai default tanggal selesai = tanggal mulai
-            if (!tanggalSelesaiInput.value && document.getElementById('tanggal').value) {
-                tanggalSelesaiInput.value = document.getElementById('tanggal').value;
+            if (!tanggalSelesaiInput.value && tanggalInput.value) {
+                tanggalSelesaiInput.value = tanggalInput.value;
             }
         } else {
             // Sembunyikan input tanggal selesai
@@ -254,15 +327,116 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleMultiDay.classList.add('btn-outline-primary');
         }
     });
-    
-    // ... kode JavaScript yang sudah ada ...
 
-    // Fungsi untuk validasi waktu (sudah ada di kode sebelumnya)
-    function validateTimes() {
-        // ... isi fungsi validasi waktu ...
+    function checkDate() {
+        const selectedDate = tanggalInput.value;
+        if (blockedDates.includes(selectedDate)) {
+            tanggalInput.classList.add('is-invalid');
+            dateWarning.textContent = 'Tanggal yang dipilih tidak tersedia untuk reservasi. Silakan pilih tanggal lain.';
+            dateWarning.style.display = 'block';
+            submitButton.disabled = true;
+        } else {
+            tanggalInput.classList.remove('is-invalid');
+            dateWarning.style.display = 'none';
+            submitButton.disabled = false;
+        }
+    }
+    
+    tanggalInput.addEventListener('change', checkDate);
+    if (tanggalInput.value) {
+        checkDate();
     }
 
-    // ... sisa kode JavaScript yang sudah ada ...
+    function validateTimes() {
+        const startTime = jamMulai.value;
+        const endTime = jamSelesai.value;
+        
+        if (startTime && endTime && startTime >= endTime) {
+            jamSelesai.setCustomValidity('Jam selesai harus setelah jam mulai');
+            jamSelesai.classList.add('is-invalid');
+        } else {
+            jamSelesai.setCustomValidity('');
+            jamSelesai.classList.remove('is-invalid');
+        }
+    }
+
+    jamMulai.addEventListener('change', validateTimes);
+    jamSelesai.addEventListener('change', validateTimes);
+    
+    checkAvailabilityButton.addEventListener('click', function() {
+        const roomId = roomSelect.value;
+        const tanggal = tanggalInput.value;
+        const jam_mulai = jamMulai.value;
+        const jam_selesai = jamSelesai.value;
+
+        if (!roomId || !tanggal || !jam_mulai || !jam_selesai) {
+            showAvailabilityResult(false, 'Mohon lengkapi semua field terlebih dahulu.');
+            return;
+        }
+
+        checkAvailabilityButton.disabled = true;
+        checkAvailabilityButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Mengecek...';
+
+        fetch('{{ route("reservations.check-availability") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                room_info_id: roomId,
+                tanggal: tanggal,
+                jam_mulai: jam_mulai,
+                jam_selesai: jam_selesai
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            showAvailabilityResult(data.available, data.message, data.existing_reservations);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAvailabilityResult(false, 'Terjadi kesalahan saat mengecek ketersediaan.');
+        })
+        .finally(() => {
+            checkAvailabilityButton.disabled = false;
+            checkAvailabilityButton.innerHTML = '<i class="bi bi-search"></i> Cek Ketersediaan';
+        });
+    });
+
+    function showAvailabilityResult(available, message, existingReservationsData = null) {
+        availabilityResult.style.display = 'block';
+        const alertIcon = document.getElementById('alert-icon');
+        
+        if (available) {
+            availabilityResult.firstElementChild.className = 'alert alert-success p-3';
+            alertIcon.className = 'bi bi-check-circle-fill text-success';
+            availabilityMessage.innerHTML = message;
+            existingReservationsList.style.display = 'none';
+        } else {
+            availabilityResult.firstElementChild.className = 'alert alert-danger p-3';
+            alertIcon.className = 'bi bi-exclamation-triangle-fill text-danger';
+            availabilityMessage.innerHTML = message;
+            
+            if (existingReservationsData && existingReservationsData.length > 0) {
+                reservationList.innerHTML = '';
+                existingReservationsData.forEach(reservation => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${reservation.jam_mulai} - ${reservation.jam_selesai}</strong>`;
+                    reservationList.appendChild(li);
+                });
+                existingReservationsList.style.display = 'block';
+            } else {
+                existingReservationsList.style.display = 'none';
+            }
+        }
+    }
+
+    [roomSelect, tanggalInput, jamMulai, jamSelesai].forEach(element => {
+        element.addEventListener('change', function() {
+            availabilityResult.style.display = 'none';
+        });
+    });
 });
 </script>
 @endsection
