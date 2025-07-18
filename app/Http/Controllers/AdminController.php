@@ -530,19 +530,26 @@ class AdminController extends Controller
             'nama' => 'required|string|max:100',
             'kontak' => 'required|string|max:100',
             'tanggal' => 'required|date|after_or_equal:today',
+            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal', // Ditambahkan
             'jam_mulai' => 'required|date_format:H:i',
             'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
             'keperluan' => 'required|string|max:255',
             'fasilitas' => 'nullable|array',
             'fasilitas.*' => 'string|max:100',
         ]);
-        
+
         $admin = auth()->guard('admin')->user();
-        
-        if (Reservation::hasConflict($validatedData['tanggal'], $validatedData['jam_mulai'], $validatedData['jam_selesai'], $validatedData['room_info_id'])) {
-            return back()->with('error', 'Ruangan sudah dibooking pada jam tersebut. Silakan pilih jam lain.');
+
+        if (Reservation::hasConflict(
+            $validatedData['tanggal'],
+            $request->tanggal_selesai,
+            $validatedData['jam_mulai'],
+            $validatedData['jam_selesai'],
+            $validatedData['room_info_id']
+        )) {
+            return back()->with('error', 'Ruangan sudah dibooking pada rentang waktu tersebut.');
         }
-        
+
         $reservationData = [
             'admin_id' => $admin->id,
             'user_id' => null,
@@ -551,6 +558,7 @@ class AdminController extends Controller
             'nama' => $validatedData['nama'],
             'kontak' => $validatedData['kontak'],
             'tanggal' => $validatedData['tanggal'],
+            'tanggal_selesai' => $request->input('tanggal_selesai', $validatedData['tanggal']), // Ditambahkan
             'jam_mulai' => $validatedData['jam_mulai'],
             'jam_selesai' => $validatedData['jam_selesai'],
             'keperluan' => $validatedData['keperluan'],
@@ -560,6 +568,6 @@ class AdminController extends Controller
 
         Reservation::create($reservationData);
 
-        return redirect()->route('admin.reservations.index')->with('success', 'Reservasi baru berhasil dibuat dan otomatis disetujui.');
+        return redirect()->route('admin.reservations.index')->with('success', 'Reservasi baru berhasil dibuat.');
     }
 }

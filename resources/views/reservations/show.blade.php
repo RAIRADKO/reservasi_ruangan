@@ -47,7 +47,7 @@
                     <div class="col-12 col-md-6 mb-3">
                         <h6 class="text-muted h6"><i class="bi bi-calendar-event-fill me-2"></i>Detail Jadwal</h6>
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">Tanggal: <strong>{{ $reservation->tanggal->isoFormat('dddd, D MMMM Y') }}</strong></li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">Tanggal: <strong>{{ $reservation->tanggal_formatted }}</strong></li>
                             <li class="list-group-item d-flex justify-content-between align-items-center px-0">Waktu: <strong>{{ $reservation->jam_range }}</strong></li>
                         </ul>
                     </div>

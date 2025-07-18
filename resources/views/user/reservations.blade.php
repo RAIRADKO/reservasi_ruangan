@@ -48,7 +48,7 @@
                             <tr class='clickable-row' data-href="{{ route('reservations.show', $reservation->id) }}">
                                 <td>
                                     <a href="{{ route('reservations.show', $reservation->id) }}" class="text-decoration-none fw-bold">
-                                        {{ $reservation->tanggal->isoFormat('dddd, D MMMM Y') }}
+                                        {{ $reservation->tanggal_formatted }}
                                     </a>
                                 </td>
                                 <td>{{ $reservation->jam_range }}</td>

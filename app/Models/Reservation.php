@@ -15,6 +15,7 @@ class Reservation extends Model
         'nama',
         'kontak',
         'tanggal',
+        'tanggal_selesai', // Ditambahkan
         'jam_mulai',
         'jam_selesai',
         'keperluan',
@@ -22,13 +23,14 @@ class Reservation extends Model
         'status',
         'rejection_reason',
         'checked_out_at',
-        'satisfaction_rating', 
-        'feedback', 
+        'satisfaction_rating',
+        'feedback',
     ];
 
     protected $casts = [
         'tanggal' => 'date',
-        'checked_out_at' => 'datetime', 
+        'tanggal_selesai' => 'date', // Ditambahkan
+        'checked_out_at' => 'datetime',
     ];
 
     const STATUS_PENDING = 'pending';
@@ -47,7 +49,7 @@ class Reservation extends Model
             self::STATUS_COMPLETED => 'Selesai',
         ];
     }
-    
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -57,40 +59,56 @@ class Reservation extends Model
     {
         return $this->belongsTo(RoomInfo::class);
     }
-    
+
     public function dinas(): BelongsTo
     {
         return $this->belongsTo(Dinas::class);
     }
-    
-    public static function hasConflict($tanggal, $jam_mulai, $jam_selesai, $room_info_id, $excludeId = null)
+
+    // --- LOGIKA KONFLIK DIPERBARUI ---
+    public static function hasConflict($tanggal_mulai, $tanggal_selesai, $jam_mulai, $jam_selesai, $room_info_id, $excludeId = null)
     {
-        $query = self::where('tanggal', $tanggal)
-            ->where('room_info_id', $room_info_id)
+        $tanggal_selesai = $tanggal_selesai ?? $tanggal_mulai;
+
+        $query = self::where('room_info_id', $room_info_id)
             ->where('status', self::STATUS_APPROVED)
-            ->where(function ($q) use ($jam_mulai, $jam_selesai) {
-                $q->where(function ($q) use ($jam_mulai, $jam_selesai) {
-                    $q->where('jam_mulai', '<', $jam_selesai)
-                      ->where('jam_selesai', '>', $jam_mulai);
+            ->where(function ($q) use ($tanggal_mulai, $tanggal_selesai) {
+                $q->where(function($sub) use ($tanggal_mulai, $tanggal_selesai) {
+                    $sub->where('tanggal', '<=', $tanggal_selesai)
+                        ->where('tanggal_selesai', '>=', $tanggal_mulai);
+                })->orWhere(function($sub) use ($tanggal_mulai, $tanggal_selesai) {
+                    $sub->where('tanggal', '<=', $tanggal_selesai)
+                        ->whereNull('tanggal_selesai')
+                        ->where('tanggal', '>=', $tanggal_mulai);
                 });
+            })
+            ->where(function ($q) use ($jam_mulai, $jam_selesai) {
+                $q->where('jam_mulai', '<', $jam_selesai)
+                  ->where('jam_selesai', '>', $jam_mulai);
             });
-            
+
         if ($excludeId) {
             $query->where('id', '!=', $excludeId);
         }
-        
+
         return $query->exists();
     }
-    
+    // --- AKHIR PERUBAHAN ---
+
     public function getJamRangeAttribute()
     {
         return date('H:i', strtotime($this->jam_mulai)) . ' - ' . date('H:i', strtotime($this->jam_selesai));
     }
-    
+
+    // --- ATRIBUT BARU UNTUK TAMPILAN TANGGAL ---
     public function getTanggalFormattedAttribute()
     {
+        if ($this->tanggal_selesai && $this->tanggal->ne($this->tanggal_selesai)) {
+            return $this->tanggal->format('d M Y') . ' - ' . $this->tanggal_selesai->format('d M Y');
+        }
         return $this->tanggal->format('d M Y');
     }
+    // --- AKHIR PERUBAHAN ---
 
     public function getTanggalAttribute($value)
     {

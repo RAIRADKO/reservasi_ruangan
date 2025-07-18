@@ -36,25 +36,20 @@ class ReservationController extends Controller
         $validatedData = $request->validated();
         $user = Auth::user();
 
-        // Cek konflik jadwal sebelum membuat reservasi
-        if (Reservation::hasConflict($validatedData['tanggal'], $validatedData['jam_mulai'], $validatedData['jam_selesai'], $validatedData['room_info_id'])) {
-            return back()->with('error', 'Ruangan sudah dibooking pada jam tersebut. Silakan pilih jam lain.');
-        }
+        // Pengecekan konflik sekarang sudah dihandle oleh StoreReservationRequest
 
-        // Gabungkan data yang divalidasi dengan user_id dan status
         $reservationData = array_merge($validatedData, [
             'user_id' => $user->id,
-            'nama' => $user->name, // Ambil nama dari user yang login
-            'kontak' => $user->nip, // Ambil NIP sebagai kontak
+            'nama' => $user->name,
+            'kontak' => $user->nip,
             'fasilitas_terpilih' => isset($validatedData['fasilitas']) ? implode(',', $validatedData['fasilitas']) : null,
-            // --- INI BAGIAN PENTING ---
-            // Pastikan status default adalah 'pending'
-            'status' => Reservation::STATUS_PENDING, 
+            'status' => Reservation::STATUS_PENDING,
+            'tanggal_selesai' => $request->input('tanggal_selesai', $request->input('tanggal')), // Simpan tanggal selesai
         ]);
 
         Reservation::create($reservationData);
 
-        return redirect()->route('user.reservations')->with('success', 'Reservasi Anda telah berhasil dikirim dan sedang menunggu persetujuan.');
+        return redirect()->route('user.reservations')->with('success', 'Reservasi Anda telah berhasil dikirim.');
     }
 
     public function cancel(Reservation $reservation)
@@ -91,39 +86,39 @@ class ReservationController extends Controller
         $request->validate([
             'room_info_id' => 'required|exists:room_infos,id',
             'tanggal' => 'required|date',
+            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal',
             'jam_mulai' => 'required|date_format:H:i',
             'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
         ]);
-        $isBlocked = BlockedDate::where('date', $request->tanggal)->exists();
+
+        $tanggalMulai = $request->tanggal;
+        $tanggalSelesai = $request->tanggal_selesai ?? $tanggalMulai;
+
+        // Cek tanggal yang diblokir
+        $isBlocked = BlockedDate::whereBetween('date', [$tanggalMulai, $tanggalSelesai])->exists();
         if ($isBlocked) {
             return response()->json([
                 'available' => false,
-                'message' => 'Tanggal yang dipilih tidak tersedia untuk reservasi.'
+                'message' => 'Satu atau lebih tanggal dalam rentang yang dipilih tidak tersedia.'
             ]);
         }
+
+        // Cek konflik
         $hasConflict = Reservation::hasConflict(
-            $request->tanggal,
+            $tanggalMulai,
+            $tanggalSelesai,
             $request->jam_mulai,
             $request->jam_selesai,
             $request->room_info_id
         );
+
         if ($hasConflict) {
-            $existingReservations = Reservation::where('tanggal', $request->tanggal)
-                ->where('room_info_id', $request->room_info_id)
-                ->where('status', Reservation::STATUS_APPROVED)
-                ->orderBy('jam_mulai')
-                ->get(['jam_mulai', 'jam_selesai']);
             return response()->json([
                 'available' => false,
-                'message' => 'Ruangan sudah dibooking pada jam tersebut.',
-                'existing_reservations' => $existingReservations->map(function ($reservation) {
-                    return [
-                        'jam_mulai' => date('H:i', strtotime($reservation->jam_mulai)),
-                        'jam_selesai' => date('H:i', strtotime($reservation->jam_selesai)),
-                    ];
-                })
+                'message' => 'Ruangan sudah dibooking pada rentang tanggal dan jam tersebut.',
             ]);
         }
+
         return response()->json([
             'available' => true,
             'message' => 'Ruangan tersedia untuk waktu yang dipilih.'
