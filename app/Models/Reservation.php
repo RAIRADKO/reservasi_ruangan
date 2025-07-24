@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Reservation extends Model
 {
     protected $fillable = [
+        'batch_id',
         'user_id',
         'admin_id',
         'room_info_id',
@@ -26,6 +27,11 @@ class Reservation extends Model
         'satisfaction_rating',
         'feedback',
     ];
+    // Batch/grouping multi-day reservation
+    public function scopeBatch($query, $batchId)
+    {
+        return $query->where('batch_id', $batchId);
+    }
 
     protected $casts = [
         'tanggal' => 'date',

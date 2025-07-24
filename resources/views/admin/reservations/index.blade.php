@@ -113,11 +113,29 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            $shownBatches = [];
+                        @endphp
                         @forelse($reservations as $reservation)
+                            @php
+                                $batchKey = $reservation->batch_id ?: 'single-'.$reservation->id;
+                                if (in_array($batchKey, $shownBatches)) continue;
+                                $shownBatches[] = $batchKey;
+                                // Ambil semua reservasi dalam batch (atau single)
+                                $batchItems = $reservation->batch_id
+                                    ? $reservations->where('batch_id', $reservation->batch_id)
+                                    : collect([$reservation]);
+                                $first = $batchItems->sortBy('tanggal')->first();
+                                $last = $batchItems->sortByDesc('tanggal')->first();
+                            @endphp
                         <tr class="border-bottom">
                             <td class="py-3">
                                 <div class="fw-medium text-dark">
-                                    {{ $reservation->tanggal_formatted }}
+                                    @if($reservation->batch_id && $first->tanggal != $last->tanggal)
+                                        {{ $first->tanggal->format('d M Y') }} - {{ $last->tanggal->format('d M Y') }}
+                                    @else
+                                        {{ $first->tanggal_formatted }}
+                                    @endif
                                 </div>
                             </td>
                             <td class="py-3">
@@ -126,29 +144,29 @@
                                         <i class="bi bi-person text-primary"></i>
                                     </div>
                                     <div>
-                                        <div class="fw-medium text-dark">{{ $reservation->nama }}</div>
+                                        <div class="fw-medium text-dark">{{ $first->nama }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td class="py-3 d-none d-sm-table-cell">
-                                <span class="text-muted">{{ $reservation->dinas->name ?? 'N/A' }}</span>
+                                <span class="text-muted">{{ $first->dinas->name ?? 'N/A' }}</span>
                             </td>
                             <td class="py-3">
-                                <div class="text-muted">{{ $reservation->kontak }}</div>
+                                <div class="text-muted">{{ $first->kontak }}</div>
                             </td>
                             <td class="py-3 d-none d-md-table-cell">
                                 <span class="badge bg-light text-dark border">
                                     <i class="bi bi-clock me-1"></i>
-                                    {{ $reservation->jam_range }}
+                                    {{ $first->jam_range }}
                                 </span>
                             </td>
                             <td class="py-3 d-none d-lg-table-cell">
                                 <div class="text-muted" style="max-width: 200px;">
-                                    {{ Str::limit($reservation->keperluan, 50) }}
-                                    @if(strlen($reservation->keperluan) > 50)
+                                    {{ Str::limit($first->keperluan, 50) }}
+                                    @if(strlen($first->keperluan) > 50)
                                         <i class="bi bi-info-circle text-muted ms-1" 
                                            data-bs-toggle="tooltip" 
-                                           title="{{ $reservation->keperluan }}"></i>
+                                           title="{{ $first->keperluan }}"></i>
                                     @endif
                                 </div>
                             </td>
@@ -162,21 +180,18 @@
                                             'completed' => ['class' => 'primary', 'icon' => 'check-all', 'text' => 'Completed'],
                                             'canceled' => ['class' => 'secondary', 'icon' => 'dash-circle', 'text' => 'Canceled']
                                         ];
-                                        $config = $statusConfig[$reservation->status] ?? ['class' => 'secondary', 'icon' => 'question', 'text' => 'Unknown'];
+                                        $config = $statusConfig[$first->status] ?? ['class' => 'secondary', 'icon' => 'question', 'text' => 'Unknown'];
                                     @endphp
-                                    
                                     <span class="badge bg-{{ $config['class'] }} d-flex align-items-center gap-1">
                                         <i class="bi bi-{{ $config['icon'] }}"></i>
                                         {{ $config['text'] }}
                                     </span>
-                                    
-                                    @if($reservation->status == 'rejected' && $reservation->rejection_reason)
+                                    @if($first->status == 'rejected' && $first->rejection_reason)
                                         <i class="bi bi-info-circle text-muted cursor-pointer" 
                                            data-bs-toggle="tooltip" 
-                                           title="Alasan: {{ $reservation->rejection_reason }}"></i>
+                                           title="Alasan: {{ $first->rejection_reason }}"></i>
                                     @endif
-                                    
-                                    @if($reservation->status == 'canceled')
+                                    @if($first->status == 'canceled')
                                         <i class="bi bi-info-circle text-muted cursor-pointer" 
                                            data-bs-toggle="tooltip" 
                                            title="Dibatalkan oleh user"></i>
@@ -185,8 +200,8 @@
                             </td>
                             <td class="py-3">
                                 <div class="d-flex flex-wrap gap-1 justify-content-center">
-                                    @if($reservation->status == 'pending')
-                                        <form method="POST" action="{{ route('admin.reservations.update-status', $reservation->id) }}" class="d-inline">
+                                    @if($first->status == 'pending')
+                                        <form method="POST" action="{{ route('admin.reservations.update-status', $first->id) }}" class="d-inline">
                                             @csrf
                                             @method('PUT')
                                             <input type="hidden" name="status" value="approved">
@@ -196,20 +211,18 @@
                                                 <span class="d-none d-md-inline">Approve</span>
                                             </button>
                                         </form>
-
                                         <button type="button" class="btn btn-sm btn-danger d-flex align-items-center reject-btn" 
                                                 data-bs-toggle="modal" 
                                                 data-bs-target="#rejectModal"
-                                                data-reservation-id="{{ $reservation->id }}"
-                                                data-reservation-name="{{ $reservation->nama }}"
+                                                data-reservation-id="{{ $first->id }}"
+                                                data-reservation-name="{{ $first->nama }}"
                                                 title="Reject Reservasi">
                                             <i class="bi bi-x-lg me-1"></i>
                                             <span class="d-none d-md-inline">Reject</span>
                                         </button>
                                     @endif
-
-                                    @if($reservation->status == 'approved' && $reservation->admin_id)
-                                        <form method="POST" action="{{ route('admin.reservations.checkout', $reservation->id) }}" class="d-inline">
+                                    @if($first->status == 'approved' && $first->admin_id)
+                                        <form method="POST" action="{{ route('admin.reservations.checkout', $first->id) }}" class="d-inline">
                                             @csrf
                                             @method('PATCH')
                                             <button type="submit" class="btn btn-sm btn-info d-flex align-items-center" 
@@ -219,12 +232,11 @@
                                             </button>
                                         </form>
                                     @endif
-                                    
                                     <button type="button" class="btn btn-sm btn-outline-danger d-flex align-items-center" 
                                             data-bs-toggle="modal" 
                                             data-bs-target="#confirmDeleteModal"
-                                            data-url="{{ route('admin.reservations.destroy', $reservation->id) }}"
-                                            data-message="Apakah Anda yakin ingin menghapus reservasi oleh {{ $reservation->nama }} pada tanggal {{ $reservation->tanggal_formatted }}?"
+                                            data-url="{{ route('admin.reservations.destroy', $first->id) }}"
+                                            data-message="Apakah Anda yakin ingin menghapus reservasi oleh {{ $first->nama }} pada tanggal {{ $first->tanggal_formatted }}?"
                                             title="Hapus Reservasi">
                                         <i class="bi bi-trash me-1"></i>
                                         <span class="d-none d-md-inline">Hapus</span>

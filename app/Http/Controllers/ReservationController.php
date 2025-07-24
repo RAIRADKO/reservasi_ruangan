@@ -8,6 +8,7 @@ use App\Models\Reservation;
 use App\Models\RoomInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ReservationController extends Controller
 {
@@ -36,18 +37,33 @@ class ReservationController extends Controller
         $validatedData = $request->validated();
         $user = Auth::user();
 
-        // Pengecekan konflik sekarang sudah dihandle oleh StoreReservationRequest
+        // Ambil tanggal mulai dan tanggal selesai
+        $tanggalMulai = $request->input('tanggal');
+        $tanggalSelesai = $request->input('tanggal_selesai', $tanggalMulai);
 
-        $reservationData = array_merge($validatedData, [
-            'user_id' => $user->id,
-            'nama' => $user->name,
-            'kontak' => $user->nip,
-            'fasilitas_terpilih' => isset($validatedData['fasilitas']) ? implode(',', $validatedData['fasilitas']) : null,
-            'status' => Reservation::STATUS_PENDING,
-            'tanggal_selesai' => $request->input('tanggal_selesai', $request->input('tanggal')), // Simpan tanggal selesai
-        ]);
+        // Generate batch_id unik untuk satu pengajuan multi-hari
+        $batchId = (string) Str::uuid();
 
-        Reservation::create($reservationData);
+        // Konversi ke objek DateTime
+        $start = new \DateTime($tanggalMulai);
+        $end = new \DateTime($tanggalSelesai);
+        $end = $end->modify('+1 day'); // Supaya loop include tanggal selesai
+
+        $fasilitasTerpilih = isset($validatedData['fasilitas']) ? implode(',', $validatedData['fasilitas']) : null;
+
+        for ($date = clone $start; $date < $end; $date->modify('+1 day')) {
+            $reservationData = array_merge($validatedData, [
+                'user_id' => $user->id,
+                'nama' => $user->name,
+                'kontak' => $user->nip,
+                'fasilitas_terpilih' => $fasilitasTerpilih,
+                'status' => Reservation::STATUS_PENDING,
+                'tanggal' => $date->format('Y-m-d'),
+                'tanggal_selesai' => $date->format('Y-m-d'),
+                'batch_id' => $batchId,
+            ]);
+            Reservation::create($reservationData);
+        }
 
         return redirect()->route('user.reservations')->with('success', 'Reservasi Anda telah berhasil dikirim.');
     }

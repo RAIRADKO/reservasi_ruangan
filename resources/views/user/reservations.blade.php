@@ -41,60 +41,75 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($reservations as $reservation)
                             @php
-                                $isPast = \Carbon\Carbon::parse($reservation->tanggal->toDateString() . ' ' . $reservation->jam_selesai)->isPast();
+                                $shownBatches = [];
                             @endphp
-                            <tr class='clickable-row' data-href="{{ route('reservations.show', $reservation->id) }}">
-                                <td>
-                                    <a href="{{ route('reservations.show', $reservation->id) }}" class="text-decoration-none fw-bold">
-                                        {{ $reservation->tanggal_formatted }}
-                                    </a>
-                                </td>
-                                <td>{{ $reservation->jam_range }}</td>
-                                <td>{{ \Illuminate\Support\Str::limit($reservation->keperluan, 60) }}</td>
-                                <td class="text-center">
-                                    <span class="badge rounded-pill
-                                        @if($reservation->status == 'approved') bg-success-subtle text-success-emphasis border border-success-subtle
-                                        @elseif($reservation->status == 'pending') bg-warning-subtle text-warning-emphasis border border-warning-subtle
-                                        @elseif($reservation->status == 'rejected') bg-danger-subtle text-danger-emphasis border border-danger-subtle
-                                        @elseif($reservation->status == 'completed') bg-primary-subtle text-primary-emphasis border border-primary-subtle
-                                        @else bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle @endif">
-                                        {{ ucfirst($reservation->status) }}
-                                    </span>
-                                    @if($reservation->status == 'rejected' && $reservation->rejection_reason)
-                                        <i class="bi bi-info-circle text-danger ms-1" 
-                                           data-bs-toggle="tooltip" 
-                                           data-bs-placement="top"
-                                           title="Alasan: {{ $reservation->rejection_reason }}">
-                                        </i>
-                                    @endif
-                                </td>
-                                <td class="text-center">
-                                    @if($reservation->status == 'approved' && $isPast)
-                                        <a href="{{ route('user.reservations.checkout', $reservation->id) }}" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Lakukan Check Out" onclick="event.stopPropagation()">
-                                            <i class="bi bi-box-arrow-right"></i>
+                            @foreach($reservations as $reservation)
+                                @php
+                                    $batchKey = $reservation->batch_id ?: 'single-'.$reservation->id;
+                                    if (in_array($batchKey, $shownBatches)) continue;
+                                    $shownBatches[] = $batchKey;
+                                    $batchItems = $reservation->batch_id
+                                        ? $reservations->where('batch_id', $reservation->batch_id)
+                                        : collect([$reservation]);
+                                    $first = $batchItems->sortBy('tanggal')->first();
+                                    $last = $batchItems->sortByDesc('tanggal')->first();
+                                    $isPast = \Carbon\Carbon::parse($last->tanggal->toDateString() . ' ' . $last->jam_selesai)->isPast();
+                                @endphp
+                                <tr class='clickable-row' data-href="{{ route('reservations.show', $first->id) }}">
+                                    <td>
+                                        <a href="{{ route('reservations.show', $first->id) }}" class="text-decoration-none fw-bold">
+                                            @if($reservation->batch_id && $first->tanggal != $last->tanggal)
+                                                {{ $first->tanggal->format('d M Y') }} - {{ $last->tanggal->format('d M Y') }}
+                                            @else
+                                                {{ $first->tanggal_formatted }}
+                                            @endif
                                         </a>
-                                    @elseif($reservation->status == 'pending' || ($reservation->status == 'approved' && !$isPast))
-                                        <button type="button" class="btn btn-sm btn-outline-danger cancel-btn" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#cancelModal"
-                                                data-reservation-id="{{ $reservation->id }}"
-                                                data-reservation-date="{{ $reservation->tanggal->isoFormat('dddd, D MMMM Y') }}"
-                                                data-reservation-time="{{ $reservation->jam_range }}"
-                                                data-reservation-purpose="{{ $reservation->keperluan }}"
-                                                data-reservation-status="{{ $reservation->status }}"
-                                                data-cancel-url="{{ route('user.reservations.cancel', $reservation->id) }}"
-                                                data-bs-toggle="tooltip" 
-                                                title="Batalkan Reservasi"
-                                                onclick="event.stopPropagation()">
-                                            <i class="bi bi-x-circle"></i>
-                                        </button>
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td>{{ $first->jam_range }}</td>
+                                    <td>{{ \Illuminate\Support\Str::limit($first->keperluan, 60) }}</td>
+                                    <td class="text-center">
+                                        <span class="badge rounded-pill
+                                            @if($first->status == 'approved') bg-success-subtle text-success-emphasis border border-success-subtle
+                                            @elseif($first->status == 'pending') bg-warning-subtle text-warning-emphasis border border-warning-subtle
+                                            @elseif($first->status == 'rejected') bg-danger-subtle text-danger-emphasis border border-danger-subtle
+                                            @elseif($first->status == 'completed') bg-primary-subtle text-primary-emphasis border border-primary-subtle
+                                            @else bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle @endif">
+                                            {{ ucfirst($first->status) }}
+                                        </span>
+                                        @if($first->status == 'rejected' && $first->rejection_reason)
+                                            <i class="bi bi-info-circle text-danger ms-1" 
+                                               data-bs-toggle="tooltip" 
+                                               data-bs-placement="top"
+                                               title="Alasan: {{ $first->rejection_reason }}">
+                                            </i>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        @if($first->status == 'approved' && $isPast)
+                                            <a href="{{ route('user.reservations.checkout', $first->id) }}" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Lakukan Check Out" onclick="event.stopPropagation()">
+                                                <i class="bi bi-box-arrow-right"></i>
+                                            </a>
+                                        @elseif($first->status == 'pending' || ($first->status == 'approved' && !$isPast))
+                                            <button type="button" class="btn btn-sm btn-outline-danger cancel-btn" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#cancelModal"
+                                                    data-reservation-id="{{ $first->id }}"
+                                                    data-reservation-date="{{ $first->tanggal->isoFormat('dddd, D MMMM Y') }}"
+                                                    data-reservation-time="{{ $first->jam_range }}"
+                                                    data-reservation-purpose="{{ $first->keperluan }}"
+                                                    data-reservation-status="{{ $first->status }}"
+                                                    data-cancel-url="{{ route('user.reservations.cancel', $first->id) }}"
+                                                    data-bs-toggle="tooltip" 
+                                                    title="Batalkan Reservasi"
+                                                    onclick="event.stopPropagation()">
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>

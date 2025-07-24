@@ -166,31 +166,47 @@ class AdminController extends Controller
             'rejection_reason' => 'required_if:status,rejected|string|nullable',
         ]);
         
-        $oldStatus = $reservation->status;
         $newStatus = $request->status;
-        
         $updateData = ['status' => $newStatus];
-
         if ($newStatus === Reservation::STATUS_REJECTED) {
             $updateData['rejection_reason'] = $request->rejection_reason;
         } else {
             $updateData['rejection_reason'] = null;
         }
 
-        $reservation->update($updateData);
-        $reservation->load('user');
-
-        if ($reservation->user) { // Pastikan user ada sebelum kirim email
-            if ($newStatus === Reservation::STATUS_APPROVED && $oldStatus !== Reservation::STATUS_APPROVED) {
-                Mail::to($reservation->user->email)->send(new ReservationApprovedUserNotification($reservation));
+        if ($reservation->batch_id) {
+            // Update semua status batch sekaligus
+            $batchReservations = Reservation::where('batch_id', $reservation->batch_id)->get();
+            $oldStatus = $batchReservations->first()->status;
+            Reservation::where('batch_id', $reservation->batch_id)->update($updateData);
+            // Ambil salah satu reservasi batch untuk notifikasi
+            $mainRes = $batchReservations->first();
+            $mainRes->refresh();
+            $mainRes->load('user');
+            if ($mainRes->user) {
+                if ($newStatus === Reservation::STATUS_APPROVED && $oldStatus !== Reservation::STATUS_APPROVED) {
+                    Mail::to($mainRes->user->email)->send(new ReservationApprovedUserNotification($mainRes));
+                }
+                if ($newStatus === Reservation::STATUS_REJECTED && $oldStatus !== Reservation::STATUS_REJECTED) {
+                    Mail::to($mainRes->user->email)->send(new ReservationRejectedUserNotification($mainRes));
+                }
             }
-    
-            if ($newStatus === Reservation::STATUS_REJECTED && $oldStatus !== Reservation::STATUS_REJECTED) {
-                Mail::to($reservation->user->email)->send(new ReservationRejectedUserNotification($reservation));
+            // Redirect ke halaman reservasi admin agar admin tidak perlu approve satu-satu
+            return redirect()->route('admin.reservations.index')->with('success', 'Semua reservasi dalam pengajuan ini berhasil diperbarui.');
+        } else {
+            $oldStatus = $reservation->status;
+            $reservation->update($updateData);
+            $reservation->load('user');
+            if ($reservation->user) {
+                if ($newStatus === Reservation::STATUS_APPROVED && $oldStatus !== Reservation::STATUS_APPROVED) {
+                    Mail::to($reservation->user->email)->send(new ReservationApprovedUserNotification($reservation));
+                }
+                if ($newStatus === Reservation::STATUS_REJECTED && $oldStatus !== Reservation::STATUS_REJECTED) {
+                    Mail::to($reservation->user->email)->send(new ReservationRejectedUserNotification($reservation));
+                }
             }
+            return back()->with('success', 'Status reservasi berhasil diperbarui.');
         }
-        
-        return back()->with('success', 'Status reservasi berhasil diperbarui.');
     }
 
     public function destroy(Reservation $reservation)
