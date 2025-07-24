@@ -31,10 +31,6 @@
                     <td>⏰ Waktu</td>
                     <td>{{ date('H:i', strtotime($reservation->jam_mulai)) }} - {{ date('H:i', strtotime($reservation->jam_selesai)) }}</td>
                 </tr>
-                <tr>
-                    <td>📬 Pengingat Ke</td>
-                    <td>{{ ($reservation->reminder_count ?? 0) + 1 }}</td>
-                </tr>
             </tbody>
         </table>
     </div>
