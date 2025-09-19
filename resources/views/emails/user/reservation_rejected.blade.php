@@ -66,10 +66,6 @@
         </ul>
     </div>
 
-    <div style="text-align: center; margin: 30px 0;">
-        <a href="{{ $url ?? '#' }}" class="button">🔄 Ajukan Reservasi Baru</a>
-    </div>
-
     <div class="info-card" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border: 1px solid #2196f3;">
         <h3 style="color: #1976d2;">💡 Tips untuk Reservasi Selanjutnya:</h3>
         <p style="margin: 0; color: #0d47a1;">

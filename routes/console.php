@@ -10,6 +10,6 @@ Artisan::command('inspire', function () {
 
 // CUKUP SATU BARIS INI
 Schedule::command('reservations:send-checkout-reminders')
-    ->everyMinute()
+    ->everyThirtyMinutes()
     ->withoutOverlapping()
     ->runInBackground();

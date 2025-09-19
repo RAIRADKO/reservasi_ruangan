@@ -36,7 +36,10 @@
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
-        <a href="{{ $url }}" class="button" style="background: linear-gradient(135deg, #198754 0%, #20c997 100%);">✅ Lakukan Check Out Sekarang</a>
+        {{-- Tombol ini telah diubah --}}
+        @component('mail::button', ['url' => route('user.reservations.index')])
+        Lihat Reservasi Saya
+        @endcomponent
     </div>
 
     <div class="info-list">
@@ -56,11 +59,7 @@
         </p>
     </div>
 
-    <p>Mohon untuk segera melakukan <i>check out</i> dengan menekan tombol di bawah ini. Pengingat akan dikirim setiap <strong>30 menit</strong> hingga Anda melakukan <i>check out</i> atau hingga batas waktu 12 jam tercapai.</p>
-
-    <div style="text-align: center; margin: 30px 0;">
-        <a href="{{ $url }}" class="button" style="background: linear-gradient(135deg, #198754 0%, #20c997 100%);">✅ Lakukan Check Out Sekarang</a>
-    </div>
+    <p>Mohon untuk segera melakukan <i>check out</i> dengan menekan tombol di atas. Pengingat akan dikirim setiap <strong>30 menit</strong> hingga Anda melakukan <i>check out</i> atau hingga batas waktu 12 jam tercapai.</p>
 
     <div class="signature">
         <p>Terima kasih atas perhatian dan kerjasamanya.</p>
