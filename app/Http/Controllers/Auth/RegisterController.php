@@ -64,7 +64,7 @@ class RegisterController extends Controller
             'nip' => $data['nip'],
             'kontak' => $data['kontak'],
             'password' => Hash::make($data['password']),
-            'status' => 'approved',
+            'status' => 'pending',
         ]);
     }
 
